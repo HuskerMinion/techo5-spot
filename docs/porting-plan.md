@@ -10,13 +10,13 @@ Facts and sources for everything below are in [hardware.md](hardware.md).
 
 ## How this relates to TECHO5 and TECHO5 Dot
 
-The Spot is the Show 5's sibling more than the Dot's, with the Dot's memory and a different radio.
+The Spot is the Show 5's sibling more than the Dot's, with twice its memory and a different radio.
 
 | | Show 5 (`cronos`) | Dot 2 (`biscuit`) | Spot (`rook`) |
 |---|---|---|---|
 | Kernel for the image | LineageOS 4.9.337 arm64 | Amazon 3.18 32-bit (Fire OS 6) | **LineageOS 4.9.337 arm64, `rook_defconfig`** (same tree as cronos) |
 | Partitions | single `boot` | A/B, image in `recovery` | single `boot` |
-| RAM | 1 GB | 512 MB | 512 MB (**open**) |
+| RAM | 1 GB | 512 MB | **2 GB** |
 | Screen | 960×480 | none | 480×480 round |
 | Microphones | TLV320AIC3101 + FPGA over SPI | 4× TLV320ADC3101, TDM | TLV320AIC3101 + FPGA over SPI, 4 mics |
 | Wi-Fi | MT7668 SDIO, `mt76x8_wlan.ko` | CONSYS WMT, `wmtup` | **BCM43569 USB, `bcmdhd.ko`** |
@@ -31,7 +31,7 @@ What carries over:
   (+ `BT_HCIUART_BCM`) and BlueZ's `btattach`/`hciattach` with the `.hcd` patch replace `btbridge`.
 - **Image**: TECHO5's layout as it is. Kernel + initramfs rescue in `boot`, rootfs slots as directories
   on the `system` partition, TWRP left in `recovery`, state on `userdata`. `slotctl`, trial boots and
-  the rescue environment unchanged. Sized for 512 MB like the Dot (zram on).
+  the rescue environment unchanged. With 2 GB of RAM there is no memory pressure to design around.
 - **Daemon**: one source. TECHO5's `echod` today has two builds, the default (cronos, screen) and
   `dot` (no screen). The Spot needs a third, `spot`: the screen, touch and camera code of the default
   build, with its own microphone device and channel map, button codes, backlight path and mixer
@@ -50,11 +50,12 @@ Before anything is written:
 
 1. Inspect the screen for the flicker/shake fault. Note the Fire OS version (Settings → Device Options
    → Device Software Version) and whether it is one amonet-rook supports (5.5.6.9, 5.5.5.2, 5.5.3.4).
-2. Unlock with amonet-rook (Linux live USB, not WSL). This wipes userdata and leaves TWRP in
-   `recovery`.
-3. From TWRP's adb: `tools/hwdump.sh`, saved as `docs/dumps/rook-twrp-<serial>.txt`.
-4. `tools/backup-spot.ps1 -Serial <serial>`: every partition that boots the unit, md5-checked, kept
-   off the device.
+2. Unlock with amonet-rook v2.0.0: fastboot (Volume Up + Volume Down + Mute at power-on), then
+   `fastbrick.bat` from Windows. It leaves TWRP in `recovery`; on the bench unit userdata survived.
+   **Done on the bench unit 2026-09-16.**
+3. From TWRP's adb: `tools/hwdump.sh`, saved as `docs/dumps/rook-twrp-<serial>.txt`. **Done.**
+4. `tools/backup-spot.ps1 -Serial <serial> -IncludeSystem`: every partition that boots the unit plus
+   Fire OS's system and cache, md5-checked, kept off the device. **Done.**
 5. **Prove recovery before anything is written**: restore `boot` from its backup in TWRP and boot it.
 6. Answer the open questions in hardware.md.
 

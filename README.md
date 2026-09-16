@@ -10,7 +10,8 @@ and the Home Assistant connection (ESPHome native API), with nothing leaving the
 
 ## Status
 
-Ground work only; no device attached yet. What exists:
+M0 under way on the first unit (<serial>, Fire OS 5.5.6.9): unlocked 2026-09-16, TWRP in
+`recovery`, hardware read and every partition backed up. What exists:
 
 - [docs/hardware.md](docs/hardware.md): what is known about `rook` from the unlock, TWRP, LineageOS
   and kernel sources and a stock firmware dump, each fact with its source, none of it confirmed on a
@@ -30,7 +31,7 @@ The Spot is the Show 5's closest relative, not the Dot's: same MT8163, same Line
 tree (`rook_defconfig` beside `cronos_defconfig`), a screen, a camera, a single `boot` partition
 rather than A/B slots. It differs in the radio: Wi-Fi and Bluetooth are a **Broadcom BCM43569**, Wi-Fi
 over USB with the `bcmdhd` driver and Bluetooth over a UART, so neither the Show's `mt76x8` modules nor
-the Dot's `wmtup` apply. It has 512 MB of RAM, like the Dot.
+the Dot's `wmtup` apply. It has about 2 GB of RAM, more than either.
 
 ## Lineage
 

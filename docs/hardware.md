@@ -1,9 +1,88 @@
 # Echo Spot 1st gen (2017) — `rook`
 
-Nothing in this file has been confirmed on a unit by this project yet. It collects what the unlock,
-the TWRP and LineageOS device trees, the 4.9 kernel sources and a stock firmware dump already say.
-Each fact names its source. Treat everything as *unverified here* until the first `tools/hwdump.sh`
-on a real Spot.
+This file started as what the unlock, the TWRP and LineageOS device trees, the 4.9 kernel sources and
+a stock firmware dump say, each fact with its source. The first unit has since been read: see
+"Confirmed on the bench unit" directly below, which wins wherever it disagrees with the rest.
+
+## Confirmed on the bench unit
+
+Unit `<serial>`, unlocked 2026-09-16 with amonet-rook v2.0.0 from Windows, read in TWRP
+3.7.0 with `tools/hwdump.sh`. Raw output:
+[dumps/rook-twrp-bench-unit.txt](dumps/rook-twrp-bench-unit.txt). Backups (md5-checked,
+off the device): `D:\platform-tools\echospot\<serial>\`.
+
+| Item | Value |
+|---|---|
+| Stock firmware | Fire OS **5.5.6.9** (`304.6.9.0_user_690918020`, Android 5.1.1 `LVY48F`) |
+| RAM | **MemTotal 1 959 632 kB, about 2 GB.** The device tree's 512 MB memory node is overridden by the bootloader |
+| eMMC | **7.28 GiB**, `H8G4a2` (15 269 888 sectors); boot0 1 MB, boot1 4 MB, RPMB 4 MB |
+| CPU | 4× Cortex-A53 (`0xd03`), 600 MHz – 1.3 GHz, AArch64 kernel |
+| Kernel in TWRP | **3.18.19 aarch64** (r0rt1z2's build of Amazon's tree, 2026-08-16), not the 4.9 LineageOS kernel |
+| Display | `mtkfb` 480×480, 32 bpp, `fb0` virtual 480×960 (two pages); LCM `hx8379c_dsi_wvga_vdo_rook`, "resolution: 480 x 480", 2 DSI lanes, sync-pulse video mode, panel id 1; backlight `/sys/class/leds/lcd-backlight` 0–255. The defconfig's 400×800 does not describe the panel |
+| Touch | input `mtk-tpd` (GT5668 firmware patch `020108`, sensor id 03), ABS X/Y and MT positions 0–480, 10 tracking ids |
+| Buttons | input `keys` (gpio-keys: `KEY_VOLUMEDOWN`, `KEY_VOLUMEUP`); input `mtk-kpd` (`KEY_POWER`, `KEY_VOLUMEDOWN`, `KEY_HELP`) |
+| Mute | `/sys/devices/soc/10010000.keypad/privacy_state`, `privacy_trigger`, `privacy_timer_on` (the Fire OS 6 Dot's layout) |
+| Other inputs | `ACCDET` (jack), `m_alsps_input` and `hwmdata` (sensor hubs) |
+| I²C | 0-0018 and 0-001a `tlv320aic3101`, 0-0021 `camera_sub`, 0-003c `camera_main`, 0-0044 `alsps` (OPT3001 found), 0-005d `goodix_touch`, 1-0060 `sym827-regulator`, 2-0018 `tlv320aic32x4`, 2-0019 `gsensor`, 2-0070/71/72 `tmp103_temp_sensor` — all as the device tree says |
+| SPI | `spi32766.0`: `spi-audio-pltfm` (the microphone FPGA) |
+| USB | `usb1` MUSB host, `usb2` MUSBFSH host (the Wi-Fi bus). No Wi-Fi device enumerated in TWRP: `bcmdhd` is not loaded and the chip is not powered |
+| Bluetooth | `rfkill0` bluetooth; `/dev/ttyMT0`, `/dev/ttyMT1` |
+| Camera | `/dev/camera-isp` present on the 3.18 kernel |
+| Audio | no sound card on TWRP's kernel (`/proc/asound` absent) |
+| Fire OS modules | `system/lib/modules/bcmdhd.ko` (9.9 MB), `br_netfilter.ko`, `xt_physdev.ko`, `perfinfo.ko` |
+| Fire OS firmware | `vendor/firmware/BCM43569A2_001.003.004.0167.0215.hcd`, `vendor/firmware/brcm/bcm43569a2-firmware.bin`, `bcm43569a2-firmware-test.bin`, `bcm43569a2.nvm`; `etc/firmware/gt9xx_fw.bin` |
+| Thermal | `mtktscpu`, `mtkts1/3/4/5`, `mtktspmic`, `tmp103.0`, `tmp103.1` |
+| idme | serial, `mac_addr`, `bt_mac_addr`, `board_id=<board-id>`, `bootcount=297`, `miccal.0`–`3`, `alscal`, `sensorcal`, `unlock_code` |
+| RTC | `/dev/rtc0`, reads 2010-01-01 at boot |
+| Preloader / LK | `pl_build_desc=8ec9006-20170927_201132`, `lk_build_desc=c1c79aa-20220824_171625` |
+
+### Partition table (eMMC user area)
+
+| p | Name | Size |
+|---|---|---|
+| 1 | kb | 1 MB |
+| 2 | dkb | 1 MB |
+| 3 | lk (TWRP links `lk` to `/dev/null`, real one is `lk_real`) | 1 MB |
+| 4 | tee1 (decoy, `tee1_real`) | 4 MB |
+| 5 | logo | 1 MB |
+| 6 | tee2 (decoy, `tee2_real`) | 4 MB |
+| 7 | expdb (kaeru lives here) | 16 MB |
+| 8 | MISC | 512 KB |
+| 9 | boot | 16 MB |
+| 10 | recovery (TWRP) | 16 MB |
+| 11 | system | 1.66 GB |
+| 12 | cache | 256 MB |
+| 13 | userdata | 5.35 GB |
+
+The eMMC boot area carries `boot0hdr0`, `boot0hdr1`, `boot0img0`, `boot0img1` (mmcblk0boot0p1–p4).
+There is no `persist`, `metadata`, `nvram`, `proinfo`, `seccfg`, `frp` or `para` on this unit. By-name
+links exist under `bootdevice`, `mtk-msdc.0`, `soc` and `/dev/block/by-name`, all the same directory.
+
+### Boot images (from the backups)
+
+| | kernel | loaded at | ramdisk at | tags | cmdline |
+|---|---|---|---|---|---|
+| `boot` (Fire OS 5.5.6.9) | 6.45 MB | `0x40080000` | `0x44000000` | `0x48000000` | `bootopt=64S3,32N2,64N2 firmware_class.path=/system/vendor/firmware` |
+| `recovery` (TWRP) | 5.32 MB | `0x40080000` | `0x69244e00` | `0x48000000` | the same plus `buildvariant=eng` |
+
+Page size 2048 for both. Running TWRP, `/proc/cmdline` has `root=/dev/ram`, `androidboot.unlocked_kernel=true`,
+`lcm=1-hx8379c_wvga_dsi_vdo`, `vmalloc=496M` and no `skip_initramfs`. A normal (Fire OS) boot's
+command line is still to be read.
+
+### What the unlock did and did not do
+
+- From Windows: power off, hold Volume Up + Volume Down + Mute while powering on until fastboot shows,
+  `fastboot getvar product` = `ROOK`, `unlock_status: false`, `secure: yes`, `version: 0.5`; then
+  `fastbrick.bat`. It came back in TWRP. No Linux, no Python, no BootROM step.
+- **userdata was not wiped**: 1.65 GB of Fire OS data is still there, including one saved Wi-Fi
+  network (`WPA-PSK`) in `/data/misc/wifi/wpa_supplicant.conf`, which the Linux image can reuse as the
+  Show's and the Dot's did.
+- TWRP swaps `lk`, `tee1`, `tee2` for `/dev/null` decoys (`*_real` are the partitions), as on the
+  other amonet Echos.
+
+---
+
+The rest of this file is the pre-unit research, kept for its sources.
 
 Sources, short names used below:
 
@@ -32,8 +111,8 @@ Sources, short names used below:
 | Item | Value | Source |
 |---|---|---|
 | SoC | MediaTek MT8163, 4× Cortex-A53 | DT, defconfig |
-| RAM | DT memory node `0x20000000` = **512 MB**, like the Dot. A field report says "about 1 GB"; **open** until `MemTotal` is read | DT; field |
-| Storage | eMMC, size **open** (a field report: ~4 GB free after LineageOS) | field |
+| RAM | DT memory node `0x20000000` = 512 MB; **the unit reports about 2 GB** (see above) | DT; unit |
+| Storage | 7.28 GiB eMMC `H8G4a2` (unit) | unit |
 | Display | 2.5-inch round, **480×480** in TWRP and LineageOS; LCM driver `hx8379c_dsi_wvga_vdo_rook` (DSI video mode), backlight `mediatek,lcd-backlight` (`led6`), panel-id GPIOs 32 and 44, power GPIOs 85/125, reset 83. The defconfig's `CONFIG_LCM_WIDTH/HEIGHT` say 400×800, which does not match; **open** | TWRP, Lineage, defconfig, DT |
 | Touch | Goodix **GT5668** (`CONFIG_TOUCHSCREEN_MTK_GT5668`), I²C 0 `0x5d`, IRQ GPIO 49, firmware `system/etc/firmware/gt9xx_fw.bin` on Fire OS; the DT's `tpd-resolution` (720×1280) is a template value | defconfig, DT, dump |
 | Camera | GalaxyCore **GC0312** VGA MIPI (`CONFIG_CUSTOM_KERNEL_IMGSENSOR="gc0312_mipi_raw"`); DT names main at I²C 0 `0x3c` and sub at `0x21` ("Fix me to right reg val"). `rook_defconfig` does not set `CONFIG_MTK_CAMERA_ISP`, which `cronos_defconfig` does | defconfig, DT |
@@ -121,14 +200,17 @@ first `hwdump` fills it.
 
 ## Open questions for M0
 
-1. `MemTotal`: 512 MB or 1 GB?
-2. eMMC size and the full partition table with sizes.
+Answered on the bench unit (see the top of this file): 1, 2, 5 and 9. Still open: 3, 4, 6, 7, 8.
+
+1. `MemTotal`: 512 MB or 1 GB? **About 2 GB.**
+2. eMMC size and the full partition table with sizes. **7.28 GiB, 13 partitions.**
 3. `/proc/cmdline` on a normal boot: any `skip_initramfs`, `root=`, verity arguments added by LK?
 4. Does `recovery` boot the arm64 LineageOS kernel (the cronos 32-bit-only limit)?
 5. Panel geometry as the kernel reports it (`fb0` virtual size) against the defconfig's 400×800.
+   **480×480, virtual 480×960.**
 6. Capture format of the microphone PCM (channels, rate, bit depth) and which channels carry the
    four microphones and the loopback.
 7. The camera: does the 4.9 kernel register it at all without `CONFIG_MTK_CAMERA_ISP`?
 8. Is `bcmdhd` happy with a plain nl80211 `wpa_supplicant` (it has cfg80211 support) once the module
    and firmware paths are right?
-9. The screen fault: does the unit have it?
+9. The screen fault: does the unit have it? **No; the owner reports years of clean use.**
