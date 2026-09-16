@@ -113,7 +113,7 @@ Sources, short names used below:
 | SoC | MediaTek MT8163, 4× Cortex-A53 | DT, defconfig |
 | RAM | DT memory node `0x20000000` = 512 MB; **the unit reports about 2 GB** (see above) | DT; unit |
 | Storage | 7.28 GiB eMMC `H8G4a2` (unit) | unit |
-| Display | 2.5-inch round, **480×480** in TWRP and LineageOS; LCM driver `hx8379c_dsi_wvga_vdo_rook` (DSI video mode), backlight `mediatek,lcd-backlight` (`led6`), panel-id GPIOs 32 and 44, power GPIOs 85/125, reset 83. The defconfig's `CONFIG_LCM_WIDTH/HEIGHT` say 400×800, which does not match; **open** | TWRP, Lineage, defconfig, DT |
+| Display | 2.5-inch round, **480×480** in TWRP and LineageOS; LCM driver `hx8379c_dsi_wvga_vdo_rook` (DSI video mode), backlight `mediatek,lcd-backlight` (`led6`), panel-id GPIOs 32 and 44, power GPIOs 85/125, reset 83. The defconfig's `CONFIG_LCM_WIDTH/HEIGHT` say 400×800; the unit's LCM driver reports 480×480 | TWRP, Lineage, defconfig, DT |
 | Touch | Goodix **GT5668** (`CONFIG_TOUCHSCREEN_MTK_GT5668`), I²C 0 `0x5d`, IRQ GPIO 49, firmware `system/etc/firmware/gt9xx_fw.bin` on Fire OS; the DT's `tpd-resolution` (720×1280) is a template value | defconfig, DT, dump |
 | Camera | GalaxyCore **GC0312** VGA MIPI (`CONFIG_CUSTOM_KERNEL_IMGSENSOR="gc0312_mipi_raw"`); DT names main at I²C 0 `0x3c` and sub at `0x21` ("Fix me to right reg val"). `rook_defconfig` does not set `CONFIG_MTK_CAMERA_ISP`, which `cronos_defconfig` does | defconfig, DT |
 | Mic ADCs | TI **TLV320AIC3101** at I²C 0, two register sets `0x18` (adc0) and `0x1a` (adc1), enable GPIO 35, 26 MHz clock. `CONFIG_SND_SOC_4_MICS=y`: four microphones on two stereo ADCs | DT, defconfig |

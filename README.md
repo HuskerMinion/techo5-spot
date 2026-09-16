@@ -14,8 +14,8 @@ M0 under way on the first unit (<serial>, Fire OS 5.5.6.9): unlocked 2026-09-16,
 `recovery`, hardware read and every partition backed up. What exists:
 
 - [docs/hardware.md](docs/hardware.md): what is known about `rook` from the unlock, TWRP, LineageOS
-  and kernel sources and a stock firmware dump, each fact with its source, none of it confirmed on a
-  unit yet.
+  and kernel sources and a stock firmware dump, each fact with its source, and what the first unit
+  confirmed or corrected.
 - [docs/porting-plan.md](docs/porting-plan.md): milestones from a stock Spot to the Linux image, and
   what carries over from the Show and the Dot and what does not.
 - [tools/hwdump.sh](tools/hwdump.sh): the read-only hardware inventory for the first time a unit is
