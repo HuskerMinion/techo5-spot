@@ -14,7 +14,7 @@ off the device): kept outside the repository.
 | Item | Value |
 |---|---|
 | Stock firmware | Fire OS **5.5.6.9** (`304.6.9.0_user_690918020`, Android 5.1.1 `LVY48F`) |
-| RAM | **MemTotal 1 959 632 kB, about 2 GB.** The device tree's 512 MB memory node is overridden by the bootloader |
+| RAM | **2 GB, verified.** MemTotal 1 959 632 kB (TWRP 3.18), 1 958 192 kB (LineageOS 4.9). The bootloader writes a `memory` node with `0x40000000`+1024 MB and `0x80000000`+942 MB (the source tree's 512 MB `memory@00000000` node is stale); `/proc/iomem` System RAM runs `0x40000000`–`0xBADFFFFF`. With Android stopped and zram off, 1600 MB of random data was written to a RAM-backed tmpfs (Shmem 1 639 312 kB, 95 MB left free) and read back twice with the same md5 |
 | eMMC | **7.28 GiB**, `H8G4a2` (15 269 888 sectors); boot0 1 MB, boot1 4 MB, RPMB 4 MB |
 | CPU | 4× Cortex-A53 (`0xd03`), 600 MHz – 1.3 GHz, AArch64 kernel |
 | Kernel in TWRP | **3.18.19 aarch64** (r0rt1z2's build of Amazon's tree, 2026-08-16), not the 4.9 LineageOS kernel |
