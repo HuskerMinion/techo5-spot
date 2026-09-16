@@ -10,7 +10,7 @@ and the Home Assistant connection (ESPHome native API), with nothing leaving the
 
 ## Status
 
-M0 under way on the first unit (<serial>, Fire OS 5.5.6.9): unlocked 2026-09-16, TWRP in
+M0 under way on the first unit (Fire OS 5.5.6.9): unlocked 2026-09-16, TWRP in
 `recovery`, hardware read and every partition backed up. What exists:
 
 - [docs/hardware.md](docs/hardware.md): what is known about `rook` from the unlock, TWRP, LineageOS

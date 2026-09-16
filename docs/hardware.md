@@ -6,10 +6,10 @@ a stock firmware dump say, each fact with its source. The first unit has since b
 
 ## Confirmed on the bench unit
 
-Unit `<serial>`, unlocked 2026-09-16 with amonet-rook v2.0.0 from Windows, read in TWRP
+The bench unit, unlocked 2026-09-16 with amonet-rook v2.0.0 from Windows, read in TWRP
 3.7.0 with `tools/hwdump.sh`. Raw output:
 [dumps/rook-twrp-bench-unit.txt](dumps/rook-twrp-bench-unit.txt). Backups (md5-checked,
-off the device): `D:\platform-tools\echospot\<serial>\`.
+off the device): kept outside the repository.
 
 | Item | Value |
 |---|---|
