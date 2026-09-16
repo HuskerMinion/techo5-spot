@@ -56,6 +56,7 @@ echo 7 4 1 7 > /proc/sys/kernel/printk
 crumb "dev populated: $($BB ls /dev | $BB wc -l) nodes, fb0=$([ -e /dev/fb0 ] && echo yes || echo no)"
 
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+T5_PRODUCT="Echo Spot Linux"
 . /lib/techo5-lib.sh
 
 # --- Userdata: persistent log, daemon state, Wi-Fi credentials.

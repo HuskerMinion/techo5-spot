@@ -46,6 +46,9 @@ for a in $(sed 's/#.*//' "$TECHO5/tools/linux/packages.txt"); do
 	*) apks+=(--apk "$(W "$INPUTS/apks/$a")");;
 	esac
 done
+# mkfs.ext4 (slotctl mkstore) needs libgcc_s through libeconf, which TECHO5's package list does not carry.
+# Found when the Spot's first mkstore failed in the rescue initramfs.
+apks+=(--apk "$(W "$(ls "$INPUTS"/apks/libgcc-*.apk | head -1)")")
 
 echo "== mkimage"
 export MSYS_NO_PATHCONV=1

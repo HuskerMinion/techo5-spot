@@ -1,0 +1,2 @@
+TECHO5 — Echo Spot on Linux. Root is read-only; state is on /data,
+slots are managed with slotctl, the daemon log is /data/techo5-linux/techo5.log.

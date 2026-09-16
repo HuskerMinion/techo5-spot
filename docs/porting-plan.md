@@ -117,6 +117,16 @@ TECHO5's store on `system`, its `slotctl`, `mkrootfs.sh` and `deploy-rootfs.sh`,
 `vendor` tree copied into the slot. Verified the TECHO5 way: slot a boots, the daemon runs five
 minutes and commits, slot b installs from the running system, switch and commit.
 
+**Done 2026-09-16.** `system` (p11) is the store (`slotctl mkstore`), slot a holds `v0.0.1-spot`, built
+in WSL by TECHO5's `deploy-rootfs.sh` with `BUILD_TAGS=spot`, the Spot's vendor tarball and this
+repository's `tools/linux/rootfs` overlay (`etc/techo5/device.conf`: partitions, `amzn-bcmdhd.ko`, no
+Bluetooth module, the USB name). From power: slot a at 4.5 s, `wlan0` at 8 s, an address at 17 s, the daemon
+at 22 s, Home Assistant connected. LineageOS is gone from the Spot; `boot` stays the rescue image.
+
+Two things the first install met: the rescue initramfs has no `scp` receiver, so the tarball went over
+`ssh … "cat > file"`; and its `mkfs.ext4` needed `libgcc_s` (libeconf), now added to the image by
+`tools/linux/build-image.sh` (the first mkstore borrowed the library from the rootfs tarball).
+
 ## M4 — Audio
 
 1. Capture: find the PCM and format, map the four microphones and the loopback, prove it with
@@ -178,6 +188,9 @@ Assistant or by the house's own services, never the cloud:
 - **Cameras**: a doorbell or driveway camera in the circle, from Home Assistant's camera proxy.
 - **Photo frame**: family photos from a local share when idle.
 - **Home controls**: a handful of toggles and scenes in a ring.
+- **Pop-up ring menu**: press and hold (or tap the rim) and the choices fan out around the edge of the
+  circle — volume, mute, timers, the faces — picked by touching one or sliding a finger around the
+  ring. Seen on an owner's Spot in the r/amazonecho thread; the round screen's most natural menu.
 - **Doorbell / intercom**: the Spot's camera and speaker as a room-to-room intercom through Home
   Assistant, once the camera works (M5).
 
