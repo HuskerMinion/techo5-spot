@@ -120,6 +120,9 @@ config: [dumps/rook-lineage-kernel-4.9.337.config](dumps/rook-lineage-kernel-4.9
 | Touch, buttons | as in TWRP: `mtk-tpd` 0–480, `keys` volume up/down, `mtk-kpd` power/volume down/help |
 | Camera | `/dev/camera-isp` and `/dev/kd_camera_hw` present |
 | adb root | Developer options → Rooted debugging must be on (off by default) |
+| Capture (verified) | `pcmC0D22c`: **16 kHz, 6 channels, S24_3LE** (the Show's 4-channel open is refused: the 4-mic kernel's FPGA path is `SPI_N_CHANNELS 6`). **ch0–ch3 the four microphones, ch4–ch5 the playback loopback.** Quiet room: mics −68 to −69 dBFS rms; a 0.1 FS 1 kHz tone: loopback −26.7 dBFS, mics −33 to −38 dBFS. No overruns at 320×8 |
+| Playback (verified) | `pcmC0D23p`, 48 kHz stereo S16_LE, period 768×4, with `pcmC0D1c` held open (the DL1 DRAM rule from cronos, kept as a precaution). **Silent until `Ext_Speaker_Amp_Switch` = On**, then the mics hear it. The codec already carries Amazon's speaker path at boot: `Right Channel Only` On, `HP Driver Gain Volume` 9, `PCM Playback Volume` 127, `HP DAC Playback Switch` on, `Amp Fault Enable` On |
+| Mixer | two converters, **ADC_A and ADC_B** (`ADC_x MICPGA Volume Ctrl` 40, `ADC_x Digital Volume Control` 88, `ADC_x Left/Right Mute`); full list: [dumps/rook-lineage-mixer.txt](dumps/rook-lineage-mixer.txt). Probed with TECHO5's `audioprobe -cap-channels 6` while `vendor.audio-hal` was stopped |
 | On-screen keyboard | would not enter digits on the Wi-Fi password page; the network was added from the PC with `cmd wifi connect-network` |
 
 ---
@@ -251,7 +254,7 @@ Answered on the bench unit (see the top of this file): 1, 2, 5 and 9. Still open
 5. Panel geometry as the kernel reports it (`fb0` virtual size) against the defconfig's 400×800.
    **480×480, virtual 480×960.**
 6. Capture format of the microphone PCM (channels, rate, bit depth) and which channels carry the
-   four microphones and the loopback. **PCM 22 is the capture device; format still open.**
+   four microphones and the loopback. **16 kHz, 6 ch, S24_3LE; ch0–3 microphones, ch4–5 loopback.**
 7. The camera: does the 4.9 kernel register it at all without `CONFIG_MTK_CAMERA_ISP`?
    **The running LineageOS kernel has `CONFIG_MTK_CAMERA_ISP=y` and `/dev/kd_camera_hw`.**
 8. Is `bcmdhd` happy with a plain nl80211 `wpa_supplicant` (it has cfg80211 support) once the module
