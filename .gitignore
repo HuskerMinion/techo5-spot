@@ -6,3 +6,6 @@ bin/
 .DS_Store
 Thumbs.db
 __pycache__/
+
+# Per-unit partition backups: never committed (images, serial numbers, factory data).
+backups/

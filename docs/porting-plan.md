@@ -110,6 +110,13 @@ with the `.hcd` patch, rfkill unblocked. Then BlueZ and bluez-alsa as on cronos,
 speaker, and a BLE proxy for Home Assistant. Wi-Fi and Bluetooth share one chip and antenna, so keep
 the coexistence rule from cronos (pause idle A2DP).
 
+## M6b — TECHO5 boot logos
+
+Replace Amazon's boot screens with TECHO5's, as the Show got: the bootloader's logo partition (`logo`,
+p5, 1 MB, backed up) and the image kaeru draws in hacked fastboot, then the Linux initramfs's own
+splash. TECHO5's `tools/linux/patch-lk-logo.py` and its kaeru rebuild are the starting point; the
+Spot's images are 480×480 and have to read inside the circle. The originals stay in `backups/`.
+
 ## M7 — Installer
 
 `tools/install-spot.ps1`: one command from an unlocked, TWRP'd Spot to a running image, on the model

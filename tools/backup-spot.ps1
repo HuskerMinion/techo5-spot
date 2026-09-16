@@ -28,7 +28,8 @@
 param(
     [Parameter(Mandatory)][string]$Serial,
     [string]$Adb = 'adb',
-    [string]$BackupRoot = 'D:\platform-tools\echospot',
+    # Inside the project, and ignored by git: backups hold serial numbers and factory data.
+    [string]$BackupRoot = (Join-Path $PSScriptRoot '..ackups'),
     [switch]$IncludeSystem
 )
 $ErrorActionPreference = 'Stop'
