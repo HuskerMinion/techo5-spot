@@ -10,8 +10,8 @@ and the Home Assistant connection (ESPHome native API), with nothing leaving the
 
 ## Status
 
-M0 under way on the first unit (Fire OS 5.5.6.9): unlocked 2026-09-16, TWRP in
-`recovery`, hardware read and every partition backed up. What exists:
+First unit: unlocked and backed up (M0), LineageOS 18.1 with the TECHO5 daemon beside it, answering
+Home Assistant voice turns (M1), 2026-09-16. Next: the Linux image (M2). What exists:
 
 - [docs/hardware.md](docs/hardware.md): what is known about `rook` from the unlock, TWRP, LineageOS
   and kernel sources and a stock firmware dump, each fact with its source, and what the first unit

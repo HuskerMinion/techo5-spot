@@ -67,6 +67,15 @@ Before anything is written:
 with the AIC3101 capture and AIC3204 playback PCMs, the round 480×480 display, touch. Still to do here:
 the daemon beside Android and a voice turn.
 
+**M1 done 2026-09-16.** `tools/install-spot.ps1` installed the `spot` build (TECHO5 branch `spot/daemon`) beside
+LineageOS with the null audio HAL; Home Assistant added it from its zeroconf discovery with the key (adding
+by address fails: Home Assistant opens a plaintext connection first and the daemon refuses it). Verified on
+the unit: wake word, a voice turn answered through the speaker, software mute on and off from the button.
+The entity names match the Echo it replaced in the house, so automations kept working after the old
+Alexa Media Player device was removed and the new speaker entity renamed to the old one's id; Alexa-only
+actions (announcements, "play … on" commands) were moved to `assist_satellite.announce` and the house's
+radio script.
+
 Install the unofficial LineageOS 18.1 for rook (XDA thread in hardware.md). It proves the display,
 touch, Wi-Fi and audio on the 4.9 kernel, supplies the boot image whose kernel the Linux image reuses
 and the `vendor` tree (the `bcmdhd` module and firmware, audio tuning), and gives a second
