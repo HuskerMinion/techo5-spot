@@ -96,6 +96,21 @@ backup). Success is a root shell on the USB ACM gadget (the 4.9 kernel has confi
   driver's job here.
 - The clock (NTP, then `hwclock -w`) and dropbear.
 
+**First boot done 2026-09-16.** `tools/linux/build-image.sh` builds the LineageOS rook kernel with TECHO5's
+rescue initramfs (`tools/linux/init`: the Spot's partitions, `amzn-bcmdhd.ko`), flashed to `boot`. With
+LineageOS still on `system` it runs as the rescue environment and takes everything from there: from power
+to the Kitchen daemon in 16 s (USB console at 4 s, `wlan0` up at 8 s, an address at 12 s, dropbear, NTP,
+the daemon from `/system/bin/techo5`), Home Assistant reconnected, no Android running. One fix it needed,
+in TECHO5's `techo5-lib.sh`: the USB `bcmdhd` re-enumerates after its firmware download, so `wlan0` exists
+a moment before it can be opened; `t5_wifi_up` now retries the link-up instead of starting the supplicant
+on an interface that is down. wpa_supplicant 2.9 (the Show's) associates on 5 GHz with WPA2.
+
+Back to LineageOS at any time: `fastboot flash boot backups/<serial>/boot-lineage-18.1.img`.
+
+Watch out when several TECHO5 Linux units share a PC: every image offers the same USB serial console
+(`1d6b:0104`, serial "techo5"). Identify a console by what the unit says (its serial in `/proc/cmdline`),
+never by the COM port.
+
 ## M3 — Persistent rootfs with trial slots
 
 TECHO5's store on `system`, its `slotctl`, `mkrootfs.sh` and `deploy-rootfs.sh`, with the LineageOS

@@ -9,3 +9,6 @@ __pycache__/
 
 # Per-unit partition backups: never committed (images, serial numbers, factory data).
 backups/
+
+# Build inputs for the Linux image: LineageOS and Amazon firmware, never committed.
+inputs/

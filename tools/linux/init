@@ -1,0 +1,232 @@
+#!/bin/busybox.static sh
+# TECHO5 initramfs init for the Echo Spot's Linux image (techo5-spot porting plan M2), from TECHO5's.
+#
+# Runs as PID 1 from the initramfs in the `boot` partition. Two jobs:
+#
+#  1. Boot a root filesystem slot from the store on the system partition
+#     (see slotctl; not yet on the Spot, that is M3): mount the store, let slotctl pick the slot and take one
+#     of its trial tries, bind-mount it and switch_root into its busybox init.
+#     This is the normal path and takes a few seconds.
+#
+#  2. Failing that — no store, no bootable slot, a `rescue` marker, or the
+#     slot's init not there — stay up as the rescue environment: root shell
+#     on USB serial, Wi-Fi with Android's saved credentials, dropbear, and the
+#     daemon from whatever slot (or LineageOS system) has a binary, so a
+#     broken unit is still reachable and still answers. Without a network it
+#     reboots after 15 minutes so an unattended unit never stays stuck.
+#
+# Breadcrumbs go to the spare area of the MISC partition (tools/linux/readmisc.sh)
+# and a boot log to userdata; everything is logged to the kernel log, which
+# pstore keeps across a reboot. The interpreter is the static busybox so PID 1
+# does not depend on the dynamic loader.
+
+BB=/bin/busybox.static
+MISC=/dev/mmcblk0p8          # static node from the initramfs, major 179
+STORE_DEV=/dev/mmcblk0p11    # system partition: the store (or a LineageOS system)
+DATA_DEV=/dev/mmcblk0p13     # userdata: daemon state, logs, Wi-Fi credentials
+STAY_MINUTES=${STAY_MINUTES:-15}
+
+exec > /dev/kmsg 2>&1
+CRUMB=0
+crumb() {
+	# one 512-byte block per stage, starting at MISC byte offset 4096
+	CRUMB=$((CRUMB+1))
+	echo "techo5 crumb $CRUMB: $*"
+	printf 'TECHO5 %02d %s\n' "$CRUMB" "$*" | $BB dd of=$MISC bs=512 seek=$((7+CRUMB)) count=1 conv=notrunc,sync 2>/dev/null
+}
+log() { crumb "$*"; }
+crumb "init started, kernel $($BB uname -r) $($BB uname -m)"
+
+$BB mount -t proc proc /proc
+$BB mount -t sysfs sysfs /sys
+
+# Recovery bootloader message: clear it first, so a crash later still leaves
+# the unit booting normally next time.
+$BB dd if=/dev/zero of=$MISC bs=32 count=1 conv=notrunc 2>/dev/null
+
+$BB mount -t tmpfs -o mode=0755 tmpfs /dev
+$BB mkdir -p /dev/pts /dev/graphics /run /tmp /store /data /android /newroot
+$BB mount -t devpts devpts /dev/pts
+$BB mount -t tmpfs tmpfs /run
+$BB mount -t tmpfs tmpfs /tmp
+$BB mdev -s
+$BB mknod -m 600 /dev/mmcblk0p8 b 179 8 2>/dev/null
+[ -e /dev/fb0 ] && $BB ln -sf /dev/fb0 /dev/graphics/fb0
+echo 7 4 1 7 > /proc/sys/kernel/printk
+crumb "dev populated: $($BB ls /dev | $BB wc -l) nodes, fb0=$([ -e /dev/fb0 ] && echo yes || echo no)"
+
+export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+. /lib/techo5-lib.sh
+
+# --- Userdata: persistent log, daemon state, Wi-Fi credentials.
+if mount -t ext4 -o noatime $DATA_DEV /data 2>/dev/null; then
+	mkdir -p /data/techo5-linux
+	LOGDIR=/data/techo5-linux
+	crumb "userdata mounted"
+else
+	LOGDIR=/tmp
+	crumb "userdata mount failed"
+fi
+
+# --- The system partition: a TECHO5 store, or still a LineageOS system.
+MODE=none
+if mount -t ext4 -o noatime $STORE_DEV /store 2>/dev/null; then
+	if [ -e /store/.techo5-store ]; then
+		MODE=store
+		crumb "store mounted: active=$(cat /store/active 2>/dev/null) a=$(cat /store/slots/a.state 2>/dev/null) b=$(cat /store/slots/b.state 2>/dev/null)"
+	else
+		umount /store
+		mount -t ext4 -o ro,noatime $STORE_DEV /android 2>/dev/null && MODE=android && crumb "android system mounted (no store)"
+	fi
+else
+	crumb "system partition mount failed"
+fi
+
+snapshot() {
+	{
+		echo "=== $(date) uptime $(cut -d' ' -f1 /proc/uptime) mode $MODE"
+		echo "--- dmesg tail"; dmesg | tail -60
+		echo "--- ip"; ip addr 2>&1
+		echo "--- mounts"; cat /proc/mounts
+		echo "--- mem"; head -3 /proc/meminfo
+	} > /tmp/snapshot 2>&1
+	cp /tmp/snapshot $LOGDIR/rescue.log 2>/dev/null
+	# also into MISC at byte offset 64 KiB, up to 120 KiB, so it survives without any filesystem
+	head -c 122880 /tmp/snapshot | dd of=$MISC bs=512 seek=128 conv=notrunc 2>/dev/null
+	sync
+}
+
+# --- Normal path: hand over to a slot.
+boot_slot() {
+	slot=$1
+	root=/store/slots/$slot
+	[ -x $root/sbin/init ] || [ -L $root/sbin/init ] || { crumb "slot $slot has no /sbin/init"; return 1; }
+	mount --bind $root /newroot || { crumb "bind mount of slot $slot failed"; return 1; }
+	mkdir -p /run/techo5
+	echo $slot > /run/techo5/slot
+	sync
+	# The store stays read-only under the running system; the root shares the flag.
+	mount -o remount,ro /store 2>/dev/null || crumb "store remount ro failed"
+	crumb "switching root to slot $slot ($(cat $root/etc/techo5-release 2>/dev/null))"
+	# Nothing from the initramfs may keep running: its files are about to go.
+	kill -9 -1 2>/dev/null
+	for m in store data run tmp dev sys proc; do
+		mkdir -p /newroot/$m
+		mount --move /$m /newroot/$m || crumb "moving /$m failed"
+	done
+	exec $BB switch_root /newroot /sbin/init
+	crumb "switch_root failed"
+	return 1
+}
+
+if [ $MODE = store ]; then
+	if [ -e /store/rescue ]; then
+		rm -f /store/rescue; sync
+		crumb "rescue marker found: staying in the initramfs this boot"
+	elif slot=$(STORE=/store slotctl next 2>/tmp/slotctl.err); then
+		crumb "slotctl: $(tr '\n' ' ' < /tmp/slotctl.err)"
+		boot_slot "$slot"
+		# only reached when the hand-over failed
+		mount -o remount,rw /store 2>/dev/null
+		umount /newroot 2>/dev/null
+	else
+		crumb "slotctl: $(tr '\n' ' ' < /tmp/slotctl.err)"
+	fi
+fi
+
+# --- Rescue environment.
+crumb "rescue mode ($MODE)"
+snapshot
+
+# Panel: the test screen with the clock ticking, as proof of life.
+if [ -x /usr/local/bin/fbprobe ]; then
+	/usr/local/bin/fbprobe -hold 1000h > /tmp/fbprobe.log 2>&1 &
+fi
+
+# Root shell on USB serial.
+t5_usb_acm
+(
+	while true; do
+		[ -e /dev/ttyGS0 ] || mdev -s
+		if [ -e /dev/ttyGS0 ]; then
+			setsid sh -c 'exec sh -l < /dev/ttyGS0 > /dev/ttyGS0 2>&1'
+		fi
+		sleep 2
+	done
+) &
+
+# Vendor tree: from a slot when there is one, else from the LineageOS system. The Spot's Wi-Fi is
+# the Broadcom bcmdhd module, whose firmware_path and nvram_path default to /vendor/firmware.
+VENDOR=
+for d in /store/slots/$(cat /store/active 2>/dev/null) /store/slots/a /store/slots/b /android/system; do
+	[ -e "$d/vendor/lib/modules/amzn-bcmdhd.ko" ] && { VENDOR=$d/vendor; break; }
+done
+if [ -n "$VENDOR" ]; then
+	ln -sfn $VENDOR /vendor
+	crumb "vendor tree: $VENDOR"
+else
+	crumb "no vendor tree found; no Wi-Fi"
+fi
+
+IP=
+if [ -n "$VENDOR" ]; then
+	t5_wifi_conf $LOGDIR/wpa_supplicant.conf
+	t5_wifi_up $VENDOR/lib/modules/amzn-bcmdhd.ko $LOGDIR/wpa_supplicant.conf
+fi
+
+# SSH and the daemon, once there is an address. Called again from the wait loop below: a lease
+# that arrives after t5_wifi_up gave up (udhcpc keeps trying in the background) must still make
+# the unit reachable, or a slow DHCP server leaves it in rescue with nothing but the USB console.
+network_up() {
+	[ -e /tmp/network-up ] && return 0
+	[ -n "$IP" ] || return 1
+	: > /tmp/network-up
+	crumb "network: $IP"
+	# Keys only, even here: the key built into this boot image plus the ones Home Assistant gave
+	# the device (userdata). No password logins — an empty root password would let in anyone on
+	# the network while a unit sits in rescue.
+	printf 'root:x:0:0:root:/root:/bin/sh\n' > /etc/passwd
+	printf 'root:*:0:0:99999:7:::\n' > /etc/shadow
+	mkdir -p /root/.ssh
+	[ -r /data/misc/techo5/ssh/authorized_keys ] && cat /data/misc/techo5/ssh/authorized_keys >> /root/.ssh/authorized_keys
+	chmod 700 /root /root/.ssh 2>/dev/null; chmod 600 /root/.ssh/authorized_keys 2>/dev/null
+	t5_dropbear $LOGDIR/dropbear -s
+	t5_ntp
+
+	# The daemon, from the same place as the vendor tree, so a rescue boot still answers.
+	DAEMON=
+	for f in ${VENDOR%/vendor}/usr/local/bin/techo5 ${VENDOR%/vendor}/bin/techo5; do
+		[ -x "$f" ] && { DAEMON=$f; break; }
+	done
+	if [ -n "$DAEMON" ]; then
+		killall fbprobe 2>/dev/null
+		mkdir -p /data/misc/techo5/models
+		(setsid $DAEMON run >> $LOGDIR/techo5.log 2>&1 &)
+		sleep 3
+		if pidof techo5 >/dev/null; then
+			crumb "daemon running from $DAEMON (pid $(pidof techo5)); staying up"
+		else
+			crumb "daemon failed to start: $(tail -2 $LOGDIR/techo5.log | tr '\n' ' ')"
+		fi
+	fi
+	touch /tmp/stay
+}
+network_up
+
+snapshot
+crumb "rescue ready; reboot in ${STAY_MINUTES} min unless /tmp/stay exists"
+
+i=0
+while true; do
+	sleep 30
+	i=$((i+1))
+	[ -e /tmp/network-up ] || { IP=$(t5_ip); network_up; }
+	snapshot
+	[ -e /tmp/stay ] && continue
+	if [ $((i*30)) -ge $((STAY_MINUTES*60)) ]; then
+		crumb "no network after ${STAY_MINUTES} min; rebooting"
+		sync
+		umount /store /android /data 2>/dev/null
+		$BB reboot -f
+	fi
+done
