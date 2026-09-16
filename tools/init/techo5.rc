@@ -1,0 +1,29 @@
+# TECHO5 daemon as an init service on LineageOS (the Echo Spot, rook; the same service as the Show's).
+#
+# Install (root, /system remounted rw):
+#   cp bin/echod-arm-spot /system/bin/techo5 && chmod 755 /system/bin/techo5
+#   chcon u:object_r:system_file:s0 /system/bin/techo5
+#   cp tools/init/techo5.rc /system/etc/init/techo5.rc
+#
+# The binary lives on /system so init execs a system_file and the service runs in init's own
+# domain, which on this permissive build is what reaches /dev/snd and the input devices. The
+# state directory is on /data. Android's audio stack must be on the null HAL
+# (ro.hardware.audio.primary=default) or audioserver will fight over the PCM devices.
+
+on post-fs-data
+    mkdir /data/misc/techo5 0700 root root
+    mkdir /data/misc/techo5/models 0755 root root
+    mkdir /data/techo5 0755 root root
+
+# Not oneshot: the daemon exits on purpose after installing an update and expects init to start
+# it again into the new binary, and a crash should come back too. init backs off if it keeps dying.
+service techo5 /system/bin/techo5 run
+    class late_start
+    user root
+    group root audio input system
+    disabled
+
+# Start once the framework is up, so the AFE and the Wi-Fi are settled and audioserver has
+# already opened (and, on the null HAL, not touched) its devices.
+on property:sys.boot_completed=1
+    start techo5
