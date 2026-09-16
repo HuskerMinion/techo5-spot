@@ -80,6 +80,29 @@ command line is still to be read.
 - TWRP swaps `lk`, `tee1`, `tee2` for `/dev/null` decoys (`*_real` are the partitions), as on the
   other amonet Echos.
 
+### Buttons at power-on, and getting between modes
+
+- **Volume Down** alone: kaeru's hacked fastboot. Holding all three buttons did nothing on this unit.
+- **Volume Up**: recovery.
+- From fastboot, `fastboot reboot recovery` works (kaeru 2.0.0), and `fastboot flash recovery` too.
+  `max-download-size` is 109 MB.
+- From TWRP, `adb reboot` boots Fire OS.
+
+### Fire OS puts its own recovery back, and verifies system
+
+- Every Fire OS boot runs `/system/bin/install-recovery.sh`: if `recovery` is not Amazon's image it
+  rebuilds it with `applypatch` from `boot` and `/system/recovery-from-boot.p`. The first Fire OS boot
+  after the unlock replaced TWRP with "Amazon system recovery <3e>".
+- **Do not change the system partition to stop it.** Fire OS's `fstab.mt8163` mounts `system` with
+  `wait,verify` and the ramdisk carries `verity_key`: dm-verity checks every block. Renaming
+  `recovery-from-boot.p` (a read-write mount in TWRP) left Fire OS stuck at the Amazon logo. Writing
+  `system` back from its backup, byte for byte, fixed it.
+- The way to live with it until Fire OS is gone: after any Fire OS boot, Volume Down, then
+  `fastboot flash recovery <TWRP backup>` and `fastboot reboot recovery`. Seconds, and nothing of
+  Fire OS changes.
+- Large images go to the unit with `adb push` to `/data` and `dd` from there (1.66 GB `system`: push
+  at 17.5 MB/s, dd at 38 MB/s); TWRP's `/tmp` is RAM.
+
 ---
 
 The rest of this file is the pre-unit research, kept for its sources.

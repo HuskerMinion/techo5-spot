@@ -57,6 +57,8 @@ Before anything is written:
 4. `tools/backup-spot.ps1 -Serial <serial> -IncludeSystem`: every partition that boots the unit plus
    Fire OS's system and cache, md5-checked, kept off the device. **Done.**
 5. **Prove recovery before anything is written**: restore `boot` from its backup in TWRP and boot it.
+   **Done**: `boot` written back and Fire OS booted; `system` restored from its backup after a
+   dm-verity hang (hardware.md, "Fire OS puts its own recovery back").
 6. Answer the open questions in hardware.md.
 
 ## M1 — LineageOS as the known-good baseline
