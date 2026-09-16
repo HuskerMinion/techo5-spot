@@ -148,12 +148,41 @@ daemon runs headless behind it; a unit that looks "stuck at the logo" is working
 Covered in "The round screen" below; the daemon draws it, as on cronos. Camera last, and only if the
 4.9 kernel exposes the GC0312.
 
+**Done 2026-09-16 (camera not started).** TECHO5 `spot` build, `feature/display/*_spot.go`:
+
+- Clock face with the status rim (red while muted, the conversation's colours, a timer emptying, blue
+  pulsing while Bluetooth pairs), the weather under the date, the conversation in words, the volume.
+- Touch (`mtk-tpd` is multitouch protocol A: a lift is only `BTN_TOUCH` 0): a tap talks, a swipe up or
+  down is the volume, a held finger opens the **ring menu**, a dial modelled on an owner's video. While
+  it is open the panel follows the finger, so the dial turns under it and snaps to an item when let
+  go; a tap does the item at the top.
+- Main dial: Talk, Mute, Play/Pause, Volume (the ring becomes a jog wheel), Weather (today and the next
+  four days), Timers, Settings, Sleep. Settings dial: Brightness (jog wheel), Night (the dim hours,
+  22:00 to 07:00 by default, held to 30 %), Auto brightness, Bluetooth (its own dial: Pair,
+  Connect/Disconnect, Forget), Info (name, address, version, slot), Restart (two taps), Back.
+- Backlight: the panel is unreadable below about 120 of 255 and glares at 255, so brightness in percent
+  spans 120..255.
+- Previews: `docs/spot-screen-preview-v*.png`, drawn by the test (`SPOT_PREVIEW=<dir>`).
+
 ## M6 — Bluetooth
 
 Kernel with `CONFIG_BT`, `CONFIG_BT_HCIUART`, `CONFIG_BT_HCIUART_BCM`; `btattach -B /dev/ttyMT1 -P bcm`
 with the `.hcd` patch, rfkill unblocked. Then BlueZ and bluez-alsa as on cronos, for earbuds or a
 speaker, and a BLE proxy for Home Assistant. Wi-Fi and Bluetooth share one chip and antenna, so keep
 the coexistence rule from cronos (pause idle A2DP).
+
+**Done 2026-09-16, differently.** `tools/linux/build-kernel.sh` rebuilds the LineageOS kernel at its own
+commit (`4174e0b4d0e2`) from the running kernel's config plus `BT`, `BT_BREDR`, `BT_LE`, `BT_RFCOMM` and
+`BT_HCIVHCI`; the release string still matches, `amzn-bcmdhd.ko` loads, and the appended device trees
+are byte-identical to LineageOS's. No `hci_uart` line discipline: the 4.9 `hci_bcm` is only told an
+operational speed through serdev or ACPI, so the controller would stay at 115200 baud, too slow for
+A2DP. TECHO5's `btbridge -uart` does the libbt-vendor sequence in userspace instead: rfkill on, reset,
+patchram (`BCM43569A2_001.003.004.0142.0191.hcd` from LineageOS's vendor tree, 4.6 s), reset, 3 Mbit/s,
+the factory address from `/proc/idme/bt_mac_addr`, then `/dev/vhci`. `device.conf` names the UART, patch
+and speed (`BT_UART`, `BT_HCD`, `BT_BAUD`). Result: `hci0` 22 s after power, Bluetooth 4.2 (Cypress),
+BR/EDR + LE; an LE scan heard 136 devices. The daemon's Bluetooth audio (BlueZ, bluez-alsa, the idle-A2DP
+pause) is the Show's; pairing is on the settings dial and connects the strongest audio device in pairing
+mode it hears, as on the Dot. Boot image: `build-image.sh` with `KERNEL=<Image.gz-dtb>`.
 
 ## M6b — TECHO5 boot logos
 
@@ -162,12 +191,29 @@ p5, 1 MB, backed up) and the image kaeru draws in hacked fastboot, then the Linu
 splash. TECHO5's `tools/linux/patch-lk-logo.py` and its kaeru rebuild are the starting point; the
 Spot's images are 480×480 and have to read inside the circle. The originals stay in `backups/`.
 
+**Done 2026-09-16.** The `logo` partition is empty here too. LK (stock in `lk`, and kaeru's copy in
+`expdb`, which is what boots) carries two bundles: the 480×480 Amazon logo (file offset 431416, a
+12096-byte slot, one pointer) and a 408×216 battery. `patch-lk-logo.py --bundle 431416 --size 480x480
+--in-place --colors 24` puts `logo/spot-boot-480.png` (the TECHO5 mark, 280 px wide on black) into that
+slot; only those 12096 bytes of `expdb` change, written with `dd` from the rescue initramfs after
+checking the partition against its backup, and read back. The Spot boots through it. Undo: write the
+`expdb` backup back. The picture stays up until the daemon draws the clock, so no splash of its own.
+
 ## M7 — Installer
 
 `tools/install-spot.ps1`: one command from an unlocked, TWRP'd Spot to a running image, on the model
 of TECHO5 Dot's `install-dot.ps1` (backups verified, the boot image built from this unit's own
 backup, the rootfs slot laid down, name/key/Wi-Fi provisioned, read back and verified, the first boot
 watched to healthy).
+
+**Written 2026-09-16:** `tools/install-spot-linux.ps1`, from a Spot running LineageOS 18.1 (on Wi-Fi,
+rooted adb, backed up) to TECHO5 Linux in slot a: checks, capture (the unit's LineageOS boot image and
+vendor tree), build (kernel once, boot image, root filesystem, optional logo), provision (name, ESPHome
+key, uploads checked by md5), flash `boot`, then over the USB serial console (`tools/serial-console.ps1`,
+which finds the unit by serial) the slot store, the install and the logo, and the first boot watched to a
+committed slot. Its build phase (`-BuildOnly -Logo`) is tested and reproduces the logo bytes the first
+unit boots with; the phases that touch a unit repeat what was done by hand on the first one but have not
+run end to end, since that unit is already converted. Run it with someone watching on the next Spot.
 
 ## The round screen
 

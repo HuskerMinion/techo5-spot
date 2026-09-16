@@ -20,6 +20,9 @@ TECHO5=${TECHO5:-E:/Projects/techo5-wt-spot}
 SPOT_INPUTS=${SPOT_INPUTS:-$HERE/inputs}
 INPUTS=${TECHO5_INPUTS:-D:/platform-tools/echoshow/linux-image}
 KERNEL_IMAGE=${KERNEL_IMAGE:-$SPOT_INPUTS/boot-lineage-18.1-20251108-rook.img}
+# KERNEL: a rebuilt Image.gz-dtb (tools/linux/build-kernel.sh, with Bluetooth) in place of the one in
+# KERNEL_IMAGE, whose header is still used.
+KERNEL=${KERNEL:-}
 GO=${GO:-/c/Program Files/Go/bin/go.exe}
 OUT=$HERE/bin/techo5-spot-linux-boot.img
 while [ $# -gt 0 ]; do
@@ -54,7 +57,7 @@ echo "== mkimage"
 export MSYS_NO_PATHCONV=1
 H=$(W "$HERE"); T=$(W "$TECHO5"); I=$(W "$INPUTS")
 mini=$(ls "$INPUTS"/alpine-minirootfs-*-armv7.tar.gz | head -1)
-python "$T/tools/linux/mkimage.py" --kernel-image "$(W "$KERNEL_IMAGE")" \
+python "$T/tools/linux/mkimage.py" --kernel-image "$(W "$KERNEL_IMAGE")" ${KERNEL:+--kernel "$(W "$KERNEL")"} \
 	--rootfs "$(W "$mini")" \
 	"${apks[@]}" \
 	--init "$H/tools/linux/init" \

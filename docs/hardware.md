@@ -126,6 +126,15 @@ config: [dumps/rook-lineage-kernel-4.9.337.config](dumps/rook-lineage-kernel-4.9
 | Mute button (verified) | On LineageOS it is **`KEY_POWER` (116) on `mtk-kpd`** and nothing else: Android toggles the screen on each press, and **the microphones are not cut** (claps between two presses captured at −33 to −40 dBFS, the same as after). The 4.9 kernel has no privacy driver (no `privacy_state`); Fire OS's 3.18 kernel had one. The device tree's `amz_privacy` line is GPIO 87 with `hw_latch = <0>`, so the mute was never a hardware latch on this model. Until GPIO 87 is proven to cut the microphones, mute on the Spot is enforced in software by the daemon |
 | On-screen keyboard | would not enter digits on the Wi-Fi password page; the network was added from the PC with `cmd wifi connect-network` |
 
+### On TECHO5 Linux (M5, M6, M6b)
+
+| Item | Value |
+|---|---|
+| Touch (verified) | `mtk-tpd` reports **multitouch protocol A**: no slots and never a tracking id of -1; a lift is `BTN_TOUCH` 0. A finger meant to stay still drifts about 20 px |
+| Backlight (verified) | `lcd-backlight` 0..255: almost unreadable at 120 in a lit room, fine at 191, glaring at 255 |
+| Bluetooth (verified) | rfkill0 (type bluetooth) powers the BCM43569A2; H4 on `/dev/ttyMT1` at 115200 from its ROM; patchram with LineageOS's `BCM43569A2_001.003.004.0142.0191.hcd` (Write_RAM records, then Launch_RAM) in 4.6 s; `0xFC18` to 3 Mbit/s with RTS/CTS; `0xFC01` sets the address from `/proc/idme/bt_mac_addr`. Reports HCI version 8 (4.2), manufacturer 305 (Cypress), BR/EDR and LE. Needs a kernel with `CONFIG_BT` (LineageOS's has none) |
+| Boot logo (verified) | `logo` (p5) is empty. LK has two zlib BGRA bundles: the Amazon logo 480×480 at file offset 431416 (12096 bytes, pointer at 460876) and a battery 408×216 at 443512; the same offsets in `lk` and in kaeru's copy in `expdb` |
+
 ---
 
 The rest of this file is the pre-unit research, kept for its sources.
