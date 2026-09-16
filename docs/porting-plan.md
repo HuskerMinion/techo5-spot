@@ -148,7 +148,7 @@ daemon runs headless behind it; a unit that looks "stuck at the logo" is working
 Covered in "The round screen" below; the daemon draws it, as on cronos. Camera last, and only if the
 4.9 kernel exposes the GC0312.
 
-**Done 2026-09-16 (camera not started).** TECHO5 `spot` build, `feature/display/*_spot.go`:
+**Done 2026-09-16, camera included.** TECHO5 `spot` build, `feature/display/*_spot.go`:
 
 - Clock face with the status rim (red while muted, the conversation's colours, a timer emptying, blue
   pulsing while Bluetooth pairs), the weather under the date, the conversation in words, the volume.
@@ -163,6 +163,11 @@ Covered in "The round screen" below; the daemon draws it, as on cronos. Camera l
 - Backlight: the panel is unreadable below about 120 of 255 and glares at 255, so brightness in percent
   spans 120..255.
 - Previews: `docs/spot-screen-preview-v*.png`, drawn by the test (`SPOT_PREVIEW=<dir>`).
+- Camera: the GC0312 works from Linux (TECHO5 `hardware/camera/camera_spot.go`, notes in TECHO5's
+  `docs/camera-research.md`): 640x480 at 30 fps; Home Assistant's `camera.<name>_camera` (stills and
+  stream), `/camera.jpg` and `/camera.mjpeg` behind the Camera web access switch; Camera on the dial
+  (the Spot's own, mirrored), "show the front door" for Home Assistant's cameras, swipe to step through
+  them, a green dot on the rim while the sensor is on, and the mute powers it down.
 
 ## M6 — Bluetooth
 

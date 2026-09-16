@@ -133,6 +133,7 @@ config: [dumps/rook-lineage-kernel-4.9.337.config](dumps/rook-lineage-kernel-4.9
 | Touch (verified) | `mtk-tpd` reports **multitouch protocol A**: no slots and never a tracking id of -1; a lift is `BTN_TOUCH` 0. A finger meant to stay still drifts about 20 px |
 | Backlight (verified) | `lcd-backlight` 0..255: almost unreadable at 120 in a lit room, fine at 191, glaring at 255 |
 | Bluetooth (verified) | rfkill0 (type bluetooth) powers the BCM43569A2; H4 on `/dev/ttyMT1` at 115200 from its ROM; patchram with LineageOS's `BCM43569A2_001.003.004.0142.0191.hcd` (Write_RAM records, then Launch_RAM) in 4.6 s; `0xFC18` to 3 Mbit/s with RTS/CTS; `0xFC01` sets the address from `/proc/idme/bt_mac_addr`. Reports HCI version 8 (4.2), manufacturer 305 (Cypress), BR/EDR and LE. Needs a kernel with `CONFIG_BT` (LineageOS's has none) |
+| Camera (verified) | GC0312 (id 0xb310, I²C 0x42) on the **parallel** bus, not MIPI: CMDAT2..9, HSYNC, VSYNC, PCLK on the CSI0 pads; powered as the **sub** sensor (pin set 1); 640x480 RAW8 RGGB, 30 fps. Receiver: SENINF4 parallel, data on pads 9..2, pad input enables on all three CSI analog blocks, SENINF1_PCLK_EN only, sync polarities 0 (TECHO5 docs/camera-research.md) |
 | Boot logo (verified) | `logo` (p5) is empty. LK has two zlib BGRA bundles: the Amazon logo 480×480 at file offset 431416 (12096 bytes, pointer at 460876) and a battery 408×216 at 443512; the same offsets in `lk` and in kaeru's copy in `expdb` |
 
 ---
