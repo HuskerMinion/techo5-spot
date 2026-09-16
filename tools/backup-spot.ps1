@@ -29,7 +29,7 @@ param(
     [Parameter(Mandatory)][string]$Serial,
     [string]$Adb = 'adb',
     # Inside the project, and ignored by git: backups hold serial numbers and factory data.
-    [string]$BackupRoot = (Join-Path $PSScriptRoot '..ackups'),
+    [string]$BackupRoot = (Join-Path $PSScriptRoot '..\backups'),
     [switch]$IncludeSystem
 )
 $ErrorActionPreference = 'Stop'
