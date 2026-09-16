@@ -1,0 +1,21 @@
+TECHO5 Spot builds on the work of other open-source projects.
+
+TECHO5, https://github.com/HuskerMinion/techo5 (MIT)
+  The echod daemon, the Linux image tooling, the rootfs slot design and the kernel build recipe.
+
+TECHO5 Dot (MIT)
+  The 512 MB image layout and the installer and backup pattern.
+
+EchoLocal, https://github.com/ygelfand/echolocal
+  Copyright (c) 2026 Yuri Gelfand, MIT License.
+  The original Echo Dot 2 daemon that echod was ported from.
+
+amonet, kaeru and the Echo TWRP trees, https://github.com/R0rt1z2
+  The unlock and bootloader payload this project depends on (not redistributed).
+
+amazon-oss, https://github.com/amazon-oss
+  The LineageOS 18.1 rook device tree and the MT8163 4.9 kernel, cited in docs/.
+
+docs/dumps/rook_defconfig-lineage-18.1 is arch/arm64/configs/rook_defconfig from
+github.com/amazon-oss/android_kernel_amazon_mt8163, branch lineage-18.1 (GPL-2.0), copied as a
+reference; docs/dumps/rook-vs-cronos-defconfig.diff compares it with cronos_defconfig from the same tree.

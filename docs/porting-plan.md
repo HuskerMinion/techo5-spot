@@ -1,0 +1,164 @@
+# Porting plan
+
+Target: an unlocked Echo Spot (`rook`) boots the TECHO5 Linux image. That means an arm64 4.9 kernel,
+an Alpine armv7 root filesystem in trial slots, and one daemon (`echod`, `spot` build) that owns the
+microphones, the speaker, the round screen and touch, the buttons, Wi-Fi and the ESPHome API. No Fire
+OS or Android processes. As in TECHO5 and TECHO5 Dot, every milestone leaves a usable device and
+recovery is proven before the first flash.
+
+Facts and sources for everything below are in [hardware.md](hardware.md).
+
+## How this relates to TECHO5 and TECHO5 Dot
+
+The Spot is the Show 5's sibling more than the Dot's, with the Dot's memory and a different radio.
+
+| | Show 5 (`cronos`) | Dot 2 (`biscuit`) | Spot (`rook`) |
+|---|---|---|---|
+| Kernel for the image | LineageOS 4.9.337 arm64 | Amazon 3.18 32-bit (Fire OS 6) | **LineageOS 4.9.337 arm64, `rook_defconfig`** (same tree as cronos) |
+| Partitions | single `boot` | A/B, image in `recovery` | single `boot` |
+| RAM | 1 GB | 512 MB | 512 MB (**open**) |
+| Screen | 960×480 | none | 480×480 round |
+| Microphones | TLV320AIC3101 + FPGA over SPI | 4× TLV320ADC3101, TDM | TLV320AIC3101 + FPGA over SPI, 4 mics |
+| Wi-Fi | MT7668 SDIO, `mt76x8_wlan.ko` | CONSYS WMT, `wmtup` | **BCM43569 USB, `bcmdhd.ko`** |
+| Bluetooth | MT7668, BlueZ via `btbridge` | raw H4 on `/dev/stpbt` | **BCM43569, H4 on `/dev/ttyMT1`** |
+
+What carries over:
+
+- **Kernel**: TECHO5's `tools/linux/build-kernel.sh` with `rook_defconfig` in place of
+  `cronos_defconfig`, pinned to the commit the LineageOS rook boot image was built from so its
+  `amzn-bcmdhd.ko` still loads (`CONFIG_MODVERSIONS`, the same rule cronos has). The Bluetooth
+  additions become simpler: the chip speaks H4 on a real UART, so `CONFIG_BT` + `CONFIG_BT_HCIUART`
+  (+ `BT_HCIUART_BCM`) and BlueZ's `btattach`/`hciattach` with the `.hcd` patch replace `btbridge`.
+- **Image**: TECHO5's layout as it is. Kernel + initramfs rescue in `boot`, rootfs slots as directories
+  on the `system` partition, TWRP left in `recovery`, state on `userdata`. `slotctl`, trial boots and
+  the rescue environment unchanged. Sized for 512 MB like the Dot (zram on).
+- **Daemon**: one source. TECHO5's `echod` today has two builds, the default (cronos, screen) and
+  `dot` (no screen). The Spot needs a third, `spot`: the screen, touch and camera code of the default
+  build, with its own microphone device and channel map, button codes, backlight path and mixer
+  sequences. The display code learns a round 480×480 canvas (see "The round screen"). Changes land in
+  TECHO5's `echod`, not here.
+- **Microphones**: cronos already reads the TLV320AIC3101 through the FPGA; its capture code and the
+  "a bare Linux boot leaves the codec unconfigured" lessons are the starting point. The Spot's
+  bitstream is 6-channel, so the channel map is new work.
+
+What does not carry over: `mt76x8` modules, `wmtup`, `btbridge`, the MAX98396 speaker notes, the
+Dot's `recovery`-partition boot and its cache-partition store.
+
+## M0 — Know the unit (first time it is plugged in)
+
+Before anything is written:
+
+1. Inspect the screen for the flicker/shake fault. Note the Fire OS version (Settings → Device Options
+   → Device Software Version) and whether it is one amonet-rook supports (5.5.6.9, 5.5.5.2, 5.5.3.4).
+2. Unlock with amonet-rook (Linux live USB, not WSL). This wipes userdata and leaves TWRP in
+   `recovery`.
+3. From TWRP's adb: `tools/hwdump.sh`, saved as `docs/dumps/rook-twrp-<serial>.txt`.
+4. `tools/backup-spot.ps1 -Serial <serial>`: every partition that boots the unit, md5-checked, kept
+   off the device.
+5. **Prove recovery before anything is written**: restore `boot` from its backup in TWRP and boot it.
+6. Answer the open questions in hardware.md.
+
+## M1 — LineageOS as the known-good baseline
+
+Install the unofficial LineageOS 18.1 for rook (XDA thread in hardware.md). It proves the display,
+touch, Wi-Fi and audio on the 4.9 kernel, supplies the boot image whose kernel the Linux image reuses
+and the `vendor` tree (the `bcmdhd` module and firmware, audio tuning), and gives a second
+`hwdump` with Android's view of the hardware (`tinymix`, `getevent`, `dumpsys`).
+
+Then, as on cronos, run the daemon beside Android as an init service with Android's audio HAL set
+to null, and complete a voice turn with Home Assistant. That is the `spot` build's first test and it
+needs no Linux image.
+
+## M2 — First Linux boot (initramfs)
+
+TECHO5's initramfs with the LineageOS rook kernel, flashed to `boot` (LineageOS's boot image is the
+backup). Success is a root shell on the USB ACM gadget (the 4.9 kernel has configfs gadgets:
+`CONFIG_USB_CONFIGFS_ACM`), then:
+
+- Wi-Fi: `insmod amzn-bcmdhd.ko` with `firmware_path`/`nvram_path` pointing at the copied firmware,
+  `wlan0`, Alpine's `wpa_supplicant` and `udhcpc`. No patch-download dance: that is the chip's own
+  driver's job here.
+- The clock (NTP, then `hwclock -w`) and dropbear.
+
+## M3 — Persistent rootfs with trial slots
+
+TECHO5's store on `system`, its `slotctl`, `mkrootfs.sh` and `deploy-rootfs.sh`, with the LineageOS
+`vendor` tree copied into the slot. Verified the TECHO5 way: slot a boots, the daemon runs five
+minutes and commits, slot b installs from the running system, switch and commit.
+
+## M4 — Audio
+
+1. Capture: find the PCM and format, map the four microphones and the loopback, prove it with
+   `audioprobe` and a WAV off the device.
+2. Speaker: the AIC32x4 path, `Right Channel Only`, amp enable and the fault GPIO, volume curve.
+3. Wake word and a full voice turn from the Linux image.
+4. Echo cancellation: the WebRTC helper (`tools/aec`) on the loopback; measure before tuning, the way
+   TECHO5 Dot's `microphones.md` does.
+
+## M5 — The round screen, touch and camera
+
+Covered in "The round screen" below; the daemon draws it, as on cronos. Camera last, and only if the
+4.9 kernel exposes the GC0312.
+
+## M6 — Bluetooth
+
+Kernel with `CONFIG_BT`, `CONFIG_BT_HCIUART`, `CONFIG_BT_HCIUART_BCM`; `btattach -B /dev/ttyMT1 -P bcm`
+with the `.hcd` patch, rfkill unblocked. Then BlueZ and bluez-alsa as on cronos, for earbuds or a
+speaker, and a BLE proxy for Home Assistant. Wi-Fi and Bluetooth share one chip and antenna, so keep
+the coexistence rule from cronos (pause idle A2DP).
+
+## M7 — Installer
+
+`tools/install-spot.ps1`: one command from an unlocked, TWRP'd Spot to a running image, on the model
+of TECHO5 Dot's `install-dot.ps1` (backups verified, the boot image built from this unit's own
+backup, the rootfs slot laid down, name/key/Wi-Fi provisioned, read back and verified, the first boot
+watched to healthy).
+
+## The round screen
+
+Everything drawn has to live in a 480×480 circle: the corners are not visible. Rules for the `spot`
+layouts:
+
+- Content in the inscribed circle; the safe rectangle for text is about 340×340 centred.
+- Radial elements first: progress, volume, timers and "listening" as arcs around the rim, the way the
+  stock Alexa UI does.
+- One face at a time, changed by horizontal swipe; the settings sheet from a swipe down, as on cronos.
+- Screen off at night on a schedule and on the ambient light sensor (cronos's night screen-off).
+
+### Face ideas
+
+From TECHO5's existing pages, and from owners who have already put a Spot on their desk (Reddit
+r/amazonecho, 2026-09; spotdash). None of these need Android; each is a daemon page fed by Home
+Assistant or by the house's own services, never the cloud:
+
+- **Clock**: analogue and digital faces, the weather on it, the next calendar event under it.
+- **Weather**: now and forecast; a radar frame from Home Assistant's camera proxy.
+- **Timer / countdown**: goes full screen as a ring that empties, with the alarm on the speaker.
+- **Now playing**: album art in the circle, play/pause/skip, volume on the rim (Music Assistant or
+  any `media_player` in Home Assistant).
+- **Radio / news**: one tap for a station or the latest news podcast, as the cronos radio page does.
+- **Cameras**: a doorbell or driveway camera in the circle, from Home Assistant's camera proxy.
+- **PC / server telemetry**: CPU, RAM, disk, GPU load and temperature, from Home Assistant sensors
+  (Glances, System Monitor) rather than a separate PC agent.
+- **Job monitor**: a ring that fills while a long job runs on a PC (a render, a build, an
+  image-generation queue) and a chime and colour change when it finishes or needs attention, driven by
+  a Home Assistant entity the job updates.
+- **Push-to-talk dictation**: tap, speak, and the text goes to the PC in focus, transcribed locally
+  (Home Assistant's own speech-to-text or a Whisper service). A variation of the voice path the
+  daemon already has.
+- **Live captions**: a running transcript of what the room is hearing, on the screen, transcribed
+  locally. An owner in the thread wanted exactly this for a Deaf family member.
+- **Photo frame**: family photos from a local share when idle.
+- **Home controls**: a handful of toggles and scenes in a ring.
+- **Doorbell / intercom**: the Spot's camera and speaker as a room-to-room intercom through Home
+  Assistant, once the camera works (M5).
+
+## Ground rules
+
+- Everything stays local; no cloud services.
+- Upstream projects (TECHO5, EchoLocal, amonet/kaeru/TWRP, amazon-oss) are used under their licenses
+  and credited in `NOTICE`. Nothing is proposed upstream without the owner's OK.
+- Never distribute a boot image or Amazon's firmware: images are assembled from each unit's own
+  backup and its own LineageOS install.
+- No adb or fastboot command runs without an explicit `-s <serial>`, since other MT8163 devices share
+  the host.
