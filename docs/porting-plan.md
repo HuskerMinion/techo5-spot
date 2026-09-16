@@ -138,16 +138,6 @@ Assistant or by the house's own services, never the cloud:
   any `media_player` in Home Assistant).
 - **Radio / news**: one tap for a station or the latest news podcast, as the cronos radio page does.
 - **Cameras**: a doorbell or driveway camera in the circle, from Home Assistant's camera proxy.
-- **PC / server telemetry**: CPU, RAM, disk, GPU load and temperature, from Home Assistant sensors
-  (Glances, System Monitor) rather than a separate PC agent.
-- **Job monitor**: a ring that fills while a long job runs on a PC (a render, a build, an
-  image-generation queue) and a chime and colour change when it finishes or needs attention, driven by
-  a Home Assistant entity the job updates.
-- **Push-to-talk dictation**: tap, speak, and the text goes to the PC in focus, transcribed locally
-  (Home Assistant's own speech-to-text or a Whisper service). A variation of the voice path the
-  daemon already has.
-- **Live captions**: a running transcript of what the room is hearing, on the screen, transcribed
-  locally. An owner in the thread wanted exactly this for a Deaf family member.
 - **Photo frame**: family photos from a local share when idle.
 - **Home controls**: a handful of toggles and scenes in a ring.
 - **Doorbell / intercom**: the Spot's camera and speaker as a room-to-room intercom through Home
