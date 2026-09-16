@@ -103,6 +103,25 @@ command line is still to be read.
 - Large images go to the unit with `adb push` to `/data` and `dd` from there (1.66 GB `system`: push
   at 17.5 MB/s, dd at 38 MB/s); TWRP's `/tmp` is RAM.
 
+### On LineageOS 18.1 (M1)
+
+`lineage-18.1-20251108-UNOFFICIAL-rook` installed from TWRP 2026-09-16 (its script writes only
+`system` and `boot`; data formatted first). Raw output, redacted:
+[dumps/rook-lineage-18.1-bench-unit.txt](dumps/rook-lineage-18.1-bench-unit.txt); the running kernel's
+config: [dumps/rook-lineage-kernel-4.9.337.config](dumps/rook-lineage-kernel-4.9.337.config).
+
+| Item | Value |
+|---|---|
+| Kernel | **4.9.337-g4174e0b4d0e2** arm64, built 2025-11-08, userspace 32-bit (`armv8l`). `CONFIG_LOCALVERSION_AUTO=y` and `CONFIG_MODVERSIONS=y`: a rebuilt kernel must match that release string for `amzn-bcmdhd.ko` to load, as on cronos |
+| Kernel options | `CONFIG_IKCONFIG` (config readable at `/proc/config.gz`), `CONFIG_USB_CONFIGFS_ACM`, `CONFIG_CFG80211`, `CONFIG_ZRAM`, `CONFIG_MTK_CAMERA_ISP=y` (the running build has it although `rook_defconfig` does not list it); **`# CONFIG_BT is not set`**, so Bluetooth needs the kernel rebuild, as cronos did |
+| Wi-Fi | `amzn_bcmdhd` module from `/vendor/lib/modules/amzn-bcmdhd.ko` (3.5 MB). USB `2-1: 0a5c:bd27 Broadcom Remote Download Wireless Adapter` on the MUSBFSH bus. Joined a WPA2/WPA3 network on **5 GHz** (5180 MHz, 802.11ac, 780 Mbps link) at first try |
+| Sound card | `mt-snd-card`. **PCM 22: `TLV320AIC3101 Capture`** (the microphones), **PCM 23: `TLV320AIC3204 Playback`** (the speaker), plus the MediaTek AFE's usual set (`MultiMedia1`, `DL1_AWB_Record`, `TDM_Debug_Record`, `I2S0AWB_Capture`, …) |
+| Display | Android: "Built-in Screen" 480×480 at 59.82 Hz, 160 dpi, **`FLAG_ROUND`**; `fb0` virtual 480×1440 (three pages); backlight 102/255 at the default setting |
+| Touch, buttons | as in TWRP: `mtk-tpd` 0–480, `keys` volume up/down, `mtk-kpd` power/volume down/help |
+| Camera | `/dev/camera-isp` and `/dev/kd_camera_hw` present |
+| adb root | Developer options → Rooted debugging must be on (off by default) |
+| On-screen keyboard | would not enter digits on the Wi-Fi password page; the network was added from the PC with `cmd wifi connect-network` |
+
 ---
 
 The rest of this file is the pre-unit research, kept for its sources.
@@ -232,8 +251,9 @@ Answered on the bench unit (see the top of this file): 1, 2, 5 and 9. Still open
 5. Panel geometry as the kernel reports it (`fb0` virtual size) against the defconfig's 400×800.
    **480×480, virtual 480×960.**
 6. Capture format of the microphone PCM (channels, rate, bit depth) and which channels carry the
-   four microphones and the loopback.
+   four microphones and the loopback. **PCM 22 is the capture device; format still open.**
 7. The camera: does the 4.9 kernel register it at all without `CONFIG_MTK_CAMERA_ISP`?
+   **The running LineageOS kernel has `CONFIG_MTK_CAMERA_ISP=y` and `/dev/kd_camera_hw`.**
 8. Is `bcmdhd` happy with a plain nl80211 `wpa_supplicant` (it has cfg80211 support) once the module
-   and firmware paths are right?
+   and firmware paths are right? **Works under Android's supplicant on 5 GHz; Alpine's is M2.**
 9. The screen fault: does the unit have it? **No; the owner reports years of clean use.**

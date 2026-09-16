@@ -63,6 +63,10 @@ Before anything is written:
 
 ## M1 — LineageOS as the known-good baseline
 
+**Installed and verified 2026-09-16** (hardware.md, "On LineageOS 18.1"): Wi-Fi on 5 GHz, the sound card
+with the AIC3101 capture and AIC3204 playback PCMs, the round 480×480 display, touch. Still to do here:
+the daemon beside Android and a voice turn.
+
 Install the unofficial LineageOS 18.1 for rook (XDA thread in hardware.md). It proves the display,
 touch, Wi-Fi and audio on the 4.9 kernel, supplies the boot image whose kernel the Linux image reuses
 and the `vendor` tree (the `bcmdhd` module and firmware, audio tuning), and gives a second

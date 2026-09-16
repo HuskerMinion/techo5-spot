@@ -1,0 +1,1086 @@
+
+===== identity
+ro.product.device=rook
+ro.product.model=Echo Spot
+ro.build.display.id=lineage_rook-userdebug 11 RQ3A.211001.001 eng.ben.20251108.171409 dev-keys
+ro.build.version.release=11
+ro.build.version.fireos=
+ro.build.version.incremental=eng.ben.20251108.171409
+ro.hardware=mt8163
+ro.board.platform=mt8163
+ro.bootloader=unknown
+ro.boot.hardware=mt8163
+ro.twrp.version=
+Linux localhost 4.9.337-g4174e0b4d0e2 #1 SMP PREEMPT Sat Nov 8 15:30:01 GMT 2025 armv8l
+Linux version 4.9.337-g4174e0b4d0e2 (nobody@android-build) (gcc version 6.3.1 20170109 (Linaro GCC 6.3-2017.02) ) #1 SMP PREEMPT Sat Nov 8 15:30:01 GMT 2025
+uid=0(root) gid=0(root) groups=0(root),1004(input),1007(log),1011(adb),1015(sdcard_rw),1028(sdcard_r),1078(ext_data_rw),1079(ext_obb_rw),3001(net_bt_admin),3002(net_bt),3003(inet),3006(net_bw_stats),3009(readproc),3011(uhid) context=u:r:su:s0
+
+===== cpu
+      2 CPU part	: 0xd03
+      2 Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt lpae evtstrm aes pmull sha1 sha2 crc32
+      1 Hardware	: MT8163
+      2 model name	: ARMv8 Processor rev 3 (v8l)
+      1 processor	: 0
+      1 processor	: 1
+1300000 1216000 1133000 1050000 871000 741000 624000 600000 
+
+===== memory (open question 1)
+MemTotal:        1958192 kB
+MemFree:          976064 kB
+MemAvailable:    1404036 kB
+SwapTotal:        488520 kB
+CmaTotal:              0 kB
+
+===== storage / partitions (open question 2)
+major minor  #blocks  name
+
+ 253        0     488524 zram0
+ 179        0    7634944 mmcblk0
+ 179        1       1024 mmcblk0p1
+ 179        2       1024 mmcblk0p2
+ 179        3       1024 mmcblk0p3
+ 179        4       4096 mmcblk0p4
+ 179        5       1024 mmcblk0p5
+ 179        6       4096 mmcblk0p6
+ 179        7      16384 mmcblk0p7
+ 179        8        512 mmcblk0p8
+ 179        9      16384 mmcblk0p9
+ 179       10      16384 mmcblk0p10
+ 179       11    1703936 mmcblk0p11
+ 179       12     262143 mmcblk0p12
+ 179       13    5605872 mmcblk0p13
+ 179       96       4096 mmcblk0rpmb
+ 179       64       4096 mmcblk0boot1
+ 179       32       1024 mmcblk0boot0
+--- /dev/block/by-name
+total 0
+lrwxrwxrwx 1 root root 20 2010-01-01 00:05 MISC -> /dev/block/mmcblk0p8
+lrwxrwxrwx 1 root root 20 2010-01-01 00:05 boot -> /dev/block/mmcblk0p9
+lrwxrwxrwx 1 root root 21 2010-01-01 00:05 cache -> /dev/block/mmcblk0p12
+lrwxrwxrwx 1 root root 20 2010-01-01 00:05 dkb -> /dev/block/mmcblk0p2
+lrwxrwxrwx 1 root root 20 2010-01-01 00:05 expdb -> /dev/block/mmcblk0p7
+lrwxrwxrwx 1 root root 20 2010-01-01 00:05 kb -> /dev/block/mmcblk0p1
+lrwxrwxrwx 1 root root 20 2010-01-01 00:05 lk -> /dev/block/mmcblk0p3
+lrwxrwxrwx 1 root root 20 2010-01-01 00:05 logo -> /dev/block/mmcblk0p5
+lrwxrwxrwx 1 root root 18 2010-01-01 00:05 mmcblk0 -> /dev/block/mmcblk0
+lrwxrwxrwx 1 root root 23 2010-01-01 00:05 mmcblk0boot0 -> /dev/block/mmcblk0boot0
+lrwxrwxrwx 1 root root 23 2010-01-01 00:05 mmcblk0boot1 -> /dev/block/mmcblk0boot1
+lrwxrwxrwx 1 root root 22 2010-01-01 00:05 mmcblk0rpmb -> /dev/block/mmcblk0rpmb
+lrwxrwxrwx 1 root root 21 2010-01-01 00:05 recovery -> /dev/block/mmcblk0p10
+lrwxrwxrwx 1 root root 21 2010-01-01 00:05 system -> /dev/block/mmcblk0p11
+lrwxrwxrwx 1 root root 20 2010-01-01 00:05 tee1 -> /dev/block/mmcblk0p4
+lrwxrwxrwx 1 root root 20 2010-01-01 00:05 tee2 -> /dev/block/mmcblk0p6
+lrwxrwxrwx 1 root root 21 2010-01-01 00:05 userdata -> /dev/block/mmcblk0p13
+/sys/block/mmcblk0: size=15269888 name=H8G4a2 cid=<cid>
+/sys/block/mmcblk0boot0: size=2048 name= cid=
+/sys/block/mmcblk0rpmb: size=8192 name= cid=
+Filesystem            1K-blocks    Used Available Use% Mounted on
+/dev/block/mmcblk0p11   1677160 1063168    613992  64% /
+/dev/block/mmcblk0p12    237412      56    237356   1% /cache
+/dev/block/mmcblk0p13   5441264   18912   5422352   1% /data
+/data/media             5441264   18912   5422352   1% /mnt/runtime/default/emulated
+/dev/fuse               5441264   18912   5422352   1% /mnt/user/0/emulated
+tmpfs /dev tmpfs rw,seclabel,nosuid,relatime,size=977048k,nr_inodes=244262,mode=755 0 0
+devpts /dev/pts devpts rw,seclabel,relatime,mode=600,ptmxmode=000 0 0
+proc /proc proc rw,relatime,gid=3009,hidepid=2 0 0
+sysfs /sys sysfs rw,seclabel,relatime 0 0
+selinuxfs /sys/fs/selinux selinuxfs rw,relatime 0 0
+tmpfs /mnt tmpfs rw,seclabel,nosuid,nodev,noexec,relatime,size=977048k,nr_inodes=244262,mode=755,gid=1000 0 0
+/dev/block/platform/soc/11230000.mmc/by-name/system / ext4 ro,seclabel,nodev,relatime 0 0
+tmpfs /apex tmpfs rw,seclabel,nosuid,nodev,noexec,relatime,size=977048k,nr_inodes=244262,mode=755 0 0
+tmpfs /linkerconfig tmpfs rw,seclabel,nosuid,nodev,noexec,relatime,size=977048k,nr_inodes=244262,mode=755 0 0
+tmpfs /mnt/installer tmpfs rw,seclabel,nosuid,nodev,noexec,relatime,size=977048k,nr_inodes=244262,mode=755,gid=1000 0 0
+tmpfs /mnt/androidwritable tmpfs rw,seclabel,nosuid,nodev,noexec,relatime,size=977048k,nr_inodes=244262,mode=755,gid=1000 0 0
+/dev/block/platform/soc/11230000.mmc/by-name/system /apex/com.android.adbd ext4 ro,seclabel,relatime 0 0
+/dev/block/platform/soc/11230000.mmc/by-name/system /apex/com.android.art ext4 ro,seclabel,relatime 0 0
+/dev/block/platform/soc/11230000.mmc/by-name/system /apex/com.android.conscrypt ext4 ro,seclabel,relatime 0 0
+/dev/block/platform/soc/11230000.mmc/by-name/system /apex/com.android.extservices ext4 ro,seclabel,relatime 0 0
+/dev/block/platform/soc/11230000.mmc/by-name/system /apex/com.android.i18n ext4 ro,seclabel,relatime 0 0
+/dev/block/platform/soc/11230000.mmc/by-name/system /apex/com.android.ipsec ext4 ro,seclabel,relatime 0 0
+/dev/block/platform/soc/11230000.mmc/by-name/system /apex/com.android.media ext4 ro,seclabel,relatime 0 0
+/dev/block/platform/soc/11230000.mmc/by-name/system /apex/com.android.media.swcodec ext4 ro,seclabel,relatime 0 0
+/dev/block/platform/soc/11230000.mmc/by-name/system /apex/com.android.mediaprovider ext4 ro,seclabel,relatime 0 0
+/dev/block/platform/soc/11230000.mmc/by-name/system /apex/com.android.neuralnetworks ext4 ro,seclabel,relatime 0 0
+/dev/block/platform/soc/11230000.mmc/by-name/system /apex/com.android.os.statsd ext4 ro,seclabel,relatime 0 0
+/dev/block/platform/soc/11230000.mmc/by-name/system /apex/com.android.permission ext4 ro,seclabel,relatime 0 0
+/dev/block/platform/soc/11230000.mmc/by-name/system /apex/com.android.resolv ext4 ro,seclabel,relatime 0 0
+/dev/block/platform/soc/11230000.mmc/by-name/system /apex/com.android.runtime ext4 ro,seclabel,relatime 0 0
+/dev/block/platform/soc/11230000.mmc/by-name/system /apex/com.android.sdkext ext4 ro,seclabel,relatime 0 0
+/dev/block/platform/soc/11230000.mmc/by-name/system /apex/com.android.tethering ext4 ro,seclabel,relatime 0 0
+/dev/block/platform/soc/11230000.mmc/by-name/system /apex/com.android.tethering ext4 ro,seclabel,relatime 0 0
+/dev/block/platform/soc/11230000.mmc/by-name/system /system/apex/com.android.tethering ext4 ro,seclabel,relatime 0 0
+/dev/block/platform/soc/11230000.mmc/by-name/system /apex/com.android.tzdata ext4 ro,seclabel,relatime 0 0
+/dev/block/platform/soc/11230000.mmc/by-name/system /apex/com.android.wifi ext4 ro,seclabel,relatime 0 0
+none /sys/fs/cgroup cgroup2 rw,nosuid,nodev,noexec,relatime 0 0
+none /dev/cpuctl cgroup rw,nosuid,nodev,noexec,relatime,cpu 0 0
+none /acct cgroup rw,nosuid,nodev,noexec,relatime,cpuacct 0 0
+none /dev/memcg cgroup rw,nosuid,nodev,noexec,relatime,memory 0 0
+tmpfs /linkerconfig tmpfs rw,seclabel,nosuid,nodev,noexec,relatime,size=977048k,nr_inodes=244262,mode=755 0 0
+tracefs /sys/kernel/tracing tracefs rw,seclabel,relatime 0 0
+debugfs /sys/kernel/debug debugfs rw,seclabel,relatime 0 0
+none /config configfs rw,nosuid,nodev,noexec,relatime 0 0
+none /sys/fs/fuse/connections fusectl rw,relatime 0 0
+bpf /sys/fs/bpf bpf rw,nosuid,nodev,noexec,relatime 0 0
+pstore /sys/fs/pstore pstore rw,seclabel,nosuid,nodev,noexec,relatime 0 0
+tracefs /sys/kernel/debug/tracing tracefs rw,seclabel,relatime 0 0
+/dev/block/platform/soc/11230000.mmc/by-name/cache /cache ext4 rw,seclabel,nosuid,nodev,noatime,noauto_da_alloc,data=ordered 0 0
+/dev/block/platform/soc/11230000.mmc/by-name/userdata /data ext4 rw,seclabel,nosuid,nodev,noatime,noauto_da_alloc,resgid=1065,errors=remount-ro,data=ordered 0 0
+/dev/block/platform/soc/11230000.mmc/by-name/userdata /data/user/0 ext4 rw,seclabel,nosuid,nodev,noatime,noauto_da_alloc,resgid=1065,errors=remount-ro,data=ordered 0 0
+tmpfs /data_mirror tmpfs rw,seclabel,nosuid,nodev,noexec,relatime,size=977048k,nr_inodes=244262,mode=700,gid=1000 0 0
+/dev/block/platform/soc/11230000.mmc/by-name/userdata /data_mirror/data_ce/null ext4 rw,seclabel,nosuid,nodev,noatime,noauto_da_alloc,resgid=1065,errors=remount-ro,data=ordered 0 0
+/dev/block/platform/soc/11230000.mmc/by-name/userdata /data_mirror/data_ce/null/0 ext4 rw,seclabel,nosuid,nodev,noatime,noauto_da_alloc,resgid=1065,errors=remount-ro,data=ordered 0 0
+/dev/block/platform/soc/11230000.mmc/by-name/userdata /data_mirror/data_de/null ext4 rw,seclabel,nosuid,nodev,noatime,noauto_da_alloc,resgid=1065,errors=remount-ro,data=ordered 0 0
+/dev/block/platform/soc/11230000.mmc/by-name/userdata /data_mirror/cur_profiles ext4 rw,seclabel,nosuid,nodev,noatime,noauto_da_alloc,resgid=1065,errors=remount-ro,data=ordered 0 0
+tmpfs /storage tmpfs rw,seclabel,nosuid,nodev,noexec,relatime,size=977048k,nr_inodes=244262,mode=755,gid=1000 0 0
+adb /dev/usb-ffs/adb functionfs rw,relatime 0 0
+/data/media /mnt/runtime/default/emulated sdcardfs rw,nosuid,nodev,noexec,noatime,fsuid=1023,fsgid=1023,gid=1015,multiuser,mask=6,derive_gid,default_normal 0 0
+/data/media /mnt/runtime/read/emulated sdcardfs rw,nosuid,nodev,noexec,noatime,fsuid=1023,fsgid=1023,gid=9997,multiuser,mask=23,derive_gid,default_normal 0 0
+/data/media /mnt/runtime/write/emulated sdcardfs rw,nosuid,nodev,noexec,noatime,fsuid=1023,fsgid=1023,gid=9997,multiuser,mask=7,derive_gid,default_normal 0 0
+/data/media /mnt/runtime/full/emulated sdcardfs rw,nosuid,nodev,noexec,noatime,fsuid=1023,fsgid=1023,gid=9997,multiuser,mask=7,derive_gid,default_normal 0 0
+/dev/fuse /mnt/user/0/emulated fuse rw,lazytime,nosuid,nodev,noexec,noatime,user_id=0,group_id=0,allow_other 0 0
+/dev/fuse /mnt/installer/0/emulated fuse rw,lazytime,nosuid,nodev,noexec,noatime,user_id=0,group_id=0,allow_other 0 0
+/dev/fuse /mnt/androidwritable/0/emulated fuse rw,lazytime,nosuid,nodev,noexec,noatime,user_id=0,group_id=0,allow_other 0 0
+/dev/fuse /storage/emulated fuse rw,lazytime,nosuid,nodev,noexec,noatime,user_id=0,group_id=0,allow_other 0 0
+/data/media /mnt/pass_through/0/emulated sdcardfs rw,nosuid,nodev,noexec,noatime,fsuid=1023,fsgid=1023,gid=9997,multiuser,mask=7,derive_gid,default_normal 0 0
+/data/media /mnt/user/0/emulated/0/Android/data sdcardfs rw,nosuid,nodev,noexec,noatime,fsuid=1023,fsgid=1023,gid=1015,multiuser,mask=6,derive_gid,default_normal 0 0
+/data/media /storage/emulated/0/Android/data sdcardfs rw,nosuid,nodev,noexec,noatime,fsuid=1023,fsgid=1023,gid=1015,multiuser,mask=6,derive_gid,default_normal 0 0
+/data/media /mnt/androidwritable/0/emulated/0/Android/data sdcardfs rw,nosuid,nodev,noexec,noatime,fsuid=1023,fsgid=1023,gid=1015,multiuser,mask=6,derive_gid,default_normal 0 0
+/data/media /mnt/installer/0/emulated/0/Android/data sdcardfs rw,nosuid,nodev,noexec,noatime,fsuid=1023,fsgid=1023,gid=1015,multiuser,mask=6,derive_gid,default_normal 0 0
+/data/media /mnt/user/0/emulated/0/Android/obb sdcardfs rw,nosuid,nodev,noexec,noatime,fsuid=1023,fsgid=1023,gid=1015,multiuser,mask=6,derive_gid,default_normal 0 0
+/data/media /storage/emulated/0/Android/obb sdcardfs rw,nosuid,nodev,noexec,noatime,fsuid=1023,fsgid=1023,gid=1015,multiuser,mask=6,derive_gid,default_normal 0 0
+/data/media /mnt/androidwritable/0/emulated/0/Android/obb sdcardfs rw,nosuid,nodev,noexec,noatime,fsuid=1023,fsgid=1023,gid=1015,multiuser,mask=6,derive_gid,default_normal 0 0
+/data/media /mnt/installer/0/emulated/0/Android/obb sdcardfs rw,nosuid,nodev,noexec,noatime,fsuid=1023,fsgid=1023,gid=9997,multiuser,mask=7,derive_gid,default_normal 0 0
+
+===== kernel cmdline (open question 3)
+console=tty0 console=ttyS0,921600n1 console=ttyMT0,921600n1 earlycon=uart8250,mmio32,0x11002000 root=/dev/ram vmalloc=496M androidboot.hardware=mt8163 androidboot.unlocked_kernel=true androidboot.rpmb_state=1 androidboot.secure_cpu=1 androidboot.prod=1 androidboot.pl_version=0x0000 androidboot.tee_version=0x0000 androidboot.lk_version=0x0000 androidboot.pl_build_desc=8ec9006-20170927_201132 androidboot.lk_build_desc=c1c79aa-20220824_171625 bootopt=64S3,32N2,64N2 console=ttyMT0,921600n1 firmware_class.path=/vendor/firmware androidboot.selinux=permissive buildvariant=userdebug lcm=1-hx8379c_wvga_dsi_vdo fps=5982 vram=4194304 printk.disable_uart=1 bootprof.pl_t=2258 bootprof.lk_t=2520 boot_reason=4 androidboot.serialno=<serial> androidboot.bootreason=wdt_by_pass_pwk nt35521_id=1
+
+===== kernel config (if built in)
+CONFIG_IKCONFIG=y
+CONFIG_MODVERSIONS=y
+CONFIG_CUSTOM_KERNEL_IMGSENSOR="gc0312_mipi_raw"
+CONFIG_MTK_CAMERA_ISP=y
+CONFIG_CUSTOM_KERNEL_LCM="hx8379c_dsi_wvga_vdo_rook"
+CONFIG_LCM_HEIGHT="800"
+CONFIG_LCM_WIDTH="400"
+CONFIG_SND_SOC_4_MICS=y
+CONFIG_USB_CONFIGFS=y
+CONFIG_PSTORE=y
+
+===== previous boot's kernel log
+total 0
+
+===== modules
+amzn_bcmdhd 2492020 0 - Live 0x0000000000000000 (O)
+--- /vendor/lib/modules
+total 3548
+-rw-r--r-- 1 root root 3559192 2009-01-01 00:00 amzn-bcmdhd.ko
+-rw-r--r-- 1 root root   30864 2009-01-01 00:00 br_netfilter.ko
+-rw-r--r-- 1 root root   20112 2009-01-01 00:00 efivarfs.ko
+-rw-r--r-- 1 root root     131 2009-01-01 00:00 modules.alias
+-rw-r--r-- 1 root root     105 2009-01-01 00:00 modules.dep
+-rw-r--r-- 1 root root      55 2009-01-01 00:00 modules.softdep
+-rw-r--r-- 1 root root    5992 2009-01-01 00:00 xt_physdev.ko
+
+===== idme / factory data
+DKB
+KB
+alscal
+board_id
+bootcount
+bootmode
+bt_mac_addr
+bt_mfg
+dev_flags
+device_type_id
+fos_flags
+locale
+mac_addr
+mac_sec
+manufacturing
+mfg.locale
+miccal.0
+miccal.1
+miccal.2
+miccal.3
+postmode
+product_name
+productid
+productid2
+region
+sensorcal
+serial
+unlock_code
+usr_flags
+wifi_mfg
+board_id=<board-id>
+product_name=0
+productid=03
+productid2=FL
+serial=<serial>
+mac_addr=<mac>
+bt_mac_addr=<mac>
+bootcount=306
+dev_flags=0
+
+===== audio: /proc/asound (open question 6)
+ 0 [mtsndcard      ]: mt-snd-card - mt-snd-card
+                      mt-snd-card
+  1:        : sequencer
+  2: [ 0]   : control
+  3: [ 0- 0]: digital audio playback
+  4: [ 0- 1]: digital audio capture
+  5: [ 0- 2]: digital audio playback
+  6: [ 0- 2]: digital audio capture
+  7: [ 0- 3]: digital audio playback
+  8: [ 0- 3]: digital audio capture
+  9: [ 0- 4]: digital audio playback
+ 10: [ 0- 4]: digital audio capture
+ 11: [ 0- 5]: digital audio playback
+ 12: [ 0- 5]: digital audio capture
+ 13: [ 0- 6]: digital audio playback
+ 14: [ 0- 6]: digital audio capture
+ 15: [ 0- 7]: digital audio playback
+ 16: [ 0- 8]: digital audio capture
+ 17: [ 0- 9]: digital audio playback
+ 18: [ 0-10]: digital audio playback
+ 19: [ 0-11]: digital audio capture
+ 20: [ 0-12]: digital audio capture
+ 21: [ 0-13]: digital audio playback
+ 22: [ 0-14]: digital audio capture
+ 23: [ 0-15]: digital audio capture
+ 24: [ 0-16]: digital audio playback
+ 25: [ 0-16]: digital audio capture
+ 26: [ 0-17]: digital audio playback
+ 27: [ 0-18]: digital audio playback
+ 28: [ 0-19]: digital audio playback
+ 29: [ 0-20]: digital audio playback
+ 30: [ 0-20]: digital audio capture
+ 31: [ 0-21]: digital audio playback
+ 33:        : timer
+ 34: [ 0-21]: digital audio capture
+ 35: [ 0-22]: digital audio capture
+ 36: [ 0-23]: digital audio playback
+ 37: [ 0-24]: digital audio playback
+00-00: MultiMedia1_PLayback mt-soc-codec-tx-dai-0 :  : playback 1
+00-01: MultiMedia1_Capture mt-soc-codec-rx-dai-1 :  : capture 1
+00-02: Voice_MD1_PLayback mt-soc-codec-voicemd1-dai-2 :  : playback 1 : capture 1
+00-03: ULDL_Loopback mt-soc-codec-uldlloopback-dai-3 :  : playback 1 : capture 1
+00-04: I2S0_PLayback mt-soc-i2s0-dummy-dai-codec-4 :  : playback 1 : capture 1
+00-05: MRGRX_PLayback mt-soc-mrgrx-dai-codec-5 :  : playback 1 : capture 1
+00-06: MRGRX_CAPTURE mt-soc-mrgrx-dummy-dai-codec-6 :  : playback 1 : capture 1
+00-07: I2S0DL1_PLayback mt-soc-codec-I2s0tx-dai-7 :  : playback 1
+00-08: DL1_AWB_Record mt-soc-codec-dl1awb-dai-8 :  : capture 1
+00-09: Voice_MD1_BT_Playback mt-soc-codec-voicemd1-bt-dai-9 :  : playback 1
+00-10: VOIP_Call_BT_Playback mt-soc-codec-voipcall-btout-dai-10 :  : playback 1
+00-11: VOIP_Call_BT_Capture mt-soc-codec-voipcall-btin-dai-11 :  : capture 1
+00-12: TDM_Debug_Record mt-soc-tdmrx-dai-codec-12 :  : capture 1
+00-13: FM_MRGTX_Playback mt-soc-fmmrg2tx-dummy-dai-codec-13 :  : playback 1
+00-14: MultiMediaData2_Capture mt-soc-codec-rx-dai2-14 :  : capture 1
+00-15: I2S0AWB_Capture mt-soc-codec-i2s0awb-dai-15 :  : capture 1
+00-16: Voice_MD2_PLayback mt-soc-codec-voicemd2-dai-16 :  : playback 1 : capture 1
+00-17: MultiMedia_Routing mt-soc-dummy-dai-codec-17 :  : playback 1
+00-18: Voice_MD2_BT_Playback mt-soc-codec-voicemd2-bt-dai-18 :  : playback 1
+00-19: HP_IMPEDANCE_Playback mt-soc-codec-hp-impedance-dai-19 :  : playback 1
+00-20: FM_I2S_Playback mt-soc-fm-i2s-dai-codec-20 :  : playback 1 : capture 1
+00-21: FM_I2S_Capture mt-soc-fm-i2s-dummy-dai-codec-21 :  : playback 1 : capture 1
+00-22: TLV320AIC3101 Capture tlv320aic3101-codec-22 :  : capture 1
+00-23: TLV320AIC3204 Playback tlv320aic32x4-hifi-23 :  : playback 1
+00-24: I2S1_Playback mt-soc-dummy-dai-codec-24 :  : playback 1
+total 0
+crw-rw---- 1 system audio  14,  12 2010-01-01 00:05 adsp
+crw-rw---- 1 system audio  14,   4 2010-01-01 00:05 audio
+crw-rw---- 1 system audio 116,   2 2010-01-01 00:05 controlC0
+crw-rw---- 1 system audio  14,   3 2010-01-01 00:05 dsp
+crw-rw---- 1 system audio  14,   0 2010-01-01 00:05 mixer
+crw-rw---- 1 system audio 116,   3 2010-01-01 00:05 pcmC0D0p
+crw-rw---- 1 system audio 116,  18 2010-01-01 00:05 pcmC0D10p
+crw-rw---- 1 system audio 116,  19 2010-01-01 00:05 pcmC0D11c
+crw-rw---- 1 system audio 116,  20 2010-01-01 00:05 pcmC0D12c
+crw-rw---- 1 system audio 116,  21 2010-01-01 00:05 pcmC0D13p
+crw-rw---- 1 system audio 116,  22 2010-01-01 00:05 pcmC0D14c
+crw-rw---- 1 system audio 116,  23 2010-01-01 00:05 pcmC0D15c
+crw-rw---- 1 system audio 116,  25 2010-01-01 00:05 pcmC0D16c
+crw-rw---- 1 system audio 116,  24 2010-01-01 00:05 pcmC0D16p
+crw-rw---- 1 system audio 116,  26 2010-01-01 00:05 pcmC0D17p
+crw-rw---- 1 system audio 116,  27 2010-01-01 00:05 pcmC0D18p
+crw-rw---- 1 system audio 116,  28 2010-01-01 00:05 pcmC0D19p
+crw-rw---- 1 system audio 116,   4 2010-01-01 00:05 pcmC0D1c
+crw-rw---- 1 system audio 116,  30 2010-01-01 00:05 pcmC0D20c
+crw-rw---- 1 system audio 116,  29 2010-01-01 00:05 pcmC0D20p
+crw-rw---- 1 system audio 116,  34 2010-01-01 00:05 pcmC0D21c
+crw-rw---- 1 system audio 116,  31 2010-01-01 00:05 pcmC0D21p
+crw-rw---- 1 system audio 116,  35 2010-01-01 00:05 pcmC0D22c
+crw-rw---- 1 system audio 116,  36 2010-01-01 00:05 pcmC0D23p
+crw-rw---- 1 system audio 116,  37 2010-01-01 00:05 pcmC0D24p
+crw-rw---- 1 system audio 116,   6 2010-01-01 00:05 pcmC0D2c
+crw-rw---- 1 system audio 116,   5 2010-01-01 00:05 pcmC0D2p
+crw-rw---- 1 system audio 116,   8 2010-01-01 00:05 pcmC0D3c
+crw-rw---- 1 system audio 116,   7 2010-01-01 00:05 pcmC0D3p
+crw-rw---- 1 system audio 116,  10 2010-01-01 00:05 pcmC0D4c
+crw-rw---- 1 system audio 116,   9 2010-01-01 00:05 pcmC0D4p
+crw-rw---- 1 system audio 116,  12 2010-01-01 00:05 pcmC0D5c
+crw-rw---- 1 system audio 116,  11 2010-01-01 00:05 pcmC0D5p
+crw-rw---- 1 system audio 116,  14 2010-01-01 00:05 pcmC0D6c
+crw-rw---- 1 system audio 116,  13 2010-01-01 00:05 pcmC0D6p
+crw-rw---- 1 system audio 116,  15 2010-01-01 00:05 pcmC0D7p
+crw-rw---- 1 system audio 116,  16 2010-01-01 00:05 pcmC0D8c
+crw-rw---- 1 system audio 116,  17 2010-01-01 00:05 pcmC0D9p
+crw-rw---- 1 system audio 116,   1 2010-01-01 00:05 seq
+crw-rw---- 1 system audio  14,   1 2010-01-01 00:05 sequencer
+crw-rw---- 1 system audio  14,   8 2010-01-01 00:05 sequencer2
+crw-rw---- 1 system audio 116,  33 2010-01-01 00:05 timer
+--- /proc/asound/card0/pcm0p: card: 0 device: 0 subdevice: 0 stream: PLAYBACK id: MultiMedia1_PLayback mt-soc-codec-tx-dai-0 name:  subname: subdevice #0 class: 0 subclass: 0 subdevices_count: 1 subdevices_avail: 1 
+    hw_params: closed
+--- /proc/asound/card0/pcm10p: card: 0 device: 10 subdevice: 0 stream: PLAYBACK id: VOIP_Call_BT_Playback mt-soc-codec-voipcall-btout-dai-10 name:  subname: subdevice #0 class: 0 subclass: 0 subdevices_count: 1 subdevices_avail: 1 
+    hw_params: closed
+--- /proc/asound/card0/pcm11c: card: 0 device: 11 subdevice: 0 stream: CAPTURE id: VOIP_Call_BT_Capture mt-soc-codec-voipcall-btin-dai-11 name:  subname: subdevice #0 class: 0 subclass: 0 subdevices_count: 1 subdevices_avail: 1 
+    hw_params: closed
+--- /proc/asound/card0/pcm12c: card: 0 device: 12 subdevice: 0 stream: CAPTURE id: TDM_Debug_Record mt-soc-tdmrx-dai-codec-12 name:  subname: subdevice #0 class: 0 subclass: 0 subdevices_count: 1 subdevices_avail: 1 
+    hw_params: closed
+--- /proc/asound/card0/pcm13p: card: 0 device: 13 subdevice: 0 stream: PLAYBACK id: FM_MRGTX_Playback mt-soc-fmmrg2tx-dummy-dai-codec-13 name:  subname: subdevice #0 class: 0 subclass: 0 subdevices_count: 1 subdevices_avail: 1 
+    hw_params: closed
+--- /proc/asound/card0/pcm14c: card: 0 device: 14 subdevice: 0 stream: CAPTURE id: MultiMediaData2_Capture mt-soc-codec-rx-dai2-14 name:  subname: subdevice #0 class: 0 subclass: 0 subdevices_count: 1 subdevices_avail: 1 
+    hw_params: closed
+--- /proc/asound/card0/pcm15c: card: 0 device: 15 subdevice: 0 stream: CAPTURE id: I2S0AWB_Capture mt-soc-codec-i2s0awb-dai-15 name:  subname: subdevice #0 class: 0 subclass: 0 subdevices_count: 1 subdevices_avail: 1 
+    hw_params: closed
+--- /proc/asound/card0/pcm16c: card: 0 device: 16 subdevice: 0 stream: CAPTURE id: Voice_MD2_PLayback mt-soc-codec-voicemd2-dai-16 name:  subname: subdevice #0 class: 0 subclass: 0 subdevices_count: 1 subdevices_avail: 1 
+    hw_params: closed
+--- /proc/asound/card0/pcm16p: card: 0 device: 16 subdevice: 0 stream: PLAYBACK id: Voice_MD2_PLayback mt-soc-codec-voicemd2-dai-16 name:  subname: subdevice #0 class: 0 subclass: 0 subdevices_count: 1 subdevices_avail: 1 
+    hw_params: closed
+--- /proc/asound/card0/pcm17p: card: 0 device: 17 subdevice: 0 stream: PLAYBACK id: MultiMedia_Routing mt-soc-dummy-dai-codec-17 name:  subname: subdevice #0 class: 0 subclass: 0 subdevices_count: 1 subdevices_avail: 1 
+    hw_params: closed
+--- /proc/asound/card0/pcm18p: card: 0 device: 18 subdevice: 0 stream: PLAYBACK id: Voice_MD2_BT_Playback mt-soc-codec-voicemd2-bt-dai-18 name:  subname: subdevice #0 class: 0 subclass: 0 subdevices_count: 1 subdevices_avail: 1 
+    hw_params: closed
+--- /proc/asound/card0/pcm19p: card: 0 device: 19 subdevice: 0 stream: PLAYBACK id: HP_IMPEDANCE_Playback mt-soc-codec-hp-impedance-dai-19 name:  subname: subdevice #0 class: 0 subclass: 0 subdevices_count: 1 subdevices_avail: 1 
+    hw_params: closed
+--- /proc/asound/card0/pcm1c: card: 0 device: 1 subdevice: 0 stream: CAPTURE id: MultiMedia1_Capture mt-soc-codec-rx-dai-1 name:  subname: subdevice #0 class: 0 subclass: 0 subdevices_count: 1 subdevices_avail: 1 
+    hw_params: closed
+--- /proc/asound/card0/pcm20c: card: 0 device: 20 subdevice: 0 stream: CAPTURE id: FM_I2S_Playback mt-soc-fm-i2s-dai-codec-20 name:  subname: subdevice #0 class: 0 subclass: 0 subdevices_count: 1 subdevices_avail: 1 
+    hw_params: closed
+--- /proc/asound/card0/pcm20p: card: 0 device: 20 subdevice: 0 stream: PLAYBACK id: FM_I2S_Playback mt-soc-fm-i2s-dai-codec-20 name:  subname: subdevice #0 class: 0 subclass: 0 subdevices_count: 1 subdevices_avail: 1 
+    hw_params: closed
+--- /proc/asound/card0/pcm21c: card: 0 device: 21 subdevice: 0 stream: CAPTURE id: FM_I2S_Capture mt-soc-fm-i2s-dummy-dai-codec-21 name:  subname: subdevice #0 class: 0 subclass: 0 subdevices_count: 1 subdevices_avail: 1 
+    hw_params: closed
+--- /proc/asound/card0/pcm21p: card: 0 device: 21 subdevice: 0 stream: PLAYBACK id: FM_I2S_Capture mt-soc-fm-i2s-dummy-dai-codec-21 name:  subname: subdevice #0 class: 0 subclass: 0 subdevices_count: 1 subdevices_avail: 1 
+    hw_params: closed
+--- /proc/asound/card0/pcm22c: card: 0 device: 22 subdevice: 0 stream: CAPTURE id: TLV320AIC3101 Capture tlv320aic3101-codec-22 name:  subname: subdevice #0 class: 0 subclass: 0 subdevices_count: 1 subdevices_avail: 1 
+    hw_params: closed
+--- /proc/asound/card0/pcm23p: card: 0 device: 23 subdevice: 0 stream: PLAYBACK id: TLV320AIC3204 Playback tlv320aic32x4-hifi-23 name:  subname: subdevice #0 class: 0 subclass: 0 subdevices_count: 1 subdevices_avail: 0 
+    hw_params: access: RW_INTERLEAVED
+    hw_params: format: S16_LE
+    hw_params: subformat: STD
+    hw_params: channels: 2
+    hw_params: rate: 48000 (48000/1)
+    hw_params: period_size: 1536
+    hw_params: buffer_size: 3072
+--- /proc/asound/card0/pcm24p: card: 0 device: 24 subdevice: 0 stream: PLAYBACK id: I2S1_Playback mt-soc-dummy-dai-codec-24 name:  subname: subdevice #0 class: 0 subclass: 0 subdevices_count: 1 subdevices_avail: 1 
+    hw_params: closed
+--- /proc/asound/card0/pcm2c: card: 0 device: 2 subdevice: 0 stream: CAPTURE id: Voice_MD1_PLayback mt-soc-codec-voicemd1-dai-2 name:  subname: subdevice #0 class: 0 subclass: 0 subdevices_count: 1 subdevices_avail: 1 
+    hw_params: closed
+--- /proc/asound/card0/pcm2p: card: 0 device: 2 subdevice: 0 stream: PLAYBACK id: Voice_MD1_PLayback mt-soc-codec-voicemd1-dai-2 name:  subname: subdevice #0 class: 0 subclass: 0 subdevices_count: 1 subdevices_avail: 1 
+    hw_params: closed
+--- /proc/asound/card0/pcm3c: card: 0 device: 3 subdevice: 0 stream: CAPTURE id: ULDL_Loopback mt-soc-codec-uldlloopback-dai-3 name:  subname: subdevice #0 class: 0 subclass: 0 subdevices_count: 1 subdevices_avail: 1 
+    hw_params: closed
+--- /proc/asound/card0/pcm3p: card: 0 device: 3 subdevice: 0 stream: PLAYBACK id: ULDL_Loopback mt-soc-codec-uldlloopback-dai-3 name:  subname: subdevice #0 class: 0 subclass: 0 subdevices_count: 1 subdevices_avail: 1 
+    hw_params: closed
+--- /proc/asound/card0/pcm4c: card: 0 device: 4 subdevice: 0 stream: CAPTURE id: I2S0_PLayback mt-soc-i2s0-dummy-dai-codec-4 name:  subname: subdevice #0 class: 0 subclass: 0 subdevices_count: 1 subdevices_avail: 1 
+    hw_params: closed
+--- /proc/asound/card0/pcm4p: card: 0 device: 4 subdevice: 0 stream: PLAYBACK id: I2S0_PLayback mt-soc-i2s0-dummy-dai-codec-4 name:  subname: subdevice #0 class: 0 subclass: 0 subdevices_count: 1 subdevices_avail: 1 
+    hw_params: closed
+--- /proc/asound/card0/pcm5c: card: 0 device: 5 subdevice: 0 stream: CAPTURE id: MRGRX_PLayback mt-soc-mrgrx-dai-codec-5 name:  subname: subdevice #0 class: 0 subclass: 0 subdevices_count: 1 subdevices_avail: 1 
+    hw_params: closed
+--- /proc/asound/card0/pcm5p: card: 0 device: 5 subdevice: 0 stream: PLAYBACK id: MRGRX_PLayback mt-soc-mrgrx-dai-codec-5 name:  subname: subdevice #0 class: 0 subclass: 0 subdevices_count: 1 subdevices_avail: 1 
+    hw_params: closed
+--- /proc/asound/card0/pcm6c: card: 0 device: 6 subdevice: 0 stream: CAPTURE id: MRGRX_CAPTURE mt-soc-mrgrx-dummy-dai-codec-6 name:  subname: subdevice #0 class: 0 subclass: 0 subdevices_count: 1 subdevices_avail: 1 
+    hw_params: closed
+--- /proc/asound/card0/pcm6p: card: 0 device: 6 subdevice: 0 stream: PLAYBACK id: MRGRX_CAPTURE mt-soc-mrgrx-dummy-dai-codec-6 name:  subname: subdevice #0 class: 0 subclass: 0 subdevices_count: 1 subdevices_avail: 1 
+    hw_params: closed
+--- /proc/asound/card0/pcm7p: card: 0 device: 7 subdevice: 0 stream: PLAYBACK id: I2S0DL1_PLayback mt-soc-codec-I2s0tx-dai-7 name:  subname: subdevice #0 class: 0 subclass: 0 subdevices_count: 1 subdevices_avail: 1 
+    hw_params: closed
+--- /proc/asound/card0/pcm8c: card: 0 device: 8 subdevice: 0 stream: CAPTURE id: DL1_AWB_Record mt-soc-codec-dl1awb-dai-8 name:  subname: subdevice #0 class: 0 subclass: 0 subdevices_count: 1 subdevices_avail: 1 
+    hw_params: closed
+--- /proc/asound/card0/pcm9p: card: 0 device: 9 subdevice: 0 stream: PLAYBACK id: Voice_MD1_BT_Playback mt-soc-codec-voicemd1-bt-dai-9 name:  subname: subdevice #0 class: 0 subclass: 0 subdevices_count: 1 subdevices_avail: 1 
+    hw_params: closed
+
+===== audio: mixer controls
+/proc/asound/card0/id: mtsndcard
+tinymix not available
+
+===== audio: configuration files
+-rw-r--r-- 1 root root 2559 2009-01-01 00:00 /system/etc/audio_device.xml
+-rw-r--r-- 1 root root 7356 2009-01-01 00:00 /vendor/etc/audio_policy_configuration.xml
+audio.a2dp.default.so
+android.hardware.audio.effect@2.0-impl.so
+android.hardware.audio@2.0-impl.so
+android.hardware.bluetooth.audio@2.0-impl.so
+audio.bluetooth.default.so
+audio.primary.amazon_wrapper.so
+audio.primary.default.so
+audio.primary_amazon.mt8163.so
+audio.r_submix.default.so
+audio.usb.default.so
+
+===== input devices
+add device 1: /dev/input/event1
+  name:     "ACCDET"
+  events:
+  input props:
+    <none>
+add device 2: /dev/input/event2
+  name:     "hwmdata"
+  events:
+    REL (0002): REL_Y                 REL_Z                
+  input props:
+    <none>
+add device 3: /dev/input/event4
+  name:     "keys"
+  events:
+    KEY (0001): KEY_VOLUMEDOWN        KEY_VOLUMEUP         
+  input props:
+    <none>
+add device 4: /dev/input/event5
+  name:     "mtk-tpd"
+  events:
+    KEY (0001): BTN_TOUCH            
+    ABS (0003): ABS_X                 : value 0, min 0, max 480, fuzz 0, flat 0, resolution 480
+                ABS_Y                 : value 0, min 0, max 480, fuzz 0, flat 0, resolution 480
+                ABS_PRESSURE          : value 0, min 0, max 255, fuzz 0, flat 0, resolution 0
+                ABS_MT_TOUCH_MAJOR    : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_MT_TOUCH_MINOR    : value 0, min 0, max 100, fuzz 0, flat 0, resolution 0
+                ABS_MT_POSITION_X     : value 0, min 0, max 480, fuzz 0, flat 0, resolution 0
+                ABS_MT_POSITION_Y     : value 0, min 0, max 480, fuzz 0, flat 0, resolution 0
+                ABS_MT_TRACKING_ID    : value 0, min 0, max 10, fuzz 0, flat 0, resolution 0
+  input props:
+    INPUT_PROP_DIRECT
+add device 5: /dev/input/event3
+  name:     "m_alsps_input"
+  events:
+    REL (0002): REL_Y                 REL_Z                
+    ABS (0003): ABS_X                 : value 0, min -32768, max 32767, fuzz 0, flat 0, resolution 0
+                ABS_WHEEL             : value 0, min 0, max 64, fuzz 0, flat 0, resolution 0
+  input props:
+    <none>
+add device 6: /dev/input/event0
+  name:     "mtk-kpd"
+  events:
+    KEY (0001): KEY_VOLUMEDOWN        KEY_POWER             KEY_HELP             
+  input props:
+    <none>
+I: Bus=0019 Vendor=2454 Product=6500 Version=0010
+N: Name="mtk-kpd"
+P: Phys=
+S: Sysfs=/devices/platform/soc/10010000.keypad/input/input0
+U: Uniq=
+H: Handlers=event0 dynamic_boost 
+B: PROP=0
+B: EV=3
+B: KEY=400 140000 0 0 0
+
+I: Bus=0019 Vendor=0000 Product=0000 Version=0000
+N: Name="ACCDET"
+P: Phys=
+S: Sysfs=/devices/virtual/input/input1
+U: Uniq=
+H: Handlers=event1 dynamic_boost 
+B: PROP=0
+B: EV=3
+B: KEY=0
+
+I: Bus=0000 Vendor=0000 Product=0000 Version=0000
+N: Name="hwmdata"
+P: Phys=
+S: Sysfs=/devices/virtual/input/input2
+U: Uniq=
+H: Handlers=event2 dynamic_boost 
+B: PROP=0
+B: EV=5
+B: REL=6
+
+I: Bus=0000 Vendor=0000 Product=0000 Version=0000
+N: Name="m_alsps_input"
+P: Phys=
+S: Sysfs=/devices/virtual/input/input3
+U: Uniq=
+H: Handlers=event3 dynamic_boost 
+B: PROP=0
+B: EV=d
+B: REL=6
+B: ABS=101
+
+I: Bus=0019 Vendor=0001 Product=0001 Version=0100
+N: Name="keys"
+P: Phys=gpio-keys/input0
+S: Sysfs=/devices/platform/keys/input/input4
+U: Uniq=
+H: Handlers=event4 dynamic_boost 
+B: PROP=0
+B: EV=100003
+B: KEY=c0000 0 0 0
+
+I: Bus=0000 Vendor=0003 Product=5668 Version=0201
+N: Name="mtk-tpd"
+P: Phys=
+S: Sysfs=/devices/virtual/input/input5
+U: Uniq=
+H: Handlers=event5 dynamic_boost 
+B: PROP=2
+B: EV=b
+B: KEY=400 0 0 0 0 0 0 0 0 0 0
+B: ABS=2630000 1000003
+
+
+===== buttons and mute (GPIO 37, 50, 87)
+
+===== display (open question 5)
+fb0/modes: U:480x480p-0
+fb0/virtual_size: 480,1440
+fb0/bits_per_pixel: 32
+fb0/name: mtkfb
+/sys/class/leds/lcd-backlight: brightness=102 max=255
+  DisplayDeviceInfo{"Built-in Screen": uniqueId="local:0", 480 x 480, modeId 1, defaultModeId 1, supportedModes [{id=1, width=480, height=480, fps=59.82}], colorMode 0, supportedColorModes [0], HdrCapabilities HdrCapabilities{mSupportedHdrTypes=[], mMaxLuminance=500.0, mMaxAverageLuminance=500.0, mMinLuminance=0.0}, allmSupported false, gameContentTypeSupported false, density 160, 160.0 x 160.0 dpi, appVsyncOff 1000000, presDeadline 16716817, touch INTERNAL, rotation 0, type INTERNAL, address {port=0}, deviceProductInfo null, state ON, FLAG_DEFAULT_DISPLAY, FLAG_ROTATES_WITH_CONTENT, FLAG_SECURE, FLAG_SUPPORTS_PROTECTED_BUFFERS, FLAG_ROUND}
+    mBaseDisplayInfo=DisplayInfo{"Built-in Screen", displayId 0, FLAG_SECURE, FLAG_SUPPORTS_PROTECTED_BUFFERS, FLAG_ROUND, FLAG_TRUSTED, real 480 x 480, largest app 480 x 480, smallest app 480 x 480, appVsyncOff 1000000, presDeadline 16716817, mode 1, defaultMode 1, modes [{id=1, width=480, height=480, fps=59.82}], hdrCapabilities HdrCapabilities{mSupportedHdrTypes=[], mMaxLuminance=500.0, mMaxAverageLuminance=500.0, mMinLuminance=0.0}, minimalPostProcessingSupported false, rotation 0, state ON, type INTERNAL, uniqueId "local:0", app 480 x 480, density 160 (160.0 x 160.0) dpi, layerStack 0, colorMode 0, supportedColorModes [0], address {port=0}, deviceProductInfo null, removeMode 0}
+console=tty0 console=ttyS0,921600n1 console=ttyMT0,921600n1 earlycon=uart8250,mmio32,0x11002000 root=/dev/ram vmalloc=496M androidboot.hardware=mt8163 androidboot.unlocked_kernel=true androidboot.rpmb_state=1 androidboot.secure_cpu=1 androidboot.prod=1 androidboot.pl_version=0x0000 androidboot.tee_version=0x0000 androidboot.lk_version=0x0000 androidboot.pl_build_desc=8ec9006-20170927_201132 androidboot.lk_build_desc=c1c79aa-20220824_171625 bootopt=64S3,32N2,64N2 console=ttyMT0,921600n1 firmware_class.path=/vendor/firmware androidboot.selinux=permissive buildvariant=userdebug lcm=1-hx8379c_wvga_dsi_vdo fps=5982 vram=4194304 printk.disable_uart=1 bootprof.pl_t=2258 bootprof.lk_t=2520 boot_reason=4 androidboot.serialno=<serial> androidboot.bootreason=wdt_by_pass_pwk nt35521_id=1
+
+===== camera (open question 7)
+crw-rw---- 1 system camera 246,   0 2010-01-01 00:05 /dev/camera-isp
+crw-rw---- 1 system camera 238,   0 2010-01-01 00:05 /dev/kd_camera_hw
+
+===== i2c
+0-0018: tlv320aic3101
+0-001a: tlv320aic3101
+0-0021: camera_sub
+0-003c: camera_main
+0-0044: alsps
+0-005d: goodix_touch
+1-0060: sym827-regulator
+2-0018: tlv320aic32x4
+2-0019: gsensor
+2-0070: tmp103_temp_sensor
+2-0071: tmp103_temp_sensor
+2-0072: tmp103_temp_sensor
+i2c-0: i2c-mt65xx
+i2c-1: i2c-mt65xx
+i2c-2: i2c-mt65xx
+
+===== spi (microphone FPGA)
+spi32766.0: spi:spi-audio-pltfm
+
+===== usb (Wi-Fi chip on usb1)
+2-1: 0a5c:bd27 Broadcom Remote Download Wireless Adapter
+usb1: 1d6b:0002 Linux 4.9.337-g4174e0b4d0e2 musb-hcd MUSB HDRC host driver
+usb2: 1d6b:0001 Linux 4.9.337-g4174e0b4d0e2 musbfsh-hcd MUSBFSH HDRC host driver
+musb-hdrc
+
+===== wi-fi and bluetooth (open question 8)
+ifb0
+ifb1
+ip6_vti0
+ip6tnl0
+ip_vti0
+lo
+sit0
+tunl0
+wlan0
+<mac>
+/sys/class/rfkill/rfkill0: bluetooth bluetooth state=1
+/sys/class/rfkill/rfkill1: phy0 wlan state=1
+/sys/class/rfkill/rfkill2: brcmfmac-wifi wlan state=1
+crw------- 1 root      root   204, 209 2010-01-01 00:05 /dev/ttyMT0
+crw-rw---- 1 bluetooth net_bt 204, 210 2025-11-08 17:39 /dev/ttyMT1
+--- /system/vendor/firmware
+/system/vendor/firmware:
+total 624
+-rw-r--r-- 1 root root  47987 2009-01-01 00:00 BCM43569A2_001.003.004.0142.0191.hcd
+-rw-r--r-- 1 root root 548864 2009-01-01 00:00 bcm43569a2-firmware.bin
+-rw-r--r-- 1 root root   7053 2009-01-01 00:00 bcm43569a2.nvm
+-rw-r--r-- 1 root root  24235 2009-01-01 00:00 md32_d.bin
+-rw-r--r-- 1 root root  23888 2009-01-01 00:00 md32_p.bin
+--- /vendor/firmware
+/vendor/firmware:
+total 624
+-rw-r--r-- 1 root root  47987 2009-01-01 00:00 BCM43569A2_001.003.004.0142.0191.hcd
+-rw-r--r-- 1 root root 548864 2009-01-01 00:00 bcm43569a2-firmware.bin
+-rw-r--r-- 1 root root   7053 2009-01-01 00:00 bcm43569a2.nvm
+-rw-r--r-- 1 root root  24235 2009-01-01 00:00 md32_d.bin
+-rw-r--r-- 1 root root  23888 2009-01-01 00:00 md32_p.bin
+[cache_key.bluetooth.get_bond_state]: [-3461254760202638314]
+[cache_key.bluetooth.get_profile_connection_state]: [-3461254760202638310]
+[cache_key.bluetooth.get_state]: [-3461254760202638309]
+[cache_key.bluetooth.is_offloaded_filtering_supported]: [-3461254760202638313]
+[init.svc.vendor.bluetooth-1-0]: [running]
+[init.svc.vendor.wifi_hal_legacy]: [running]
+[init.svc.wificond]: [running]
+[init.svc_debug_pid.vendor.bluetooth-1-0]: [249]
+[init.svc_debug_pid.vendor.wifi_hal_legacy]: [2638]
+[init.svc_debug_pid.wificond]: [330]
+[net.bt.name]: [Android]
+[persist.bluetooth.btsnoopdefaultmode]: []
+[ro.boottime.vendor.bluetooth-1-0]: [4436204846]
+[ro.boottime.vendor.wifi_hal_legacy]: [25343553231]
+[ro.boottime.wificond]: [4987022461]
+[ro.bt.bdaddr_path]: [/data/vendor/bluedroid/macbt]
+[ro.wifi.channels]: []
+[sys.wifitracing.started]: [1]
+[vendor.wlan.driver.version]: [101.10.591.95.46]
+[vendor.wlan.firmware.version]: [7.120.18.16]
+
+===== sensors
+/sys/bus/iio/devices/iio:device0: 11001000.auxadc
+/sys/bus/iio/devices/iio:device1: alsps
+aal_als
+m_alsps_misc
+usb_accessory
+
+===== thermal
+thermal_zone0: mtkts1 31800
+thermal_zone1: mtkts5 35800
+thermal_zone2: mtkts3 35800
+thermal_zone3: mtkts4 34100
+thermal_zone4: mtktspmic 39366
+thermal_zone5: mtktscpu 35500
+thermal_zone6: mtkts_bts0 36000
+thermal_zone7: mtkts_bts1 36000
+thermal_zone8: mtkts_bts2 36000
+thermal_zone9: mtkts_bts3 31000
+
+===== rtc
+/dev/rtc0
+2026-09-16
+17:15:37
+
+===== processes
+USER            PID   PPID     VSZ    RSS WCHAN            ADDR S NAME                       
+root              1      0   31792   7240 SyS_epoll_wait      0 S init
+root              2      0       0      0 kthreadd            0 S [kthreadd]
+root             11      2       0      0 rescuer_thread      0 S [lru-add-drain]
+root             28      2       0      0 down                0 D [GCPU]
+root             29      2       0      0 update_counter_thread 0 S [update_tz_count]
+root             31      2       0      0 oom_reaper          0 S [oom_reaper]
+root             32      2       0      0 rescuer_thread      0 S [writeback]
+root             33      2       0      0 kcompactd           0 S [kcompactd0]
+root             34      2       0      0 rescuer_thread      0 S [crypto]
+root             35      2       0      0 rescuer_thread      0 S [bioset]
+root             36      2       0      0 rescuer_thread      0 S [kblockd]
+root             37      2       0      0 rescuer_thread      0 S [cmdq_auto_relea]
+root             38      2       0      0 rescuer_thread      0 S [cmdq_task]
+root             39      2       0      0 rescuer_thread      0 S [cmdq_resource]
+root             40      2       0      0 rescuer_thread      0 S [cmdq_auto_relea]
+root             41      2       0      0 rescuer_thread      0 S [cmdq_auto_relea]
+root             42      2       0      0 rescuer_thread      0 S [cmdq_auto_relea]
+root             43      2       0      0 rescuer_thread      0 S [cmdq_auto_relea]
+root             44      2       0      0 rescuer_thread      0 S [cmdq_auto_relea]
+root             45      2       0      0 rescuer_thread      0 S [cmdq_auto_relea]
+root             46      2       0      0 rescuer_thread      0 S [cmdq_auto_relea]
+root             47      2       0      0 rescuer_thread      0 S [cmdq_auto_relea]
+root             48      2       0      0 rescuer_thread      0 S [cmdq_auto_relea]
+root             49      2       0      0 rescuer_thread      0 S [cmdq_auto_relea]
+root             50      2       0      0 rescuer_thread      0 S [cmdq_auto_relea]
+root             51      2       0      0 rescuer_thread      0 S [cmdq_auto_relea]
+root             52      2       0      0 rescuer_thread      0 S [cmdq_auto_relea]
+root             53      2       0      0 rescuer_thread      0 S [cmdq_auto_relea]
+root             54      2       0      0 rescuer_thread      0 S [cmdq_auto_relea]
+root             55      2       0      0 rescuer_thread      0 S [cmdq_auto_relea]
+root             56      2       0      0 rescuer_thread      0 S [md]
+root             58      2       0      0 rescuer_thread      0 S [cfg80211]
+root             60      2       0      0 cpufreq_interactive_speedchange_task 0 S [cfinteractive]
+root             61      2       0      0 ion_comm_cache_pool 0 S [ion_comm_pool]
+root             62      2       0      0 ion_history_record  0 S [ion_history]
+root             75      2       0      0 kswapd              0 S [kswapd0]
+root             76      2       0      0 rescuer_thread      0 S [vmstat]
+root            108      2       0      0 rescuer_thread      0 S [bioset]
+root            109      2       0      0 rescuer_thread      0 S [bioset]
+root            110      2       0      0 rescuer_thread      0 S [bioset]
+root            111      2       0      0 rescuer_thread      0 S [bioset]
+root            112      2       0      0 rescuer_thread      0 S [bioset]
+root            113      2       0      0 rescuer_thread      0 S [bioset]
+root            114      2       0      0 rescuer_thread      0 S [bioset]
+root            115      2       0      0 rescuer_thread      0 S [bioset]
+root            116      2       0      0 rescuer_thread      0 S [bioset]
+root            117      2       0      0 _hps_task_main      0 S [hps_main]
+root            118      2       0      0 rescuer_thread      0 S [ged_notify_sw_v]
+root            120      2       0      0 disp_irq_log_kthread_func 0 S [ddp_irq_log_kth]
+root            121      2       0      0 kthread             0 D [display_esd_che]
+root            123      2       0      0 _dpmgr_wait_event   0 S [display_check_a]
+root            124      2       0      0 _dpmgr_wait_event   0 S [present_fence_w]
+root            125      2       0      0 primary_display_frame_update_kthread 0 S [frame_update_wo]
+root            126      2       0      0 decouple_fence_release_kthread 0 S [decouple_fence_]
+root            127      2       0      0 _disp_primary_path_idle_detect_thread 0 S [display_idle_de]
+root            128      2       0      0 disp_switch_mode_kthread 0 S [disp_switch_mod]
+root            131      2       0      0 kthread_worker_fn   0 S [spi32766]
+root            132      2       0      0 rescuer_thread      0 S [dm_bufio_cache]
+root            135      2       0      0 rescuer_thread      0 S [bioset]
+root            136      2       0      0 mmc_queue_thread    0 S [mmcqd/0]
+root            137      2       0      0 rescuer_thread      0 S [bioset]
+root            138      2       0      0 mmc_queue_thread    0 S [mmcqd/0boot0]
+root            139      2       0      0 rescuer_thread      0 S [bioset]
+root            140      2       0      0 mmc_queue_thread    0 S [mmcqd/0boot1]
+root            141      2       0      0 rescuer_thread      0 S [bioset]
+root            142      2       0      0 mmc_queue_thread    0 S [mmcqd/0rpmb]
+root            145      2       0      0 rescuer_thread      0 S [ipv6_addrconf]
+root            148      2       0      0 rescuer_thread      0 S [kbase_job_fault]
+root            150      2       0      0 rescuer_thread      0 S [accdet_eint]
+root            151      2       0      0 rescuer_thread      0 S [sensor_polling]
+root            152      2       0      0 rescuer_thread      0 S [hwmsen_polling]
+root            153      2       0      0 rescuer_thread      0 S [usb20_st_wq]
+root            154      2       0      0 rescuer_thread      0 S [usb20_low_power]
+root            155      2       0      0 down                0 D [entropy_thread]
+root            157      2       0      0 ktp_thread          0 S [kthermp]
+root            158      2       0      0 dboost_dvfs_hotplug_thread 0 D [dynamic_boost]
+root            159      2       0      0 rescuer_thread      0 S [mtk-tpd]
+root            160      2       0      0 rescuer_thread      0 S [gt1x_workthread]
+root            161      2       0      0 tpd_event_handler   0 S [mtk-tpd]
+root            163      2       0      0 rescuer_thread      0 S [touch_resume]
+root            165      2       0      0 rescuer_thread      0 S [ext4-rsv-conver]
+root            169      1   11272   5508 poll_schedule_timeout 0 S init
+root            172      1   11948   5708 poll_schedule_timeout 0 S ueventd
+logd            182      1   13284   3672 sigsuspend          0 S logd
+lmkd            183      1    8056   2568 SyS_epoll_wait      0 S lmkd
+system          184      1   10488   4100 SyS_epoll_wait      0 S servicemanager
+system          185      1   11464   4864 SyS_epoll_wait      0 S hwservicemanager
+system          186      1   10292   3716 SyS_epoll_wait      0 S vndservicemanager
+root            188      2       0      0 kthread_worker_fn   0 S [psimon]
+root            190      1   19520   6476 binder_thread_read  0 S vold
+root            200      2       0      0 kjournald2          0 S [jbd2/mmcblk0p12]
+root            201      2       0      0 rescuer_thread      0 S [ext4-rsv-conver]
+system          203      1   14432   3956 binder_thread_read  0 S android.system.suspend@1.0-service
+system          204      1   11356   4868 binder_thread_read  0 S android.hardware.keymaster@4.1-service
+root            213      2       0      0 kjournald2          0 S [jbd2/mmcblk0p13]
+root            214      2       0      0 rescuer_thread      0 S [ext4-rsv-conver]
+root            224      2       0      0 rescuer_thread      0 S [ext_eventd]
+tombstoned      230      1    7436   2312 SyS_epoll_wait      0 S tombstoned
+statsd          237      1   20088   4196 SyS_epoll_wait      0 S statsd
+system          247      1    9948   3336 binder_thread_read  0 S android.hidl.allocator@1.0-service
+bluetooth       249      1   13376   3492 binder_thread_read  0 S android.hardware.bluetooth@1.0-service
+media           250      1   11928   4468 binder_thread_read  0 S android.hardware.cas@1.2-service
+media           252      1   16136   5836 binder_thread_read  0 S android.hardware.drm@1.1-service.widevine
+media           253      1   13476   5864 binder_thread_read  0 S android.hardware.drm@1.3-service.clearkey
+system          254      1   10532   4048 binder_thread_read  0 S android.hardware.gatekeeper@1.0-service.software
+system          256      1   15984   5808 binder_thread_read  0 S android.hardware.graphics.allocator@2.0-service
+system          258      1   35292   7356 binder_thread_read  0 S android.hardware.graphics.composer@2.1-service
+system          260      1   10204   3700 SyS_epoll_wait      0 S android.hardware.health@2.1-service
+system          263      1    9100   3148 binder_thread_read  0 S android.hardware.light-service.mt8163
+system          264      1    9860   3464 binder_thread_read  0 S android.hardware.memtrack@1.0-service
+system          265      1    9740   3384 binder_thread_read  0 S android.hardware.usb@1.0-service.basic
+system          266      1   11284   3436 binder_thread_read  0 S fireos.hardware.amazonthermal@1.0-service
+nobody          268      1    9348   3236 binder_thread_read  0 S android.hardware.power-service.amazon
+root            269      1    9900   3776 sigsuspend          0 S suspend_blocker_mt8163
+system          270      1   10432   4064 binder_thread_read  0 S vendor.lineage.livedisplay@2.0-service-mt8163
+credstore       272      1   13676   5936 binder_thread_read  0 S credstore
+gpu_service     273      1   12820   5508 binder_thread_read  0 S gpuservice
+root            288      2       0      0 rescuer_thread      0 S [f_mtp]
+nobody          303      1    9192   2820 poll_schedule_timeout 0 S traced_probes
+nobody          304      1    9332   2920 poll_schedule_timeout 0 S traced
+mediacodec      315      1   31872  11824 binder_thread_read  0 S media.codec
+root            317      1   10096   3224 binder_thread_read  0 S adb_root
+cameraserver    319      1   40348  17824 binder_thread_read  0 S cameraserver
+drm             320      1   20520   6492 binder_thread_read  0 S drmserver
+incidentd       322      1   12668   4148 SyS_epoll_wait      0 S incidentd
+root            323      1   17208   4856 binder_thread_read  0 S installd
+keystore        324      1   14416   6456 binder_thread_read  0 S keystore
+mediaex         325      1   33636  17784 binder_thread_read  0 S media.extractor
+media           326      1   16804   6032 binder_thread_read  0 S media.metrics
+media           327      1   69132  20580 binder_thread_read  0 S mediaserver
+root            329      1   15396   4440 binder_thread_read  0 S storaged
+wifi            330      1   15184   6008 SyS_epoll_wait      0 S wificond
+system          332      1    7360   2096 hrtimer_nanosleep   0 S thermal
+mediacodec      334      1   36548  14876 binder_thread_read  0 S media.swcodec
+system          339      1   13680   5668 binder_thread_read  0 S gatekeeperd
+wifi           2152      1   16428   9664 poll_schedule_timeout 0 S wpa_supplicant
+root           2378      1   24152   5940 0                   0 S adbd
+audioserver    2404      1   40052  17800 binder_thread_read  0 S android.hardware.audio.service
+iorapd         2434      1   21776   7688 futex_wait_queue_me 0 S iorapd
+root           2435      1   29212   7248 binder_thread_read  0 S netd
+system         2436      1  100420  29568 SyS_epoll_wait      0 S surfaceflinger
+audioserver    2437      1   43612  16896 binder_thread_read  0 S audioserver
+root           2438      1 1821616 150228 poll_schedule_timeout 0 S zygote
+root           2469      2       0      0 rescuer_thread      0 S [kbase_event]
+system         2516   2438 2195236 225320 SyS_epoll_wait      0 S system_server
+system         2567      1   11056   3548 poll_schedule_timeout 0 S android.hardware.sensors@1.0-service
+iorapd         2605   2434   12532   6076 pipe_wait           0 S iorap.prefetcherd
+wifi           2638      1   14464   6728 binder_thread_read  0 S android.hardware.wifi@1.0-service-lazy
+root           2642      2       0      0 down_interruptible  0 S [dhd_logtrace_th]
+
+===== init services (Android)
+adb_root]: [running]
+adbd]: [running]
+amazonthermal-1.0]: [running]
+apexd]: [stopped]
+apexd-bootstrap]: [stopped]
+apexd-snapshotde]: [stopped]
+audioserver]: [running]
+bootanim]: [stopped]
+boringssl_self_test32]: [stopped]
+boringssl_self_test32_vendor]: [stopped]
+boringssl_self_test_apex32]: [stopped]
+bpfloader]: [stopped]
+cameraserver]: [running]
+console]: [stopped]
+credstore]: [running]
+derive_sdk]: [stopped]
+drm]: [running]
+gatekeeperd]: [running]
+gpu]: [running]
+health-hal-2-1]: [running]
+heapprofd]: [stopped]
+hidl_memory]: [running]
+hwservicemanager]: [running]
+idmap2d]: [stopped]
+incidentd]: [running]
+installd]: [running]
+iorapd]: [running]
+keystore]: [running]
+lmkd]: [running]
+logcatd]: [stopped]
+logd]: [running]
+logd-auditctl]: [stopped]
+logd-reinit]: [stopped]
+media]: [running]
+media.swcodec]: [running]
+mediadrm]: [running]
+mediaextractor]: [running]
+mediametrics]: [running]
+netd]: [running]
+nvram_daemon]: [stopped]
+servicemanager]: [running]
+statsd]: [running]
+storaged]: [running]
+surfaceflinger]: [running]
+suspend_blocker_mt8163]: [running]
+system_suspend]: [running]
+thermal]: [running]
+thermal_manager]: [stopped]
+tombstoned]: [running]
+traced]: [running]
+traced_perf]: [stopped]
+traced_probes]: [running]
+ueventd]: [running]
+usbd]: [stopped]
+vendor.amazon_init]: [stopped]
+vendor.audio-hal]: [running]
+vendor.bluetooth-1-0]: [running]
+vendor.cas-hal-1-2]: [running]
+vendor.drm-clearkey-hal-1-3]: [running]
+vendor.drm-widevine-hal-1-1]: [running]
+vendor.gatekeeper-1-0]: [running]
+vendor.gralloc-2-0]: [running]
+vendor.hwcomposer-2-1]: [running]
+vendor.insmod_sh]: [stopped]
+vendor.keymaster-4-1]: [running]
+vendor.light-default]: [running]
+vendor.livedisplay-hal-2-0-mt8163]: [running]
+vendor.media.omx]: [running]
+vendor.memtrack-hal-1-0]: [running]
+vendor.power-amazon]: [running]
+vendor.sensors-hal-1-0]: [running]
+vendor.usb-hal-1-0]: [running]
+vendor.wifi_hal_legacy]: [running]
+vndservicemanager]: [running]
+vold]: [running]
+wificond]: [running]
+wpa_supplicant]: [running]
+zygote]: [running]
+
+===== selinux
+Permissive
+
+===== kernel log (hardware lines)
+[    1.709813] musbfsh-hdrc musbfsh-hdrc.0: MUSBFSH HDRC host driver
+[    1.709831] musbfsh-hdrc musbfsh-hdrc.0: new USB bus registered, assigned bus number 2
+[    1.710025] usb usb2: Product: MUSBFSH HDRC host driver
+[    1.710028] usb usb2: Manufacturer: Linux 4.9.337-g4174e0b4d0e2 musbfsh-hcd
+[    1.710031] usb usb2: SerialNumber: musbfsh-hdrc.0
+[    1.710460] [MUSBFSH] musbfsh_start 547: <== devctl 0x98
+[    1.721715] <<GTP-INF>>[gt1x_check_firmware:675] Update type: Header
+[    1.722499] <<GTP-INF>>[gt1x_check_firmware:676] Firmware length: 65664
+[    1.723316] <<GTP-INF>>[gt1x_check_firmware:677] Firmware product: GT5668
+[    1.724163] <<GTP-INF>>[gt1x_check_firmware:678] Firmware patch: 020108
+[    1.724987] <<GTP-INF>>[gt1x_check_firmware:679] Firmware chip: 0x92
+[    1.725778] <<GTP-INF>>[gt1x_check_firmware:680] Subsystem count: 10
+[    1.774832] <<GTP-INF>>[gt1x_read_version:937] IC VERSION:GT5668_020108(Patch)_0100(Mask)_03(SensorID)
+[    1.775993] <<GTP-INF>>[gt1x_update_judge:766] ----fw_ver_info:GT5668_5668(Patch)
+[    1.806832] <<GTP-INF>>[gt1x_read_version:937] IC VERSION:GT5668_020108(Patch)_0100(Mask)_03(SensorID)
+[    1.807979] <<GTP-ERR>>[gt1x_update_firmware:481] Update firmware failed!
+[    2.210683] musbfsh-hdrc musbfsh-hdrc.0: USB controller at         (ptrval) using DMA, IRQ 234
+[    2.220286] init: Using Android DT directory /proc/device-tree/firmware/android/
+[    2.226281] [MUSBFSH] musbfsh_bus_suspend 2322: musbfsh_bus_suspend++, power=0x61\x0d
+[    2.591997] init: Using Android DT directory /proc/device-tree/firmware/android/
+[    2.853761] musb-hdrc musb-hdrc: prop=1, power=0, is_host=0
+[    2.854507] musb-hdrc musb-hdrc: prop=2, power=0, is_host=0
+[    2.855200] musb-hdrc musb-hdrc: prop=3, power=0, is_host=0
+[    3.011947] amzn_bcmdhd: loading out-of-tree module taints kernel.
+[    3.026847] [dhd] _dhd_module_init: in Dongle Host Driver, version 101.10.591.95.46 (20250226-2)(b5e08f9)\x0a/var/home/ben/LineageOS/lineage-18.1/out/target/product/rook/obj/ETC/amzn-bcmdhd_intermediates compiled on Nov  8 2025 at 15:30:55\x0a
+[    3.029817] [dhd] ANDROID_VERSION = 11
+[    3.030968] [dhd] dhd_wifi_platform_load: Enter
+[    3.033442] Modules linked in: amzn_bcmdhd(O+)
+[    3.106593] [<        (ptrval)>] wifi_platform_set_power+0x4c/0x840 [amzn_bcmdhd]
+[    3.108542] [<        (ptrval)>] wifi_platform_set_power+0x18c/0x840 [amzn_bcmdhd]
+[    3.110178] [<        (ptrval)>] wifi_platform_set_power+0x614/0x840 [amzn_bcmdhd]
+[    3.117493] [<        (ptrval)>] dhd_wifi_platform_register_drv+0xe4/0x318 [amzn_bcmdhd]
+[    3.119187] [<        (ptrval)>] init_module+0x80/0x548 [amzn_bcmdhd]
+[    3.123512] [dhd] wifi_platform_set_power: regulator enable/disable failed
+[    3.331025] [dhd] Power-up adapter 'DHD generic adapter'
+[    3.574389] [MUSBFSH] musbfsh_stage0_irq 445: CONNECT ! devctl 0x5d
+[    3.575194] [MUSBFSH] musbfsh_bus_resume 2344: musbfsh_bus_resume++, power=0x61\x0d
+[    3.682294] [MUSBFSH] musbfsh_port_reset 188: reset=1 power=0x61
+[    3.742230] [MUSBFSH] musbfsh_port_reset 188: reset=0 power=0x78
+[    3.802205] usb 2-1: new high-speed USB device number 2 using musbfsh-hdrc
+[    3.803147] [MUSBFSH] musbfsh_port_reset 188: reset=1 power=0x70
+[    3.862214] [MUSBFSH] musbfsh_port_reset 188: reset=0 power=0x78
+[    3.947041] [dhd] dbus_usbos_probe : no mutex held
+[    3.947630] [dhd] dbus_usbos_probe : set mutex lock
+[    3.948236] [dhd] dbus_usbos_probe: bus num(busnum)=2, slot num (portnum)=1
+[    3.949104] [dhd] attach adapter info 'DHD generic adapter'
+[    3.951179] [dhd] high speed device detected
+[    3.956601] [dhd] dhd_log_dump_init: kernel log buf size = 128KB; logdump_prsrv_tailsize = 80KB; limit prsrv tail size to = 19KB
+[    3.958973] [dhd] dhd_os_attach_pktlog(): dhd_os_attach_pktlog attach
+[    3.959792] [dhd] dhd_deferred_work_init: work queue initialized
+[    3.960530] [dhd] dhd_tcpack_suppress_set 397: already set to 0
+[    3.961356] [dhd] dhd_init_logtrace_process(): thread:dhd_logtrace_thread_sdio:e1 started
+[    3.962393] [dhd] dhd_init_logtrace_process: thr_logtrace_ctl(225) not inited
+[    3.963354] [dhd] dhd_get_memdump_info: MEMDUMP ENABLED = 3
+[    3.964343] [dhd] dbus_usb_dlneeded: chip 0xaa31 rev 0x2
+[    3.964994] [dhd] dbus_dlneeded: dlneeded=1
+[    3.965518] [dhd] dhd_conf_set_chiprev : chip=0xaa31, chiprev=2
+[    3.966313] [dhd] dhd_conf_set_path_params : Final fw_path=/vendor/firmware/bcm43569a2-firmware.bin
+[    3.967456] [dhd] dhd_conf_set_path_params : Final nv_path=/vendor/firmware/bcm43569a2.nvm
+[    3.968474] [dhd] dhd_conf_set_path_params : Final clm_path=/vendor/firmware/clm.blob
+[    3.969450] [dhd] dhd_conf_set_path_params : Final conf_path=/vendor/firmware/config.txt
+[    3.971897] [dhd] dhd_get_download_buffer: Open image file failed /vendor/firmware/config.txt
+[    3.972954] [dhd] dhd_conf_read_config : Ignore config file /vendor/firmware/config.txt
+[    3.974028] [dhd] dhd_os_open_image1: /vendor/firmware/bcm43569a2.nvm (7053 bytes) open success
+[    3.975433] [dhd] ########################################################
+[    3.976410] [dhd] dhd_os_open_image1: /vendor/firmware/bcm43569a2-firmware.bin (548864 bytes) open success
+[    4.194354] [MUSBFSH] musbfsh_h_ep0_irq 1090: STALLING ENDPOINT
+[    4.195103] [dhd] dbus_usbos_dl_cmd: usb_control_msg failed -32
+[    4.195965] [dhd] dbus_usb_resetcfg: download done. Bootup time = 150 ms postboot chip 0xa123/rev 0x1
+[    4.210272] [dhd] dhd_dbus_state_change: DBUS current state=2
+[    4.210985] [dhd] dhd_get_memdump_info: MEMDUMP ENABLED = 3
+[    4.212587] [dhd] wlc_ver_major 3, wlc_ver_minor 0
+[    4.213181] [dhd] dhd_tcpack_suppress_set 397: already set to 0
+[    4.214774] [dhd] dhd_legacy_preinit_ioctls: use firmware generated mac_address <mac>
+[    4.215926] [dhd] dhd_apply_default_clm: Ignore clm file /vendor/firmware/clm.blob
+[    4.219028] [dhd] Firmware up: op_mode=0x0005, MAC=<mac>
+[    4.234767] [dhd] dhd_legacy_preinit_ioctls wl vhtmode 0 failed -5
+[    4.235973] [dhd] dhd_legacy_preinit_ioctls mimo_bw_cap setting  failed  -5
+[    4.237255] [dhd] Disable tdls_auto_op failed. -23
+[    4.239740] [dhd] dhd_legacy_preinit_ioctls Set scancache failed -23
+[    4.240990] [dhd] dhd_legacy_preinit_ioctls: event_log_max_sets: 40 ret: -23
+[    4.245171] [dhd] arp_enable:1 arp_ol:0
+[    4.246959] [dhd]   Driver: 101.10.591.95.46 (20250226-2)\x0a[dhd]   Firmware: wl0: Apr 30 2019 14:26:36 version 7.120.18.16 (r714188) FWID 01-9d9e66ed\x0a[dhd]   CLM: 7.12.6 (2019-04-30 14:24:49) 
+[    4.249442] [dhd] dhd_conf_get_disable_proptx : fw_proptx=1, disable_proptx=-1
+[    4.252721] [dhd] dhd_wlfc_hostreorder_init(): successful bdcv2 tlv signaling, 64
+[    4.255257] [dhd] Android Location Service, UNSUPPORTED
+[    4.256364] [dhd] rtt_do_get_ioctl: failed to send getbuf proxd iovar (CMD ID : 1), status=-23
+[    4.257428] [dhd] dhd_rtt_init : FTM is not supported
+[    4.258055] [dhd] dhd_rtt_init EXIT, err = 0
+[    4.259395] [dhd] dhd_ndo_get_version: failed, retcode = -23
+[    4.260533] [dhd] dhd_wl_ioctl_get_intiovar: get int iovar wnm_bsstrans_resp failed, ERR -23
+[    4.261574] [dhd] failed to get wnm_bsstrans_resp
+[    4.262614] [dhd] failed to set WNM capabilities 101, err -23
+[    4.284150] [dhd] dhd_legacy_preinit_ioctls: Failed to get preserve log # !
+[    4.285334] [dhd] dhd_legacy_preinit_ioctls: d3_hostwake_delay IOVAR not present, proceed
+[    4.298234] [dhd] dhd_rx_frame: net device is NOT registered. drop event packet
+[    4.300317] [dhd] dhd_conf_set_country : set country CN, revision 38
+[    4.303113] [dhd] dhd_rx_frame: net device is NOT registered. drop event packet
+[    4.304688] [dhd] dhd_conf_set_country : Country code: CN (CN/38)
+[    4.308044] [dhd] CONFIG-ERROR) dhd_conf_set_intiovar : txbf setting failed -23
+[    4.309448] [dhd] Dongle Host Driver, version 101.10.591.95.46 (20250226-2)(b5e08f9)\x0a/var/home/ben/LineageOS/lineage-18.1/out/target/product/rook/obj/ETC/amzn-bcmdhd_intermediates compiled on Nov  8 2025 at 15:30:55\x0a
+[    4.313393] [dhd] [wlan0] wl_ext_init_mchan_mode : MCC
+[    4.314044] [dhd] Register interface [wlan0]  MAC: <mac>\x0a
+[    4.315099] [dhd] [wlan0] wl_android_wifi_off : g_wifi_on=1 force_off=1
+[    4.315964] [dhd] dhd_bus_devreset: == Power OFF ==
+[    4.316581] [dhd] dhd_dbus_state_change: DBUS current state=3
+[    4.317311] [MUSBFSH] musbfsh_cleanup_urb 2135: abort RX2 DMA for urb         (ptrval) --> 0
+[    4.318466] [MUSBFSH] musbfsh_cleanup_urb 2135: abort RX2 DMA for urb         (ptrval) --> 0
+[    4.319528] [MUSBFSH] musbfsh_cleanup_urb 2135: abort RX2 DMA for urb         (ptrval) --> 0
+[    4.320589] [MUSBFSH] musbfsh_cleanup_urb 2135: abort RX2 DMA for urb         (ptrval) --> 0
+[    4.321647] [MUSBFSH] musbfsh_cleanup_urb 2135: abort RX2 DMA for urb         (ptrval) --> 0
+[    4.322741] [MUSBFSH] musbfsh_cleanup_urb 2135: abort RX2 DMA for urb         (ptrval) --> 0
+[    4.323810] [MUSBFSH] musbfsh_cleanup_urb 2135: abort RX2 DMA for urb         (ptrval) --> 0
+[    4.324871] [dhd] dhd_bus_devreset:  WLAN OFF DONE
+[    4.325474] [dhd] [wlan0] wl_android_wifi_off : out
+[    4.326077] [MUSBFSH] musbfsh_stage0_irq 449: DISCONNECT !devctl 19
+[    4.326929] [dhd] wl_android_post_init: 0
+[    4.327456] [dhd] dbus_usbos_probe : mutex is released.
+[    4.327612] [dhd] _dhd_module_init: Exit err=0
+[    4.329947] [dhd] dbus_usbos_disconnect : no mutex held
+[    4.330644] [dhd] dbus_usbos_disconnect : set mutex lock
+[    4.331299] [dhd] dbus_usbos_disconnect: bus num(busnum)=2, slot num (portnum)=1
+[    4.332221] [dhd] dhd_dbus_disconnect_cb: Enter dhd_remove=0 on DHD generic adapter
+[    4.743409] [dhd] dbus_usbos_disconnect : mutex is released.
+[    4.886385] [MUSBFSH] musbfsh_bus_suspend 2322: musbfsh_bus_suspend++, power=0x60\x0d
+[    6.334214] [Power/cpufreq] @_mt_cpufreq_lcm_status_switch: LCM is on
+[   18.270071] [ALS/PS] opt3001_obj als enable value = 0
+[   25.537064] [dhd] [wlan0] dhd_open : Enter
+[   25.538141] [dhd] Dongle Host Driver, version 101.10.591.95.46 (20250226-2)(b5e08f9)\x0a/var/home/ben/LineageOS/lineage-18.1/out/target/product/rook/obj/ETC/amzn-bcmdhd_intermediates compiled on Nov  8 2025 at 15:30:55\x0a
+[   25.541593] [dhd] ANDROID_VERSION = 11
+[   25.542134] [dhd] dhd_init_logstrs_array: Failed to open the file /data/misc/conn/logstrs.bin 
+[   25.545360] [dhd] dhd_open: ######### called for ifidx=0 #########
+[   25.546134] [dhd] [wlan0] wl_android_wifi_on : in g_wifi_on=0
+[   25.547994] [dhd] \x0a\x0adhd_bus_devreset: == WLAN ON ==
+[   25.548945] [dhd] dhd_bus_devreset : mutex is released.
+[   25.789564] [MUSBFSH] musbfsh_stage0_irq 445: CONNECT ! devctl 0x5d
+[   25.790386] [MUSBFSH] musbfsh_bus_resume 2344: musbfsh_bus_resume++, power=0x60\x0d
+[   25.906300] [MUSBFSH] musbfsh_port_reset 188: reset=1 power=0x60
+[   25.966468] [MUSBFSH] musbfsh_port_reset 188: reset=0 power=0x78
+[   26.026246] usb 2-1: new high-speed USB device number 3 using musbfsh-hdrc
+[   26.027186] [MUSBFSH] musbfsh_port_reset 188: reset=1 power=0x70
+[   26.086463] [MUSBFSH] musbfsh_port_reset 188: reset=0 power=0x78
+[   26.180355] [dhd] dbus_usbos_probe : mutex is locked!. wait for unlocking
+[   26.181220] [dhd] dbus_usbos_probe : set mutex lock
+[   26.181839] [dhd] dbus_usbos_probe: bus num(busnum)=2, slot num (portnum)=1
+[   26.182793] [dhd] attach adapter info 'DHD generic adapter'
+[   26.191019] [dhd] high speed device detected
+[   26.192031] [dhd] dbus_usb_dlneeded: chip 0xaa31 rev 0x2
+[   26.192707] [dhd] dbus_dlneeded: dlneeded=1
+[   26.193248] [dhd] dhd_conf_set_path_params : Final fw_path=/vendor/firmware/bcm43569a2-firmware.bin
+[   26.194654] [dhd] dhd_conf_set_path_params : Final nv_path=/vendor/firmware/bcm43569a2.nvm
+[   26.195706] [dhd] dhd_conf_set_path_params : Final clm_path=/vendor/firmware/clm.blob
+[   26.196731] [dhd] dhd_conf_set_path_params : Final conf_path=/vendor/firmware/config.txt
+[   26.198049] [dhd] dhd_get_download_buffer: Open image file failed /vendor/firmware/config.txt
+[   26.199254] [dhd] dhd_conf_read_config : Ignore config file /vendor/firmware/config.txt
+[   26.200836] [dhd] dhd_os_open_image1: /vendor/firmware/bcm43569a2.nvm (7053 bytes) open success
+[   26.201989] [dhd] ########################################################
+[   26.203237] [dhd] dhd_os_open_image1: /vendor/firmware/bcm43569a2-firmware.bin (548864 bytes) open success
+[   26.478356] [MUSBFSH] musbfsh_h_ep0_irq 1090: STALLING ENDPOINT
+[   26.479129] [dhd] dbus_usbos_dl_cmd: usb_control_msg failed -32
+[   26.480016] [dhd] dbus_usb_resetcfg: download done. Bootup time = 150 ms postboot chip 0xa123/rev 0x1
+[   26.494261] [dhd] dbus_usbos_probe : mutex is released.
+[   26.495266] [dhd] dhd_bus_devreset : mutex is locked!. wait for unlocking
+[   26.496258] [dhd] dhd_bus_devreset : set mutex lock
+[   26.498316] [dhd] dhd_dbus_state_change: DBUS current state=2
+[   26.499034] [dhd] dhd_get_memdump_info: MEMDUMP ENABLED = 3
+[   26.504645] [dhd] wlc_ver_major 3, wlc_ver_minor 0
+[   26.505245] [dhd] dhd_tcpack_suppress_set 397: already set to 0
+[   26.507476] [dhd] dhd_legacy_preinit_ioctls: use firmware generated mac_address <mac>
+[   26.509324] [dhd] dhd_apply_default_clm: Ignore clm file /vendor/firmware/clm.blob
+[   26.513207] [dhd] Firmware up: op_mode=0x0005, MAC=<mac>
+[   26.530250] [dhd] dhd_legacy_preinit_ioctls wl vhtmode 0 failed -5
+[   26.531686] [dhd] dhd_legacy_preinit_ioctls mimo_bw_cap setting  failed  -5
+[   26.533285] [dhd] Disable tdls_auto_op failed. -23
+[   26.538623] [dhd] dhd_legacy_preinit_ioctls Set scancache failed -23
+[   26.541577] [dhd] dhd_legacy_preinit_ioctls: event_log_max_sets: 40 ret: -23
+[   26.551681] [dhd] arp_enable:1 arp_ol:0
+[   26.553688] [dhd]   Driver: 101.10.591.95.46 (20250226-2)\x0a[dhd]   Firmware: wl0: Apr 30 2019 14:26:36 version 7.120.18.16 (r714188) FWID 01-9d9e66ed\x0a[dhd]   CLM: 7.12.6 (2019-04-30 14:24:49) 
+[   26.556666] [dhd] dhd_conf_get_disable_proptx : fw_proptx=1, disable_proptx=-1
+[   26.561204] [dhd] dhd_wlfc_hostreorder_init(): successful bdcv2 tlv signaling, 64
+[   26.565159] [dhd] Android Location Service, UNSUPPORTED
+[   26.566343] [dhd] rtt_do_get_ioctl: failed to send getbuf proxd iovar (CMD ID : 1), status=-23
+[   26.567416] [dhd] dhd_rtt_init : FTM is not supported
+[   26.568119] [dhd] dhd_rtt_init EXIT, err = 0
+[   26.569670] [dhd] dhd_ndo_get_version: failed, retcode = -23
+[   26.570900] [dhd] dhd_wl_ioctl_get_intiovar: get int iovar wnm_bsstrans_resp failed, ERR -23
+[   26.571950] [dhd] failed to get wnm_bsstrans_resp
+[   26.573137] [dhd] failed to set WNM capabilities 101, err -23
+[   26.606679] [dhd] dhd_legacy_preinit_ioctls: Failed to get preserve log # !
+[   26.608266] [dhd] dhd_legacy_preinit_ioctls: d3_hostwake_delay IOVAR not present, proceed
+[   26.623064] [dhd] dhd_conf_same_country : country code = CN/38 is already configured
+[   26.628502] [dhd] CONFIG-ERROR) dhd_conf_set_intiovar : txbf setting failed -23
+[   26.630501] [dhd] [wlan0] wl_android_wifi_on : Success
+[   26.631905] [dhd] [wlan0] wl_ext_init_mchan_mode : MCC
+[   26.646344] [dhd] CFG80211-ERROR) __wl_update_wiphybands : error reading txbf_bfe_cap (-23)
+[   26.647885] [dhd] CFG80211-ERROR) __wl_update_wiphybands : error reading txbf_bfr_cap (-23)
+[   26.680069] [dhd] CFG80211-ERROR) init_roam_cache : roamscan_mode iovar failed. -23
+[   26.681023] [dhd] CFG80211-ERROR) wl_cfg80211_up : Failed to enable RCC.
+[   26.683803] [dhd] [wlan0] dhd_open : Exit ret=0
+[   26.685371] [dhd] dhd_pri_open : no mutex held
