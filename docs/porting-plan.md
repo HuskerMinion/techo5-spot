@@ -129,6 +129,10 @@ Two things the first install met: the rescue initramfs has no `scp` receiver, so
 
 ## M4 — Audio
 
+**Not pursued (2026-09-16).** The defaults work: tuning on the Show and the Dot did not beat them, so the
+Spot keeps the averaged four microphones and the default canceller. The capture and playback facts below
+are verified (hardware.md); the measurement steps stay here only as a record.
+
 1. Capture: find the PCM and format, map the four microphones and the loopback, prove it with
    `audioprobe` and a WAV off the device.
 2. Speaker: the AIC32x4 path, `Right Channel Only`, amp enable and the fault GPIO, volume curve.
@@ -137,6 +141,9 @@ Two things the first install met: the rescue initramfs has no `scp` receiver, so
    TECHO5 Dot's `microphones.md` does.
 
 ## M5 — The round screen, touch and camera
+
+Until this exists the panel keeps the last image the bootloader drew (the Amazon logo) while the
+daemon runs headless behind it; a unit that looks "stuck at the logo" is working.
 
 Covered in "The round screen" below; the daemon draws it, as on cronos. Camera last, and only if the
 4.9 kernel exposes the GC0312.
