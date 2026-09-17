@@ -18,7 +18,7 @@
     techo5-spot-rescue.tar                the rescue initramfs's packages, busybox, tools and image scripts
     SHA256SUMS                            checksums of all of the above
 
-  No boot image is published: each unit's is built by the installer from its own LineageOS boot image.
+  No boot image is published: each unit's is built by tools/install-spot.py from its own LineageOS boot image.
   Nothing unit-specific is in any of them: no keys, Wi-Fi or Home Assistant identity, and no LineageOS
   vendor tree (drivers, firmware): each Spot keeps its own, and a tarball carrying one is refused.
 
@@ -51,9 +51,20 @@ param(
     [switch]$DryRun
 )
 $ErrorActionPreference = 'Stop'
-. (Join-Path (Join-Path $PSScriptRoot 'lib') 'release.ps1')
+$Script:SpotKernelAsset = 'techo5-spot-kernel-bt.Image.gz-dtb'
+$Script:SpotRescueAsset = 'techo5-spot-rescue.tar'
+function Sha256File([string]$path) { (Get-FileHash -Algorithm SHA256 $path).Hash.ToLower() }
+function JoinParts([string]$base, [string[]]$parts) { $p = $base; foreach ($x in $parts) { $p = Join-Path $p $x }; $p }
+# tar: on Windows its own (bsdtar); a GNU tar from Git earlier on the PATH reads C:\... as a remote host.
+function Get-Tar {
+    if (-not $IsLinux -and -not $IsMacOS -and $env:SystemRoot) {
+        $own = Join-Path (Join-Path $env:SystemRoot 'System32') 'tar.exe'
+        if (Test-Path $own) { return $own }
+    }
+    'tar'
+}
 $repo = 'HuskerMinion/techo5-spot'
-$root = $Script:SpotRepo
+$root = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $out = JoinParts $root 'bin', 'release', $Version
 New-Item -ItemType Directory -Force $out | Out-Null
 $tar = Get-Tar

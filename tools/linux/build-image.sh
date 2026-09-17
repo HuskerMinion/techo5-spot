@@ -32,7 +32,9 @@ while [ $# -gt 0 ]; do
 	esac
 done
 W() { cygpath -m "$1" 2>/dev/null || echo "$1"; }
-mkdir -p "$HERE/bin"
+# python3 where it is (Linux, macOS), else python (Windows).
+PY=${PYTHON:-$( (python3 -c 1) >/dev/null 2>&1 && echo python3 || echo python )}
+mkdir -p "$HERE/bin" "$(dirname "$OUT")"
 
 echo "== building tools for armv7 (from $TECHO5)"
 export GOOS=linux GOARCH=arm GOARM=7 CGO_ENABLED=0
@@ -59,7 +61,7 @@ key=(); [ -f "$INPUTS/techo5_ed25519.pub" ] && key=(--copy "$(W "$INPUTS/techo5_
 export MSYS_NO_PATHCONV=1
 H=$(W "$HERE"); T=$(W "$TECHO5"); I=$(W "$INPUTS")
 mini=$(ls "$INPUTS"/alpine-minirootfs-*-armv7.tar.gz | head -1)
-python "$T/tools/linux/mkimage.py" --kernel-image "$(W "$KERNEL_IMAGE")" ${KERNEL:+--kernel "$(W "$KERNEL")"} \
+"$PY" "$T/tools/linux/mkimage.py" --kernel-image "$(W "$KERNEL_IMAGE")" ${KERNEL:+--kernel "$(W "$KERNEL")"} \
 	--rootfs "$(W "$mini")" \
 	"${apks[@]}" \
 	--init "$H/tools/linux/init" \

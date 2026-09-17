@@ -54,7 +54,7 @@ Before anything is written:
    `fastbrick.bat` from Windows. It leaves TWRP in `recovery`; on the bench unit userdata survived.
    **Done on the bench unit 2026-09-16.**
 3. From TWRP's adb: `tools/hwdump.sh`, saved as `docs/dumps/rook-twrp-<serial>.txt`. **Done.**
-4. `tools/backup-spot.ps1 -Serial <serial> -IncludeSystem`: every partition that boots the unit plus
+4. `tools/backup-spot.py --serial <serial> --include-system` (then a PowerShell script): every partition that boots the unit plus
    Fire OS's system and cache, md5-checked, kept off the device. **Done.**
 5. **Prove recovery before anything is written**: restore `boot` from its backup in TWRP and boot it.
    **Done**: `boot` written back and Fire OS booted; `system` restored from its backup after a
@@ -211,7 +211,7 @@ of TECHO5 Dot's `install-dot.ps1` (backups verified, the boot image built from t
 backup, the rootfs slot laid down, name/key/Wi-Fi provisioned, read back and verified, the first boot
 watched to healthy).
 
-**Written 2026-09-16:** `tools/install-spot-linux.ps1`, from a Spot running LineageOS 18.1 (on Wi-Fi,
+**Written 2026-09-16:** `tools/install-spot-linux.ps1`, now `tools/install-spot.py`, from a Spot running LineageOS 18.1 (on Wi-Fi,
 rooted adb, backed up) to TECHO5 Linux in slot a: checks, capture (the unit's LineageOS boot image and
 vendor tree), build (kernel once, boot image, root filesystem, optional logo), provision (name, ESPHome
 key, uploads checked by md5), flash `boot`, then over the USB serial console (`tools/serial-console.ps1`,
@@ -219,6 +219,12 @@ which finds the unit by serial) the slot store, the install and the logo, and th
 committed slot. Its build phase (`-BuildOnly -Logo`) is tested and reproduces the logo bytes the first
 unit boots with; the phases that touch a unit repeat what was done by hand on the first one but have not
 run end to end, since that unit is already converted. Run it with someone watching on the next Spot.
+
+**2026-09-17:** rewritten in Python (the same on Windows, Linux and macOS) and taking the signed release
+instead of building: the root filesystem, Bluetooth kernel and rescue bundle are downloaded and checked,
+and the boot image is built from them. Rehearsed end to end, logo included, against a simulated unit (an
+Alpine root standing in for the Spot, with the real `slotctl` and the real release). The first real unit
+should still be watched.
 
 ## The round screen
 

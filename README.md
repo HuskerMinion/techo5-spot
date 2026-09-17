@@ -14,8 +14,9 @@ still EchoLocal's code. See [NOTICE](NOTICE).
 
 **Installing:** [Getting started](https://github.com/HuskerMinion/techo5/blob/main/docs/getting-started.md)
 has every step from a stock Spot, in order: the Fire OS version, the amonet-rook unlock and LineageOS
-(both linked), the installer, and Home Assistant. The installer runs in PowerShell 7 on Windows,
-Linux or macOS and builds nothing: it downloads the signed release, Bluetooth kernel included.
+(both linked), the installer, and Home Assistant. The installer is a Python 3 script that runs the same
+on Windows, Linux and macOS and builds nothing: it downloads the signed release, Bluetooth kernel
+included.
 Building it yourself: [docs/building.md](docs/building.md).
 
 ## Status
@@ -23,8 +24,8 @@ Building it yourself: [docs/building.md](docs/building.md).
 First unit, 2026-09-16: unlocked and backed up (M0), then TECHO5 Linux from trial slots on the old
 `system` partition (M2, M3): voice turns with Home Assistant, the round screen with a touch ring menu,
 weather, timers and night dimming (M5), Bluetooth audio through a rebuilt kernel (M6), and TECHO5's
-mark in place of Amazon's boot logo (M6b). `tools/install-spot-linux.ps1` (M7) does it in one command
-from LineageOS. What exists:
+mark in place of Amazon's boot logo (M6b). `tools/install-spot.py` (M7) does it in one command from
+LineageOS. What exists:
 
 - [docs/hardware.md](docs/hardware.md): what is known about `rook` from the unlock, TWRP, LineageOS
   and kernel sources and a stock firmware dump, each fact with its source, and what the first unit
@@ -33,10 +34,11 @@ from LineageOS. What exists:
   what carries over from the Show and the Dot and what does not.
 - [tools/hwdump.sh](tools/hwdump.sh): the read-only hardware inventory for the first time a unit is
   plugged in (Fire OS with root, or TWRP).
-- [tools/backup-spot.ps1](tools/backup-spot.ps1): pulls every partition that boots the unit to the PC
-  and checks each copy against an md5 read on the device. Writes nothing to the unit.
-- [tools/install-spot-linux.ps1](tools/install-spot-linux.ps1): LineageOS to TECHO5 Linux in one
-  command; [tools/serial-console.ps1](tools/serial-console.ps1) for the image's USB serial console.
+- [tools/backup-spot.py](tools/backup-spot.py): pulls every partition that boots the unit to the
+  computer and checks each copy against an md5 read on the device. Writes nothing to the unit.
+- [tools/install-spot.py](tools/install-spot.py): LineageOS to TECHO5 Linux in one command.
+  [tools/techo5lib.py](tools/techo5lib.py) holds what it shares with TECHO5's and TECHO5 Dot's installers,
+  including the USB serial console on Windows, Linux and macOS.
 - [tools/linux/](tools/linux/): the kernel with Bluetooth (`build-kernel.sh`), the boot image
   (`build-image.sh`, `init`) and the root filesystem overlay (`rootfs/etc/techo5/device.conf`). The
   daemon and image tooling are TECHO5's (`spot` build).
@@ -45,9 +47,9 @@ from LineageOS. What exists:
   TECHO5's [docs/phone.md](https://github.com/HuskerMinion/techo5/blob/main/docs/phone.md).
 - **Updates** come from this repository's
   [releases](https://github.com/HuskerMinion/techo5-spot/releases), signed, through Home Assistant's
-  update card into the spare slot; [tools/release-spot.ps1](tools/release-spot.ps1) publishes one.
-  The daemon's source is TECHO5's branch
-  [`spot/daemon`](https://github.com/HuskerMinion/techo5/tree/spot/daemon), built with `-tags spot`.
+  update card into the spare slot; [tools/release-spot.ps1](tools/release-spot.ps1) publishes one
+  (maintainer). The daemon's source is [TECHO5](https://github.com/HuskerMinion/techo5)'s `main`, built
+  with `-tags spot`.
 - [docs/dumps/](docs/dumps/): the LineageOS kernel's `rook_defconfig` and running config, and the
   difference from `cronos_defconfig`.
 
