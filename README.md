@@ -8,6 +8,10 @@ Echo Show 5 2nd gen and TECHO5 Dot reached on the Echo Dot 2. No Fire OS userspa
 root filesystem and one daemon that owns the microphones, the speaker, the round screen, wake word
 and the Home Assistant connection (ESPHome native API), with nothing leaving the house.
 
+The daemon is TECHO5's `echod`, which is built on **[EchoLocal](https://github.com/ygelfand/echolocal)**
+by Yuri Gelfand (MIT): EchoLocal's Echo Dot 2 daemon, vendored and developed further, much of it
+still EchoLocal's code. See [NOTICE](NOTICE).
+
 ## Status
 
 First unit, 2026-09-16: unlocked and backed up (M0), then TECHO5 Linux from trial slots on the old
@@ -55,7 +59,7 @@ the Dot's `wmtup` apply. It has about 2 GB of RAM, more than either.
   tooling, the rootfs slot design and the kernel build recipe this port starts from.
 - [TECHO5 Dot](https://github.com/HuskerMinion/techo5-dot) (MIT): the 512 MB image, the hand-made `/dev`, the installer pattern.
 - [EchoLocal](https://github.com/ygelfand/echolocal) (MIT, Yuri Gelfand): the daemon TECHO5's `echod`
-  was ported from.
+  is built on (see above).
 - amonet, kaeru and the Echo TWRP trees ([R0rt1z2](https://github.com/R0rt1z2), k4y0z): the unlock.
 - [amazon-oss](https://github.com/amazon-oss): the LineageOS 18.1 `rook` device tree and the 4.9
   kernel it builds.
