@@ -12,6 +12,10 @@ The daemon is TECHO5's `echod`, which is built on **[EchoLocal](https://github.c
 by Yuri Gelfand (MIT): EchoLocal's Echo Dot 2 daemon, vendored and developed further, much of it
 still EchoLocal's code. See [NOTICE](NOTICE).
 
+**Installing:** [Getting started](https://github.com/HuskerMinion/techo5/blob/main/docs/getting-started.md)
+has every step from a stock Spot, in order: the Fire OS version, the amonet-rook unlock and LineageOS
+(both linked), the installer, and Home Assistant.
+
 ## Status
 
 First unit, 2026-09-16: unlocked and backed up (M0), then TECHO5 Linux from trial slots on the old
