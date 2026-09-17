@@ -7,8 +7,8 @@
   The Spot's daemon follows this repository's releases (TECHO5 echod internal/update/releases_spot.go),
   apart from the Show's and the Dot's, so a Spot release never becomes another device's latest.
 
-  The root filesystem is built first with TECHO5's deploy-rootfs.sh on main (BUILD_TAGS=spot, this
-  repository's tools/linux/rootfs overlay and the Spot's vendor tarball; see docs/building.md), ideally
+  The root filesystem is built first with TECHO5's deploy-rootfs.sh on main (BUILD_TAGS=spot and this
+  repository's tools/linux/rootfs overlay, with no vendor tree; see docs/building.md), ideally
   installed on a unit and seen to commit. This script publishes that tarball as it is, and the daemon
   inside it, so the two cannot differ:
     echod-arm-spot                        the daemon, taken out of the root filesystem
@@ -19,7 +19,8 @@
     SHA256SUMS                            checksums of all of the above
 
   No boot image is published: each unit's is built by the installer from its own LineageOS boot image.
-  Nothing unit-specific is in any of them: no keys, Wi-Fi or Home Assistant identity.
+  Nothing unit-specific is in any of them: no keys, Wi-Fi or Home Assistant identity, and no LineageOS
+  vendor tree (drivers, firmware): each Spot keeps its own, and a tarball carrying one is refused.
 
   -AddTo attaches the kernel, the rescue bundle and SHA256SUMS to a release published before they
   existed, from that release's files in bin/release/<version>.
@@ -77,6 +78,8 @@ if (-not $AddTo) {
         throw "the root filesystem says '$release', not $Version"
     }
     Write-Host $release
+    # LineageOS's vendor tree is Amazon's and Broadcom's, not ours to publish: each Spot mounts its own.
+    if (& $tar -tzf $tarball | Where-Object { $_ -match '^(\./)?vendor/.' } | Select-Object -First 1) { throw "$tarball carries a vendor tree; build it without VENDOR_TGZ" }
     $daemon = Join-Path $out 'echod-arm-spot'
     Push-Location $out
     try {

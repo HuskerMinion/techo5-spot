@@ -24,15 +24,13 @@ pwsh ./tools/fetch-inputs.ps1 -Device spot -Out ../techo5-spot/inputs
 ```
 
 That fetches the Alpine base image, `busybox.static`, `apk.static`, the wake word models, and the
-rescue initramfs's packages. From **your own Spot**, never published (the installer captures both
-into `inputs/<serial>/` and `backups/<serial>/`, or by hand with LineageOS running and adb as root):
+rescue initramfs's packages. From **your own Spot**, never published: the LineageOS boot image
+(`adb pull /dev/block/mmcblk0p9 inputs/boot-lineage-18.1-20251108-rook.img` with adb as root; the
+installer keeps one in `backups/<serial>/`).
 
-- the LineageOS boot image: `adb pull /dev/block/mmcblk0p9 inputs/boot-lineage-18.1-20251108-rook.img`;
-- the vendor tree (the `bcmdhd` Wi-Fi driver, Broadcom firmware and Bluetooth patch):
-  ```
-  adb shell "tar -czf /data/local/tmp/vendor.tgz -C /system vendor"
-  adb pull /data/local/tmp/vendor.tgz inputs/system-vendor.tgz
-  ```
+The vendor tree (the `bcmdhd` Wi-Fi driver, Broadcom firmware and Bluetooth patch) is not an input:
+no image carries it. Each Spot keeps its own in the slot store, copied there by the installer before
+LineageOS is erased, and mounted at `/vendor` (TECHO5's `etc/techo5/boot.sh`).
 
 ## 2. The Bluetooth kernel
 
@@ -60,11 +58,10 @@ the rescue environment accepts that SSH key; otherwise it accepts only keys on t
 
 ## 4. The root filesystem
 
-From the TECHO5 checkout, with this repository's overlay and your vendor tree:
+From the TECHO5 checkout, with this repository's overlay:
 
 ```
-BUILD_TAGS=spot VERSION=v0.0.0-test VENDOR_TGZ=../techo5-spot/inputs/system-vendor.tgz \
-  DEVICE_OVERLAY=../techo5-spot/tools/linux/rootfs HOST=<spot address> \
+BUILD_TAGS=spot VERSION=v0.0.0-test DEVICE_OVERLAY=../techo5-spot/tools/linux/rootfs HOST=<spot address> \
   bash tools/linux/deploy-rootfs.sh --install
 ```
 

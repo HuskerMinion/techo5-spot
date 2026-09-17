@@ -159,7 +159,7 @@ t5_usb_acm
 # Vendor tree: from a slot when there is one, else from the LineageOS system. The Spot's Wi-Fi is
 # the Broadcom bcmdhd module, whose firmware_path and nvram_path default to /vendor/firmware.
 VENDOR=
-for d in /store/slots/$(cat /store/active 2>/dev/null) /store/slots/a /store/slots/b /android/system; do
+for d in /store/slots/$(cat /store/active 2>/dev/null) /store/slots/a /store/slots/b /store /android/system; do
 	[ -e "$d/vendor/lib/modules/amzn-bcmdhd.ko" ] && { VENDOR=$d/vendor; break; }
 done
 if [ -n "$VENDOR" ]; then
@@ -196,7 +196,8 @@ network_up() {
 
 	# The daemon, from the same place as the vendor tree, so a rescue boot still answers.
 	DAEMON=
-	for f in ${VENDOR%/vendor}/usr/local/bin/techo5 ${VENDOR%/vendor}/bin/techo5; do
+	for f in ${VENDOR%/vendor}/usr/local/bin/techo5 ${VENDOR%/vendor}/bin/techo5 \
+		/store/slots/$(cat /store/active 2>/dev/null)/usr/local/bin/techo5 /store/slots/a/usr/local/bin/techo5 /store/slots/b/usr/local/bin/techo5; do
 		[ -x "$f" ] && { DAEMON=$f; break; }
 	done
 	if [ -n "$DAEMON" ]; then

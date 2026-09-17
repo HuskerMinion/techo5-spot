@@ -219,7 +219,7 @@ if (-not $FromSource) {
     # shipping step fails, and the tarball it leaves behind is what is installed here.
     $envs = @{
         HOST = '127.0.0.1'; BUILD_TAGS = 'spot'; VERSION = $Version
-        VENDOR_TGZ = ($vendorTgz -replace '\\', '/'); DEVICE_OVERLAY = (Unix (JoinParts $repo 'tools', 'linux', 'rootfs'))
+        DEVICE_OVERLAY = (Unix (JoinParts $repo 'tools', 'linux', 'rootfs'))
     }
     foreach ($k in $envs.Keys) { SetEnv $k $envs[$k] }
     # Its warnings go to stderr, which PowerShell would take for errors: bash merges them into stdout.
@@ -322,10 +322,18 @@ if (-not $Force) {
     if ((Read-Host '   Type ERASE to go on') -ne 'ERASE') { throw 'stopped before erasing; the unit stays in rescue (fastboot flash boot the LineageOS image to go back)' }
 }
 $tar = "/data/techo5-linux/$tarName"
-$o = Spot "touch /tmp/stay; killall techo5 fbprobe 2>/dev/null; sleep 2; umount /android 2>/dev/null; mountpoint -q /android && echo STILL-MOUNTED; slotctl mkstore /dev/mmcblk0p11 --i-know-this-erases-it >/tmp/mkstore.log 2>&1 && echo MKSTORE-OK; tail -3 /tmp/mkstore.log" 300000
+# The vendor tree (Wi-Fi and Bluetooth drivers, firmware) is this unit's own, from LineageOS: releases
+# don't carry it. Kept on userdata before the system partition is erased, then in the store.
+$vmod = 'vendor/lib/modules/amzn-bcmdhd.ko'
+$o = Spot "touch /tmp/stay; tar -cf /data/techo5-linux/vendor.tar -C /android/system vendor && tar -tf /data/techo5-linux/vendor.tar $vmod >/dev/null && echo VENDOR-SAVED" 180000
+if ($o -notmatch 'VENDOR-SAVED') { throw "saving LineageOS's vendor tree failed (nothing was erased):`n$o" }
+$o = Spot "killall techo5 fbprobe 2>/dev/null; sleep 2; umount /android 2>/dev/null; mountpoint -q /android && echo STILL-MOUNTED; slotctl mkstore /dev/mmcblk0p11 --i-know-this-erases-it >/tmp/mkstore.log 2>&1 && echo MKSTORE-OK; tail -3 /tmp/mkstore.log" 300000
 if ($o -notmatch 'MKSTORE-OK') { throw "mkstore failed:`n$o" }
-$o = Spot "STORE=/store slotctl install $tar >/tmp/install.log 2>&1 && echo INSTALL-OK; tail -2 /tmp/install.log; STORE=/store slotctl status" 900000
+$o = Spot "tar -xf /data/techo5-linux/vendor.tar -C /store && [ -e /store/$vmod ] && echo VENDOR-OK" 180000
+if ($o -notmatch 'VENDOR-OK') { throw "putting the vendor tree into the store failed (it is kept in /data/techo5-linux/vendor.tar):`n$o" }
+$o = Spot "STORE=/store slotctl install $tar >/tmp/install.log 2>&1 && echo INSTALL-OK; tail -2 /tmp/install.log; [ -e /store/slots/a/$vmod ] || { mkdir -p /store/slots/a/vendor && cp -a /store/vendor/. /store/slots/a/vendor/; }; [ -e /store/slots/a/$vmod ] && rm -f /data/techo5-linux/vendor.tar && echo SLOT-VENDOR-OK; STORE=/store slotctl status" 900000
 if ($o -notmatch 'INSTALL-OK') { throw "slot install failed:`n$o" }
+if ($o -notmatch 'SLOT-VENDOR-OK') { throw "the vendor tree did not reach slot a:`n$o" }
 Note ($o -split "`n" | Where-Object { $_ -match '^slot a' })
 if ($Logo) {
     $wantOld = Md5Of (Join-Path $backup 'expdb.img')

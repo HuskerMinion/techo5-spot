@@ -29,21 +29,25 @@ function Invoke-Console([string]$name, [string]$line, [int]$wait) {
     $sp.Open()
     try {
         $sp.Write("`n"); Start-Sleep -Milliseconds 400; $null = $sp.ReadExisting()
-    [string]$BackupRoot = $(if ($env:TECHO5_BACKUPS) { $env:TECHO5_BACKUPS } else { Join-Path (Join-Path $PSScriptRoot '..') 'backups' }),
-        # The marker is printed from a variable, so the echoed command line never matches it.
-        $sp.Write("$line; m=$marker; echo `$m`n")
+        $id = Get-Random
+        $begin = "__T5BEGIN$($id)__"; $end = "__T5END$($id)__"
+        # The markers are printed from variables, and a line counts only when it is exactly a marker, so
+        # the echoed command line (which the shell wraps at 80 columns) never matches one.
+        $sp.Write("b=$begin; m=$end; echo `$b; $line; echo `$m`n")
         $buf = ''; $deadline = (Get-Date).AddMilliseconds($wait)
+        $lines = @()
         while ((Get-Date) -lt $deadline) {
             $buf += $sp.ReadExisting()
-            if ($buf -match "(?m)^$marker") { break }
+            # Terminal control sequences (the prompt's cursor query) and carriage returns out.
+            $lines = ($buf -replace "\x1b\[[0-9;?]*[A-Za-z]", '' -replace "`r", '') -split "`n"
+            if ($lines -contains $end) { break }
             Start-Sleep -Milliseconds 150
         }
-        $buf = $buf -replace "`r", ''
         $out = @(); $started = $false
-        foreach ($l in ($buf -split "`n")) {
-            if ($l -match "^$marker") { break }
+        foreach ($l in $lines) {
+            if ($started -and $l -eq $end) { break }
             if ($started) { $out += $l }
-            elseif ($l -match [regex]::Escape("m=$marker")) { $started = $true }
+            elseif ($l -eq $begin) { $started = $true }
         }
         return ($out -join "`n")
     } finally { $sp.Close() }
