@@ -30,6 +30,14 @@ from LineageOS. What exists:
 - [tools/linux/](tools/linux/): the kernel with Bluetooth (`build-kernel.sh`), the boot image
   (`build-image.sh`, `init`) and the root filesystem overlay (`rootfs/etc/techo5/device.conf`). The
   daemon and image tooling are TECHO5's (`spot` build).
+- **Phone calls** (v0.1.0): through your own SIP provider, from Home Assistant or by voice, with an
+  incoming-call face on the round screen (tap to answer, swipe to decline, tap to hang up). Setup is in
+  TECHO5's [docs/phone.md](https://github.com/HuskerMinion/techo5/blob/main/docs/phone.md).
+- **Updates** come from this repository's
+  [releases](https://github.com/HuskerMinion/techo5-spot/releases), signed, through Home Assistant's
+  update card into the spare slot; [tools/release-spot.ps1](tools/release-spot.ps1) publishes one.
+  The daemon's source is TECHO5's branch
+  [`spot/daemon`](https://github.com/HuskerMinion/techo5/tree/spot/daemon), built with `-tags spot`.
 - [docs/dumps/](docs/dumps/): the LineageOS kernel's `rook_defconfig` and running config, and the
   difference from `cronos_defconfig`.
 
@@ -45,7 +53,7 @@ the Dot's `wmtup` apply. It has about 2 GB of RAM, more than either.
 
 - [TECHO5](https://github.com/HuskerMinion/techo5) (MIT): the daemon (`echod`), the Linux image
   tooling, the rootfs slot design and the kernel build recipe this port starts from.
-- TECHO5 Dot (MIT): the 512 MB image, the hand-made `/dev`, the installer pattern.
+- [TECHO5 Dot](https://github.com/HuskerMinion/techo5-dot) (MIT): the 512 MB image, the hand-made `/dev`, the installer pattern.
 - [EchoLocal](https://github.com/ygelfand/echolocal) (MIT, Yuri Gelfand): the daemon TECHO5's `echod`
   was ported from.
 - amonet, kaeru and the Echo TWRP trees ([R0rt1z2](https://github.com/R0rt1z2), k4y0z): the unlock.
