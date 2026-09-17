@@ -22,14 +22,14 @@
   .partial file first and kept only when its md5 matches the device.
 
 .EXAMPLE
-  .\tools\backup-spot.ps1 -Serial G0B0XXXXXXXXXXXX
-  .\tools\backup-spot.ps1 -Serial G0B0XXXXXXXXXXXX -IncludeSystem
+  ./tools/backup-spot.ps1 -Serial <serial>
+  ./tools/backup-spot.ps1 -Serial <serial> -IncludeSystem
 #>
 param(
     [Parameter(Mandatory)][string]$Serial,
     [string]$Adb = 'adb',
     # Inside the project, and ignored by git: backups hold serial numbers and factory data.
-    [string]$BackupRoot = (Join-Path $PSScriptRoot '..\backups'),
+    [string]$BackupRoot = $(if ($env:TECHO5_BACKUPS) { $env:TECHO5_BACKUPS } else { Join-Path (Join-Path $PSScriptRoot '..') 'backups' }),
     [switch]$IncludeSystem
 )
 $ErrorActionPreference = 'Stop'

@@ -14,7 +14,9 @@ still EchoLocal's code. See [NOTICE](NOTICE).
 
 **Installing:** [Getting started](https://github.com/HuskerMinion/techo5/blob/main/docs/getting-started.md)
 has every step from a stock Spot, in order: the Fire OS version, the amonet-rook unlock and LineageOS
-(both linked), the installer, and Home Assistant.
+(both linked), the installer, and Home Assistant. The installer runs in PowerShell 7 on Windows,
+Linux or macOS and builds nothing: it downloads the signed release, Bluetooth kernel included.
+Building it yourself: [docs/building.md](docs/building.md).
 
 ## Status
 

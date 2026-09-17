@@ -12,3 +12,6 @@ backups/
 
 # Build inputs for the Linux image: LineageOS and Amazon firmware, never committed.
 inputs/
+
+# Installer downloads and work files.
+build/

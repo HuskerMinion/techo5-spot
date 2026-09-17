@@ -12,7 +12,7 @@
   nothing when no port answers for that serial.
 
 .EXAMPLE
-  .\tools\serial-console.ps1 -Serial <serial> -Cmd 'slotctl status'
+  ./tools/serial-console.ps1 -Serial <serial> -Cmd 'slotctl status'
 #>
 param(
     [Parameter(Mandatory)][string]$Serial,
@@ -29,7 +29,7 @@ function Invoke-Console([string]$name, [string]$line, [int]$wait) {
     $sp.Open()
     try {
         $sp.Write("`n"); Start-Sleep -Milliseconds 400; $null = $sp.ReadExisting()
-        $marker = "__T5END$(Get-Random)__"
+    [string]$BackupRoot = $(if ($env:TECHO5_BACKUPS) { $env:TECHO5_BACKUPS } else { Join-Path (Join-Path $PSScriptRoot '..') 'backups' }),
         # The marker is printed from a variable, so the echoed command line never matches it.
         $sp.Write("$line; m=$marker; echo `$m`n")
         $buf = ''; $deadline = (Get-Date).AddMilliseconds($wait)
@@ -49,9 +49,20 @@ function Invoke-Console([string]$name, [string]$line, [int]$wait) {
     } finally { $sp.Close() }
 }
 
-$ports = @(Get-CimInstance Win32_PnPEntity | Where-Object {
-        $_.PNPDeviceID -match 'VID_1D6B&PID_0104&MI_00' -and $_.Name -match '\((COM\d+)\)'
-    } | ForEach-Object { [regex]::Match($_.Name, 'COM\d+').Value })
+if ($IsLinux) {
+    # Linux: the ACM ports whose USB ids are TECHO5's console.
+    $ports = @(Get-ChildItem /dev/ttyACM* -ErrorAction SilentlyContinue | Where-Object {
+            $props = (& udevadm info -q property -n $_.FullName 2>$null) -join "`n"
+            $props -match '(?m)^ID_VENDOR_ID=1d6b$' -and $props -match '(?m)^ID_MODEL_ID=0104$'
+        } | ForEach-Object { $_.FullName })
+} elseif ($IsMacOS) {
+    # macOS: every USB modem port; the serial number check below picks the unit.
+    $ports = @(Get-ChildItem /dev/cu.usbmodem* -ErrorAction SilentlyContinue | ForEach-Object { $_.FullName })
+} else {
+    $ports = @(Get-CimInstance Win32_PnPEntity | Where-Object {
+            $_.PNPDeviceID -match 'VID_1D6B&PID_0104&MI_00' -and $_.Name -match '\((COM\d+)\)'
+        } | ForEach-Object { [regex]::Match($_.Name, 'COM\d+').Value })
+}
 if ($Port -and ($ports -contains $Port)) { $ports = @($Port) + @($ports | Where-Object { $_ -ne $Port }) }
 # Never `exit` on a mismatch: that would end the port's login shell.
 $pathLine = 'export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'

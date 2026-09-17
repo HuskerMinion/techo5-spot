@@ -5,25 +5,25 @@
 #   tools/linux/build-image.sh [-o out.img]
 #
 # What comes from where:
-#   TECHO5       a TECHO5 checkout (the spot/daemon worktree): mkimage.py, techo5-lib.sh, slotctl and
+#   TECHO5       a TECHO5 checkout on main (default: ../techo5 beside this repository): mkimage.py, techo5-lib.sh, slotctl and
 #                the Go tools, built here for armv7
 #   SPOT_INPUTS  this repository's inputs/ (git-ignored): the LineageOS rook boot image
-#   INPUTS       the Show's shared inputs: Alpine minirootfs, busybox.static, the apks in TECHO5's
-#                tools/linux/packages.txt, and the rescue SSH public key
+#   INPUTS       TECHO5_INPUTS (default: this repository's inputs/; docs/building.md): Alpine minirootfs, busybox.static, the apks in TECHO5's
+#                tools/linux/packages.txt, and optionally the rescue SSH public key (techo5_ed25519.pub)
 #
 # Flash from fastboot (Volume Down at power-on):  fastboot flash boot <out.img>; fastboot reboot
 # Back to LineageOS:                             fastboot flash boot backups/<serial>/boot-lineage-18.1.img
 set -euo pipefail
 
 HERE=$(cd "$(dirname "$0")/../.." && pwd)
-TECHO5=${TECHO5:-E:/Projects/techo5-wt-spot}
+TECHO5=${TECHO5:-$HERE/../techo5}
 SPOT_INPUTS=${SPOT_INPUTS:-$HERE/inputs}
-INPUTS=${TECHO5_INPUTS:-D:/platform-tools/echoshow/linux-image}
+INPUTS=${TECHO5_INPUTS:-$HERE/inputs}
 KERNEL_IMAGE=${KERNEL_IMAGE:-$SPOT_INPUTS/boot-lineage-18.1-20251108-rook.img}
 # KERNEL: a rebuilt Image.gz-dtb (tools/linux/build-kernel.sh, with Bluetooth) in place of the one in
 # KERNEL_IMAGE, whose header is still used.
 KERNEL=${KERNEL:-}
-GO=${GO:-/c/Program Files/Go/bin/go.exe}
+GO=${GO:-go}
 OUT=$HERE/bin/techo5-spot-linux-boot.img
 while [ $# -gt 0 ]; do
 	case "$1" in
@@ -54,6 +54,8 @@ done
 apks+=(--apk "$(W "$(ls "$INPUTS"/apks/libgcc-*.apk | head -1)")")
 
 echo "== mkimage"
+# The rescue SSH key, when there is one; without it the rescue environment takes keys from userdata only.
+key=(); [ -f "$INPUTS/techo5_ed25519.pub" ] && key=(--copy "$(W "$INPUTS/techo5_ed25519.pub")=/root/.ssh/authorized_keys")
 export MSYS_NO_PATHCONV=1
 H=$(W "$HERE"); T=$(W "$TECHO5"); I=$(W "$INPUTS")
 mini=$(ls "$INPUTS"/alpine-minirootfs-*-armv7.tar.gz | head -1)
@@ -67,6 +69,6 @@ python "$T/tools/linux/mkimage.py" --kernel-image "$(W "$KERNEL_IMAGE")" ${KERNE
 	--add "$H/bin/rebootto-arm=/usr/local/bin/rebootto" \
 	--script "$T/tools/linux/slotctl=/usr/local/sbin/slotctl" \
 	--script "$T/tools/linux/techo5-lib.sh=/lib/techo5-lib.sh" \
-	--copy "$I/techo5_ed25519.pub=/root/.ssh/authorized_keys" \
+	${key[@]+"${key[@]}"} \
 	--compress xz --cmdline-append techo5=linux -o "$(W "$OUT")"
 echo "built: $OUT"
