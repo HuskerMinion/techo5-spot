@@ -157,9 +157,13 @@ Covered in "The round screen" below; the daemon draws it, as on cronos. Camera l
   it is open the panel follows the finger, so the dial turns under it and snaps to an item when let
   go; a tap does the item at the top.
 - Main dial: Talk, Mute, Play/Pause, Volume (the ring becomes a jog wheel), Weather (today and the next
-  four days), Timers, Settings, Sleep. Settings dial: Brightness (jog wheel), Night (the dim hours,
-  22:00 to 07:00 by default, held to 30 %), Auto brightness, Bluetooth (its own dial: Pair,
-  Connect/Disconnect, Forget), Info (name, address, version, slot), Restart (two taps), Back.
+  four days), Timers, Settings, Sleep. Settings (2026-09-18, the Show's settings screen adapted to the
+  round panel, shared code in techo5's `feature/display`): six category tiles (Display, Sound,
+  Alarms, Connections, Privacy, General), each a round card of switches, − / + steppers and choice
+  lists that scrolls under a dragged finger, with Back at its foot. Display has brightness,
+  auto-brightness, Dim at night (22:00 to 07:00 by default, held to 30 %, or Never), clock format and
+  the slideshow with its photo folder; Connections has Pair, Connect/Disconnect and Forget (two taps);
+  General has updates, About (name, version, slot) and Restart (two taps).
 - Backlight: the panel is unreadable below about 120 of 255 and glares at 255, so brightness in percent
   spans 120..255.
 - Previews: `docs/spot-screen-preview-v*.png`, drawn by the test (`SPOT_PREVIEW=<dir>`).
