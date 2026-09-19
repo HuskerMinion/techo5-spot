@@ -40,7 +40,12 @@ function Push([string]$local, [string]$remote) {
     if ($LASTEXITCODE -ne 0) { throw "adb push $local failed" }
 }
 
-if (-not $KeyFile) { $KeyFile = Join-Path $PSScriptRoot "..\backups\$Serial\api.psk" }
+if (-not $KeyFile) {
+    # home-assistant.key, as on the Dot; a unit installed while it was api.psk keeps that file.
+    $KeyFile = Join-Path $PSScriptRoot "..\backups\$Serial\home-assistant.key"
+    $old = Join-Path $PSScriptRoot "..\backups\$Serial\api.psk"
+    if ((Test-Path $old) -and -not (Test-Path $KeyFile)) { $KeyFile = $old }
+}
 if (-not (Test-Path $Binary)) { throw "daemon binary not found at $Binary; build it first (see help)" }
 if (-not (Test-Path $Rc)) { throw "init script not found at $Rc" }
 

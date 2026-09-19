@@ -21,8 +21,8 @@ built from them and its own LineageOS boot image. Each step is checked before th
                is replaced (only if the partition still matches its backup)
   6. watch     the first boot from slot a to a running daemon; the slot is marked good
 
-The Home Assistant key is kept in backups/<serial>/api.psk and reused, so Home Assistant keeps the
-device. Undo: fastboot flash boot backups/<serial>/boot-lineage-18.1.img and restore system from TWRP
+The Home Assistant key is kept in backups/<serial>/home-assistant.key (api.psk on a unit installed
+before that name) and reused, so Home Assistant keeps the device. Undo: fastboot flash boot backups/<serial>/boot-lineage-18.1.img and restore system from TWRP
 or the backups; the bootloader picture: backups/<serial>/expdb.img back to expdb.
 """
 import argparse
@@ -65,12 +65,20 @@ def build_boot_image(rescue, lineage_boot, alpine_tgz, kernel, out):
         fail('building the boot image failed')
 
 
+def default_key_file(backup):
+    """backups/<serial>/home-assistant.key, as on the Dot; a unit installed while it was api.psk keeps
+    that file, so a later run reuses the key Home Assistant already has."""
+    new = os.path.join(backup, 'home-assistant.key')
+    old = os.path.join(backup, 'api.psk')
+    return old if os.path.exists(old) and not os.path.exists(new) else new
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('--serial', required=True, help="the unit's adb serial (adb devices)")
     ap.add_argument('--name', required=True, help='the name Home Assistant shows, e.g. Kitchen')
     ap.add_argument('--release', default='latest', help='a release tag, or latest')
-    ap.add_argument('--key-file', help='where the Home Assistant key is kept (default backups/<serial>/api.psk)')
+    ap.add_argument('--key-file', help='where the Home Assistant key is kept (default backups/<serial>/home-assistant.key)')
     ap.add_argument('--ssh-key', help='an SSH public key the unit accepts from the start')
     ap.add_argument('--no-bluetooth', action='store_true', help="keep LineageOS's kernel, which has no Bluetooth")
     ap.add_argument('--kernel', help='a kernel you built (tools/linux/build-kernel.sh) instead of the release\'s')
@@ -85,7 +93,7 @@ def main():
     a = ap.parse_args()
 
     backup = os.path.join(a.backups, a.serial)
-    key_file = a.key_file or os.path.join(backup, 'api.psk')
+    key_file = a.key_file or default_key_file(backup)
     boot_out = os.path.join(backup, 'techo5-spot-linux-boot.img')
     los_boot = os.path.join(backup, 'boot-lineage-18.1.img')
     adb = Adb(a.serial, a.adb)
