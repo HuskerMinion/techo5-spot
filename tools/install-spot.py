@@ -10,8 +10,9 @@ filesystem, Bluetooth kernel and rescue bundle are downloaded and checked, and t
 built from them and its own LineageOS boot image. Each step is checked before the next:
 
   1. checks    adb sees the unit as rook with root; its partition backups are on this computer
-  2. release   the root filesystem, the Bluetooth kernel and the rescue bundle, checked against their
-               checksums; this unit's LineageOS boot image kept in backups/<serial>/; the boot image built
+  2. release   the root filesystem, the Bluetooth kernel and the rescue bundle, checked against the
+               release's signed manifest; this unit's LineageOS boot image kept in backups/<serial>/;
+               the boot image built
   3. provision name, Home Assistant key and an SSH key (--ssh-key) onto userdata, and the root
                filesystem, each checked by md5
   4. flash     the boot image, from the bootloader's fastboot
@@ -155,7 +156,7 @@ def main():
     kernel = None if a.no_bluetooth else (os.path.abspath(a.kernel) if a.kernel else rel.asset('techo5-spot-kernel-bt.Image.gz-dtb'))
     rescue = os.path.join(rel.dir, 'rescue')
     tar_extract_all(rel.asset('techo5-spot-rescue.tar'), rescue)
-    note('TECHO5 Spot %s: root filesystem, %s and rescue bundle checked'
+    note('TECHO5 Spot %s: root filesystem, %s and rescue bundle checked against the signed manifest'
          % (version, 'Bluetooth kernel' if kernel else "LineageOS's kernel (no Bluetooth)"))
     build_boot_image(rescue, los_boot, alpine(a.work), kernel, boot_out)
     note('boot image %d bytes' % os.path.getsize(boot_out))
