@@ -35,7 +35,7 @@ import time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from techo5lib import (CONSOLE_TECHO5, Adb, Console, Fastboot, Release, alpine, default_dir, fail,  # noqa: E402
                        head_is_android, md5, need, new_api_key, note, repo_root, run_main, step,
-                       tar_extract_all, valid_api_key, wait_for)
+                       tar_extract_all, valid_api_key, wait_for, write_private)
 
 REPO = 'HuskerMinion/techo5-spot'
 WIFI_MODULE = 'vendor/lib/modules/amzn-bcmdhd.ko'
@@ -187,8 +187,7 @@ def main():
         note('Home Assistant key: the existing one in %s' % key_file)
     else:
         psk = new_api_key()
-        with open(key_file, 'w') as f:
-            f.write(psk)
+        write_private(key_file, psk)
         note('Home Assistant key: new, in %s' % key_file)
     adb.sh('mkdir -p /data/misc/techo5/models /data/misc/techo5/ssh /data/techo5-linux; chmod 700 /data/misc/techo5 /data/misc/techo5/ssh')
     tmp = os.path.join(a.work, 'provision-' + a.serial)
