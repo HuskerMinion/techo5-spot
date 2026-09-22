@@ -51,6 +51,12 @@ param(
     [switch]$DryRun
 )
 $ErrorActionPreference = 'Stop'
+# The tag says which device a release is for; the version says which build it is. They are not the same
+# string and must not be swapped: the tag names the release, while $Version is what the daemon is
+# stamped with and the only thing that belongs in the manifest. A manifest naming the tag differs
+# forever from what a Spot reports as running, and Home Assistant offers an update whenever the two
+# differ - which is how spot-v0.4.9 and spot-v0.4.10 shipped with a card nobody could clear.
+$tag = "spot-$Version"
 $Script:SpotKernelAsset = 'techo5-spot-kernel-bt.Image.gz-dtb'
 $Script:SpotRescueAsset = 'techo5-spot-rescue.tar'
 function Sha256File([string]$path) { (Get-FileHash -Algorithm SHA256 $path).Hash.ToLower() }
@@ -102,9 +108,9 @@ if (-not $AddTo) {
 
     Write-Host "== signed manifest"
     Push-Location (Join-Path $Techo5 'echod')
-    $from = "https://github.com/$repo/releases/download/$Version"
+    $from = "https://github.com/$repo/releases/download/$tag"
     & $Go run ./cmd/mkmanifest -version $Version -title "TECHO5 Spot $Version" -notes $Notes `
-        -release-url "https://github.com/$repo/releases/tag/$Version" -from $from `
+        -release-url "https://github.com/$repo/releases/tag/$tag" -from $from `
         -arm-spot $daemon -rootfs-arm-spot $tarball `
         -out (Join-Path $out 'manifest.json') -sign-key $SignKey
     if ($LASTEXITCODE -ne 0) { Pop-Location; throw 'mkmanifest failed' }
@@ -165,26 +171,26 @@ if ($DryRun) {
 }
 if ($AddTo) {
     # The published manifest must be the one signed here, or the checksums would describe other files.
-    $dl = "https://github.com/$repo/releases/download/$Version/manifest.json"
+    $dl = "https://github.com/$repo/releases/download/$tag/manifest.json"
     $published = Join-Path $out 'manifest.published.json'
     Invoke-WebRequest -Uri $dl -OutFile $published -UseBasicParsing
     if ((Sha256File $published) -ne (Sha256File (Join-Path $out 'manifest.json'))) { throw "bin/release/$Version/manifest.json is not the published one" }
     Remove-Item $published
-    Write-Host "== adding to release $Version on $repo"
-    & gh release upload $Version (Join-Path $out $Script:SpotKernelAsset) (Join-Path $out $Script:SpotRescueAsset) (Join-Path $out 'SHA256SUMS') --repo $repo --clobber
+    Write-Host "== adding to release $tag on $repo"
+    & gh release upload $tag (Join-Path $out $Script:SpotKernelAsset) (Join-Path $out $Script:SpotRescueAsset) (Join-Path $out 'SHA256SUMS') --repo $repo --clobber
     if ($LASTEXITCODE -ne 0) { throw 'gh release upload failed' }
-    $body = (& gh release view $Version --repo $repo --json body -q .body) -join "`n"
+    $body = (& gh release view $tag --repo $repo --json body -q .body) -join "`n"
     if ($body -notmatch [regex]::Escape($Script:SpotKernelAsset)) {
-        & gh release edit $Version --repo $repo --notes ($body.TrimEnd() + "`n`n" + $gplNote)
+        & gh release edit $tag --repo $repo --notes ($body.TrimEnd() + "`n`n" + $gplNote)
         if ($LASTEXITCODE -ne 0) { throw 'gh release edit failed' }
     }
-    Write-Host "updated: https://github.com/$repo/releases/tag/$Version"
+    Write-Host "updated: https://github.com/$repo/releases/tag/$tag"
     return
 }
-Write-Host "== release $Version on $repo"
+Write-Host "== release $tag on $repo"
 $assets = ($names + 'SHA256SUMS') | ForEach-Object { Join-Path $out $_ }
-$ghArgs = @('release', 'create', $Version) + $assets + @('--repo', $repo, '--title', "TECHO5 Spot $Version", '--notes', ($Notes + "`n`n" + $gplNote))
+$ghArgs = @('release', 'create', $tag) + $assets + @('--repo', $repo, '--title', "TECHO5 Spot $Version", '--notes', ($Notes + "`n`n" + $gplNote))
 if ($Prerelease) { $ghArgs += '--prerelease' }
 & gh @ghArgs
 if ($LASTEXITCODE -ne 0) { throw 'gh release create failed' }
-Write-Host "published: https://github.com/$repo/releases/tag/$Version"
+Write-Host "published: https://github.com/$repo/releases/tag/$tag"
