@@ -74,6 +74,7 @@ the Dot's `wmtup` apply. It has about 2 GB of RAM, more than either.
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE), and [NOTICE](NOTICE) for the other projects this builds on and the
+GPL-2.0 kernel every release ships.
 
 TECHO5 is not affiliated with Amazon. Echo, Echo Spot and Alexa are trademarks of Amazon.com, Inc.

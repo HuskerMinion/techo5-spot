@@ -40,6 +40,19 @@ amonet, kaeru and the Echo TWRP trees, https://github.com/R0rt1z2
 amazon-oss, https://github.com/amazon-oss
   The LineageOS 18.1 rook device tree and the MT8163 4.9 kernel, cited in docs/.
 
+Linux kernel, https://git.kernel.org (GPL-2.0)
+  Every release ships a kernel: techo5-spot-kernel-bt.Image.gz-dtb, Linux 4.9.337 for arm64. It is
+  GPL-2.0, and this is where its source is.
+    - Source: github.com/amazon-oss/android_kernel_amazon_mt8163 at commit 4174e0b4d0e2, the commit
+      the LineageOS 18.1 rook boot image was built from (`uname -r` on the unit is
+      4.9.337-g4174e0b4d0e2).
+    - Changes: none to the source. What differs is the configuration — Bluetooth core, BR/EDR, LE,
+      RFCOMM and the virtual HCI driver turned on.
+    - Configuration: the running kernel's own /proc/config.gz, recorded as
+      docs/dumps/rook-lineage-kernel-4.9.337.config, with those options added.
+    - The script that does it is tools/linux/build-kernel.sh, and docs/building.md is how to run it.
+      A rebuild reproduces the shipped image.
+
 docs/dumps/rook_defconfig-lineage-18.1 is arch/arm64/configs/rook_defconfig from
 github.com/amazon-oss/android_kernel_amazon_mt8163, branch lineage-18.1 (GPL-2.0), copied as a
 reference; docs/dumps/rook-vs-cronos-defconfig.diff compares it with cronos_defconfig from the same tree.

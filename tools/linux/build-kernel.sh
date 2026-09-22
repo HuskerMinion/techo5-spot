@@ -1,7 +1,7 @@
 #!/bin/bash
 # build-kernel.sh — the Echo Spot's kernel (LineageOS 18.1 rook, 4.9.337 arm64) with Bluetooth added,
 # at the commit the LineageOS boot image was built from, so its vendor module (amzn-bcmdhd.ko, built
-# with CONFIG_MODVERSIONS) still loads. Run inside WSL/Linux. Modelled on TECHO5's build-kernel.sh.
+# with CONFIG_MODVERSIONS) still loads. Run inside WSL/Linux. Modeled on TECHO5's build-kernel.sh.
 #
 #   tools/linux/build-kernel.sh [-o Image.gz-dtb]
 #

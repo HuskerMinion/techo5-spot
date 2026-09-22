@@ -250,7 +250,7 @@ first `hwdump` fills it.
 - The partition table changes and userdata is wiped (XDA thread title, amonet notes).
 - `gpt-fix.sh` rewrites the GPT from `bin/gpt-rook.bin`; `return-to-stock.sh` restores Amazon's
   recovery and the unpatched GPT from Fire OS with root.
-- kaeru's behaviour on the other MT8163 Echos (from TECHO5 and TECHO5 Dot, **unverified on rook**):
+- kaeru's behavior on the other MT8163 Echos (from TECHO5 and TECHO5 Dot, **unverified on rook**):
   no `fastboot boot`, so every test image is flashed; `fastboot continue` boots normally; a volume
   key at power-on picks recovery or fastboot.
 

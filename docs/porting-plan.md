@@ -150,10 +150,10 @@ Covered in "The round screen" below; the daemon draws it, as on cronos. Camera l
 
 **Done 2026-09-16, camera included.** TECHO5 `spot` build, `feature/display/*_spot.go`:
 
-- Clock face with the status rim (red while muted, the conversation's colours, a timer emptying, blue
+- Clock face with the status rim (red while muted, the conversation's colors, a timer emptying, blue
   pulsing while Bluetooth pairs), the weather under the date, the conversation in words, the volume.
 - Touch (`mtk-tpd` is multitouch protocol A: a lift is only `BTN_TOUCH` 0): a tap talks, a swipe up or
-  down is the volume, a held finger opens the **ring menu**, a dial modelled on an owner's video. While
+  down is the volume, a held finger opens the **ring menu**, a dial modeled on an owner's video. While
   it is open the panel follows the finger, so the dial turns under it and snaps to an item when let
   go; a tap does the item at the top.
 - Main dial: Talk, Mute, Play/Pause, Volume (the ring becomes a jog wheel), Weather (today and the next
@@ -235,7 +235,7 @@ should still be watched.
 Everything drawn has to live in a 480×480 circle: the corners are not visible. Rules for the `spot`
 layouts:
 
-- Content in the inscribed circle; the safe rectangle for text is about 340×340 centred.
+- Content in the inscribed circle; the safe rectangle for text is about 340×340 centered.
 - Radial elements first: progress, volume, timers and "listening" as arcs around the rim, the way the
   stock Alexa UI does.
 - One face at a time, changed by horizontal swipe; the settings sheet from a swipe down, as on cronos.
@@ -247,7 +247,7 @@ From TECHO5's existing pages, and from owners who have already put a Spot on the
 r/amazonecho, 2026-09; spotdash). None of these need Android; each is a daemon page fed by Home
 Assistant or by the house's own services, never the cloud:
 
-- **Clock**: analogue and digital faces, the weather on it, the next calendar event under it.
+- **Clock**: analog and digital faces, the weather on it, the next calendar event under it.
 - **Weather**: now and forecast; a radar frame from Home Assistant's camera proxy.
 - **Timer / countdown**: goes full screen as a ring that empties, with the alarm on the speaker.
 - **Now playing**: album art in the circle, play/pause/skip, volume on the rim (Music Assistant or
