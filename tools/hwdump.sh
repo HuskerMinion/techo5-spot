@@ -8,9 +8,47 @@
 #
 # Adapted from TECHO5's tools/hwdump.sh (cronos). The open questions it answers are listed at the end
 # of docs/hardware.md.
+#
+# What it prints is redacted as it goes: the serial, the network and Bluetooth addresses, the storage
+# chip's unique id and adb's pairing id come out as placeholders, so the dump describes the model
+# rather than the unit. It is meant to be pasted into an issue and it lands in docs/dumps/, which is
+# a tracked directory, so it has to be safe to publish without anyone remembering to check.
+#
+# Redaction is a filter over everything this prints rather than something applied section by section,
+# so a section added later is covered without being thought about. Read what you are about to post
+# anyway: a filter only takes out what it was told about.
 
 sec() { echo; echo "===== $1"; }
 have() { command -v "$1" >/dev/null 2>&1; }
+
+# One pass, on the unit, with busybox/toybox sed. Deliberately blunt: anything shaped like a MAC or a
+# 32-hex CID goes, wherever it appears, including lines nobody anticipated.
+redact() {
+  # One pass on the unit, with whatever sed is there: busybox, toybox or GNU. POSIX ERE only, so no
+  # \b and no \s - and no backreferences in the replacements either. Each expression writes the key
+  # back out in full instead. It reads twice as long and it cannot quietly lose the prefix it was
+  # meant to keep, which is a mistake that looks like success: the value is gone either way, so a
+  # broken backreference is invisible unless you read the output.
+  sed -E \
+    -e 's/androidboot\.serialno=[^ ]*/androidboot.serialno=<serial>/g' \
+    -e 's/^serial=.*/serial=<removed>/' \
+    -e 's/^mac_addr=.*/mac_addr=<removed>/' \
+    -e 's/^bt_mac_addr=.*/bt_mac_addr=<removed>/' \
+    -e 's/^wifi_mac_addr=.*/wifi_mac_addr=<removed>/' \
+    -e 's/^productid=.*/productid=<removed>/' \
+    -e 's/^productid2=.*/productid2=<removed>/' \
+    -e 's/^board_id=.*/board_id=<removed>/' \
+    -e 's/^ro\.serialno=.*/ro.serialno=<removed>/' \
+    -e 's/^ro\.boot\.serialno=.*/ro.boot.serialno=<removed>/' \
+    -e 's/^net\.hostname=.*/net.hostname=<removed>/' \
+    -e 's/\[(ro\.serialno|ro\.boot\.serialno|net\.hostname|persist\.sys\.device_name|persist\.adb\.wifi\.guid)\]: \[[^]]*\]/[<property>]: [<removed>]/' \
+    -e 's/cid=[0-9a-fA-F]{32}/cid=<id>/g' \
+    -e 's/[0-9a-fA-F]{2}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}/<mac>/g' \
+    -e 's/ssid=[^ ]*/ssid=<network>/g' \
+    -e 's/ESSID:"[^"]*"/ESSID:"<network>"/g'
+}
+
+dump() {
 
 sec "identity"
 for p in ro.product.device ro.product.model ro.build.display.id ro.build.version.release \
@@ -152,3 +190,6 @@ have getenforce && getenforce
 
 sec "kernel log (hardware lines)"
 dmesg 2>/dev/null | grep -iE 'bcmdhd|dhd|wlan|brcm|bluetooth|hci|aic3101|aic32x4|spi-audio|fpga|lcm|hx8379|gt5668|goodix|gc0312|opt3001|bma222|privacy|musb|usb1|firmware|mmc0' | head -200
+}
+
+dump | redact
