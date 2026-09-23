@@ -102,7 +102,9 @@ Copy-Item (Join-Path $Inputs 'busybox.static') $stage
 $env:GOOS = 'linux'; $env:GOARCH = 'arm'; $env:GOARM = '7'; $env:CGO_ENABLED = '0'
 try {
     foreach ($c in 'fbprobe', 'audioprobe', 'rebootto') {
-        Push-Location $Techo5
+        # audioprobe lives in the daemon's module, beside the ALSA code it shares.
+        $module = if (Test-Path (JoinParts $Techo5 'echod', 'cmd', $c)) { Join-Path $Techo5 'echod' } else { $Techo5 }
+        Push-Location $module
         & $Go build -trimpath -ldflags '-s -w' -o (JoinParts $stage 'bin', $c) "./cmd/$c"
         $ok = $LASTEXITCODE -eq 0
         Pop-Location
