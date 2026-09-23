@@ -3,7 +3,10 @@
   Install the TECHO5 daemon on an Echo Spot (rook) running LineageOS 18.1, beside Android.
 
 .DESCRIPTION
-  Porting plan M1. Over adb as root, and adapted from TECHO5's install-cronos.ps1:
+  NOT the installer: tools/install-spot.py puts TECHO5 Linux on a Spot. This is the porting plan's M1 tool
+  (formerly tools/install-spot.ps1), kept for bring-up work on Android; nothing else uses it.
+
+  Over adb as root, and adapted from TECHO5's install-cronos.ps1:
     - installs the daemon (built with -tags spot) as /system/bin/techo5 with an init service
     - points Android at its null primary audio HAL, so audioserver never touches the PCM devices
     - provisions /data/misc/techo5: the device name, the ESPHome API key, wake word models
@@ -19,7 +22,7 @@
     GOOS=linux GOARCH=arm GOARM=7 CGO_ENABLED=0 go build -tags spot -o <this repo>\bin\echod-arm-spot ./cmd/echod
 
 .EXAMPLE
-  .\tools\install-spot.ps1 -Serial <serial> -Name "Kitchen"
+  .\tools\install-android-daemon.ps1 -Serial <serial> -Name "Kitchen"
 #>
 param(
     [Parameter(Mandatory)][string]$Serial,

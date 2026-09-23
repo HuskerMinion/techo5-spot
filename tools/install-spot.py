@@ -33,6 +33,7 @@ or the backups; the bootloader picture: backups/<serial>/expdb.img back to expdb
 import argparse
 import os
 import re
+import shutil
 import subprocess
 import sys
 import time
@@ -213,7 +214,9 @@ def main():
             adb.push(local, '/data/misc/techo5/' + remote)
             os.remove(local)
     finally:
-        os.rmdir(tmp)
+        # Whatever a failed push left behind goes too (the Home Assistant key among it), and a cleanup that
+        # cannot finish never replaces the error that stopped the provisioning.
+        shutil.rmtree(tmp, ignore_errors=True)
     adb.sh('chmod 600 /data/misc/techo5/name /data/misc/techo5/psk /data/misc/techo5/ssh/authorized_keys 2>/dev/null')
     tar_name = 'techo5-spot-rootfs-%s.tar.gz' % version
     uploads = [(rootfs, '/data/techo5-linux/' + tar_name)]

@@ -67,7 +67,7 @@ Before anything is written:
 with the AIC3101 capture and AIC3204 playback PCMs, the round 480×480 display, touch. Still to do here:
 the daemon beside Android and a voice turn.
 
-**M1 done 2026-09-16.** `tools/install-spot.ps1` installed the `spot` build (TECHO5 branch `spot/daemon`) beside
+**M1 done 2026-09-16.** `tools/install-android-daemon.ps1` (then `install-spot.ps1`) installed the `spot` build (TECHO5 branch `spot/daemon`) beside
 LineageOS with the null audio HAL; Home Assistant added it from its zeroconf discovery with the key (adding
 by address fails: Home Assistant opens a plaintext connection first and the daemon refuses it). Verified on
 the unit: wake word, a voice turn answered through the speaker, software mute on and off from the button.
@@ -210,8 +210,8 @@ checking the partition against its backup, and read back. The Spot boots through
 
 ## M7 — Installer
 
-`tools/install-spot.ps1`: one command from an unlocked, TWRP'd Spot to a running image, on the model
-of TECHO5 Dot's `install-dot.ps1` (backups verified, the boot image built from this unit's own
+`tools/install-spot.py`: one command from an unlocked, TWRP'd Spot to a running image, on the model
+of TECHO5 Dot's installer (backups verified, the boot image built from this unit's own
 backup, the rootfs slot laid down, name/key/Wi-Fi provisioned, read back and verified, the first boot
 watched to healthy).
 

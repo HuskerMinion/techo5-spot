@@ -181,7 +181,9 @@ if ($DryRun) {
 Write-Host "== release $tag on $repo"
 $assets = ($names + 'SHA256SUMS') | ForEach-Object { Join-Path $out $_ }
 $ghArgs = @('release', 'create', $tag) + $assets + @('--repo', $repo, '--title', "TECHO5 Spot $Version", '--notes', ($Notes + "`n`n" + $gplNote))
-if ($Prerelease) { $ghArgs += '--prerelease' }
+# A version with a suffix (-rc.1, -beta) is a prerelease whether or not -Prerelease was given: GitHub
+# otherwise makes it /releases/latest, which is what the installers and every unit's updater follow.
+if ($Prerelease -or $Version -match '-') { $ghArgs += '--prerelease' }
 & gh @ghArgs
 if ($LASTEXITCODE -ne 0) { throw 'gh release create failed' }
 Write-Host "published: https://github.com/$repo/releases/tag/$tag"
