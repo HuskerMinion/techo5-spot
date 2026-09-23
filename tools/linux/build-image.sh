@@ -38,8 +38,10 @@ mkdir -p "$HERE/bin" "$(dirname "$OUT")"
 
 echo "== building tools for armv7 (from $TECHO5)"
 export GOOS=linux GOARCH=arm GOARM=7 CGO_ENABLED=0
+# audioprobe lives in the daemon's module, beside the ALSA code it shares.
 for c in fbprobe audioprobe rebootto; do
-	(cd "$TECHO5" && "$GO" build -trimpath -ldflags "-s -w" -o "$HERE/bin/$c-arm" "./cmd/$c")
+	m=$TECHO5; [ -d "$TECHO5/echod/cmd/$c" ] && m=$TECHO5/echod
+	(cd "$m" && "$GO" build -trimpath -ldflags "-s -w" -o "$HERE/bin/$c-arm" "./cmd/$c")
 done
 unset GOOS GOARCH GOARM CGO_ENABLED
 
