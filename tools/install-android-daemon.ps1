@@ -74,12 +74,35 @@ if (Test-Path $KeyFile) {
 if ([Convert]::FromBase64String($psk).Length -ne 32) { throw "key in $KeyFile is not 32 bytes base64" }
 
 Write-Host "== wake word models"
+# From a commit, not a branch, and each file checked against its sha256 before it goes near the unit: these
+# land in the directory the daemon parses as root. The same pins as the techo5 repo's tools/fetch-inputs.py
+# (MODELS_COMMIT, MODEL_SHA256) and tools/install-cronos.ps1; move them together.
+$modelsCommit = '05b65922cc433c9df13e98e32a7fe520758c837e'  # esphome/micro-wake-word-models, 2025-03-21
+$modelSha256 = @{
+    'okay_nabu.tflite'   = '0689abe1912a95a3318a0d8cb2e67bad0cbcfe3e24dd6e050c75debddfb6f891'
+    'okay_nabu.json'     = '6dd65604f70fe5ea9d1af73a7bf239529d1fbabc363807f45d2b22ce464ddbed'
+    'hey_jarvis.tflite'  = '21a7976add39ee24ec96c63d96b7aaa18e24d1d9824b963e451da8feb4b78b77'
+    'hey_jarvis.json'    = 'b153867d818675d8abcc9dace474afe7f83551ae0d5a9b1d71a98681320185af'
+    'hey_mycroft.tflite' = 'c2a9b6ed51182db72e014781d5a4ece1929dc232a40b5b4be384f0295f0e1571'
+    'hey_mycroft.json'   = '57b2b06fe5fdbbe834a242fabc7af31e4194a550fc382b2c88636a6d62d0d57e'
+    'alexa.tflite'       = '9011a8155b04de858c48038529235cbc0e42e9fca05a55bf588cb80a653a723b'
+    'alexa.json'         = '1d999798b35b1fe2606465b75ab840be51c1811d2909d5e620cefb6e96f8abd0'
+}
 $tmp = Join-Path ([IO.Path]::GetTempPath()) "techo5-spot-models"
 New-Item -ItemType Directory -Force $tmp | Out-Null
 foreach ($w in $WakeWords) {
     foreach ($ext in 'json', 'tflite') {
-        $url = "https://raw.githubusercontent.com/esphome/micro-wake-word-models/main/models/v2/$w.$ext"
-        Invoke-WebRequest -Uri $url -OutFile (Join-Path $tmp "$w.$ext") -UseBasicParsing
+        $file = "$w.$ext"
+        if (-not $modelSha256.ContainsKey($file)) {
+            throw "no pinned checksum for wake word '$w'; -WakeWords takes: $((($modelSha256.Keys | ForEach-Object { $_ -replace '\.(json|tflite)$', '' }) | Sort-Object -Unique) -join ', ')"
+        }
+        $out = Join-Path $tmp $file
+        Invoke-WebRequest -Uri "https://raw.githubusercontent.com/esphome/micro-wake-word-models/$modelsCommit/models/v2/$file" -OutFile $out -UseBasicParsing
+        $got = (Get-FileHash -Algorithm SHA256 $out).Hash.ToLower()
+        if ($got -ne $modelSha256[$file]) {
+            Remove-Item $out -Force
+            throw "$file is not the file that was pinned (sha256 $got); nothing was installed"
+        }
     }
     Write-Host "   $w"
 }
