@@ -1,10 +1,16 @@
 #!/usr/bin/env python3
-"""Install TECHO5 on an Echo Spot (rook) running LineageOS 18.1, in one command.
+"""Install TECHO5 on an Echo Spot (rook) running LineageOS 18.1, or straight from TWRP, in one command.
 
     python3 tools/backup-spot.py --serial <serial> --include-system      (from TWRP, first)
     python3 tools/install-spot.py
     python3 tools/install-spot.py --serial <serial> --name Kitchen --build-only
     python3 tools/install-spot.py --serial <serial> --name Kitchen --force
+    python3 tools/install-spot.py --lineage-zip lineage-18.1-...-rook.zip --wifi MyNetwork
+
+From TWRP (--lineage-zip), a unit fresh from its unlock never has to start LineageOS: the installer backs
+the unit up (backup-spot.py), formats userdata, installs the LineageOS zip from TWRP only for the drivers
+on its system partition and the boot image it builds from, and goes on from there. The Spot has no Wi-Fi
+page of its own, so --wifi is needed from TWRP.
 
 Run with nothing, it finds the unit (asking which, when there are several), asks for a name, and asks
 once before anything is erased. Every question has a switch, for running it from a script.
@@ -31,15 +37,17 @@ before that name) and reused, so Home Assistant keeps the device. Undo: fastboot
 or the backups; the bootloader picture: backups/<serial>/expdb.img back to expdb.
 """
 import argparse
+import hashlib
 import os
 import re
 import shutil
 import subprocess
 import sys
 import time
+import zipfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from techo5lib import (CONSOLE_TECHO5, Adb, Console, Fastboot, Release, alpine, ask_name,  # noqa: E402
+from techo5lib import (CONSOLE_TECHO5, Adb, Console, Fastboot, Release, alpine, ask_name, ask_wifi, wifi_conf,  # noqa: E402
                        check_serial_access, confirm, console_hint, default_dir, fail, head_is_android, md5,
                        need, new_api_key, note, pick_unit, repo_root, run_main, step, tar_extract_all,
                        valid_api_key, wait_for, write_private)
@@ -80,6 +88,58 @@ def default_key_file(backup):
     return old if os.path.exists(old) and not os.path.exists(new) else new
 
 
+def lineage_board(zip_path):
+    """The board a LineageOS zip is built for, from its metadata's pre-device line."""
+    try:
+        with zipfile.ZipFile(zip_path) as z:
+            meta = z.read('META-INF/com/android/metadata').decode('utf-8', 'replace')
+    except (OSError, KeyError, zipfile.BadZipFile) as e:
+        fail('%s is not a LineageOS zip: %s' % (zip_path, e))
+    m = re.search(r'^pre-device=(\S+)', meta, re.M)
+    if not m:
+        fail('%s names no device in its metadata' % zip_path)
+    return m.group(1)
+
+
+def spot_wifi_conf(lines):
+    """A wpa_supplicant configuration from wifi_conf's two lines (the name and WPA's key, both as hex):
+    the same form the boot script writes from Android's saved networks."""
+    kv = dict(line.split('=', 1) for line in lines.strip().split('\n'))
+    return 'ctrl_interface=/run/wpa\nupdate_config=0\nnetwork={\n\tssid=%s\n\tpsk=%s\n}\n' % (kv['ssid'], kv['psk'])
+
+
+def install_lineage(adb, zip_path):
+    """Format userdata and install the LineageOS zip from TWRP, without ever starting LineageOS: its
+    system partition is where this unit's drivers come from, and its boot partition the boot image this
+    one is built from. Fire OS's userdata is encrypted, so it is formatted first, and TWRP is restarted
+    for /data to be usable again."""
+    out = adb.sh('twrp format data')
+    if 'Done' not in out:
+        fail('formatting userdata in TWRP failed:\n%s' % out)
+    adb.reboot('recovery')
+    wait_for('TWRP after formatting userdata', 180,
+             lambda: adb.state() == 'recovery' and ' /data ' in adb.sh('mount'), 3)
+    note('userdata formatted')
+    adb.push(zip_path, '/data/lineage.zip')
+    with open(zip_path, 'rb') as f:
+        want = hashlib.sha256(f.read()).hexdigest()
+    if adb.sh('sha256sum /data/lineage.zip').split(' ')[0] != want:
+        fail('the LineageOS zip changed on its way to the unit')
+    out = adb.sh('twrp install /data/lineage.zip')
+    adb.sh('rm -f /data/lineage.zip')
+    if 'succeeded' not in out:
+        fail('installing LineageOS from TWRP failed:\n%s' % out)
+    note('LineageOS installed from TWRP (not started)')
+    # The system partition is mmcblk0p11 on the Spot. Its Wi-Fi driver has to be built for the kernel this
+    # one is rebuilt from, which is what the rescue console checks once it is up.
+    out = adb.sh('mkdir -p /tmp/t5sys && mount -o ro /dev/block/mmcblk0p11 /tmp/t5sys && '
+                 'grep -a -o "vermagic=[^ ]*" /tmp/t5sys/system/%s | head -1; umount /tmp/t5sys' % WIFI_MODULE)
+    if 'vermagic=4.9.337' not in out:
+        fail("the LineageOS system this zip installed has a Wi-Fi driver for %s, not the 4.9.337 kernel: use "
+             "the LineageOS 18.1 build the getting started guide links" % (out.strip() or 'no kernel it names'))
+    note('Wi-Fi driver built for kernel %s' % out.strip().split('=', 1)[1])
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('--serial', help="the unit's adb serial (adb devices); found, or asked for, when missing")
@@ -91,6 +151,9 @@ def main():
     ap.add_argument('--kernel', help='a kernel you built (tools/linux/build-kernel.sh) instead of the release\'s')
     ap.add_argument('--rootfs', help='a root filesystem you built instead of the release\'s')
     ap.add_argument('--logo', action='store_true', help="replace the bootloader's Amazon picture with TECHO5's (needs Pillow)")
+    ap.add_argument('--lineage-zip', help='install from TWRP: the LineageOS 18.1 zip for rook, installed only for its drivers')
+    ap.add_argument('--wifi', help="a Wi-Fi network to join (its passphrase is asked for); needed from TWRP, since the Spot has no Wi-Fi page")
+    ap.add_argument('--wifi-passphrase-file', help='a file holding the --wifi passphrase, for running from a script')
     ap.add_argument('--build-only', action='store_true', help='build the boot image and stop; write nothing to the unit')
     ap.add_argument('--force', action='store_true', help='do not ask before erasing LineageOS')
     ap.add_argument('--backups', default=default_dir('TECHO5_BACKUPS', 'backups'))
@@ -101,7 +164,15 @@ def main():
 
     if not (a.build_only and a.serial):
         need(a.adb, 'install the Android platform tools (adb and fastboot)')
-    a.serial = pick_unit(a.serial, a.adb, ('device',), 'Echo Spot', consoles=(CONSOLE_TECHO5,))
+    twrp = bool(a.lineage_zip)
+    if twrp:
+        if not os.path.exists(a.lineage_zip):
+            fail('no file at %s' % a.lineage_zip)
+        if a.build_only:
+            fail('--build-only builds from a LineageOS unit\'s boot image; from TWRP, run without it')
+        if not a.wifi:
+            fail('from TWRP the Spot needs --wifi: it has no Wi-Fi page of its own, and no LineageOS network to carry over')
+    a.serial = pick_unit(a.serial, a.adb, ('recovery',) if twrp else ('device',), 'Echo Spot', consoles=(CONSOLE_TECHO5,))
     if a.name is not None:
         a.name = ask_name(a.name, '')
     backup = os.path.join(a.backups, a.serial)
@@ -116,10 +187,18 @@ def main():
     step('checks')
     if a.logo and subprocess.run([sys.executable, '-c', 'import PIL'], stderr=subprocess.DEVNULL).returncode != 0:
         fail('--logo needs Pillow: %s -m pip install pillow' % os.path.basename(sys.executable))
-    for b in ('expdb.img', 'lk.img', 'recovery.img', 'system.img'):
-        if not os.path.exists(os.path.join(backup, b)):
-            fail('%s is missing: back the unit up first (tools/backup-spot.py --serial %s --include-system, from TWRP)'
-                 % (os.path.join(backup, b), a.serial))
+    missing = [b for b in ('expdb.img', 'lk.img', 'recovery.img', 'system.img') if not os.path.exists(os.path.join(backup, b))]
+    if missing and twrp:
+        # Before anything is written: the same backup backup-spot.py takes, which is what makes a bad flash
+        # a short recovery.
+        r = subprocess.run([sys.executable, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'backup-spot.py'),
+                            '--serial', a.serial, '--include-system', '--backups', a.backups, '--adb', a.adb])
+        if r.returncode != 0:
+            fail('backing the unit up failed; nothing was written')
+        missing = [b for b in missing if not os.path.exists(os.path.join(backup, b))]
+    if missing:
+        fail('%s is missing: back the unit up first (tools/backup-spot.py --serial %s --include-system, from TWRP)'
+             % (os.path.join(backup, missing[0]), a.serial))
     note('backups present in %s' % backup)
     pub = None
     if a.ssh_key:
@@ -132,21 +211,48 @@ def main():
         need(a.adb, 'install the Android platform tools (adb and fastboot)')
         need(a.fastboot, 'install the Android platform tools (adb and fastboot)')
         state = adb.state()
-        if state != 'device':
-            fail("adb does not see %s running LineageOS (state '%s')%s" % (a.serial, state, console_hint((CONSOLE_TECHO5,))))
+        if twrp and state != 'recovery':
+            fail("adb does not see %s in TWRP (state '%s'): --lineage-zip installs from TWRP; on LineageOS leave it out"
+                 % (a.serial, state))
+        if not twrp and state != 'device':
+            fail("adb does not see %s running LineageOS (state '%s'), or install from TWRP with --lineage-zip%s"
+                 % (a.serial, state, console_hint((CONSOLE_TECHO5,))))
         dev = adb.sh('getprop ro.product.device')
         if dev != 'rook':
             fail("%s reports '%s', not rook" % (a.serial, dev))
-        adb.root()
-        if not adb.sh('id').startswith('uid=0'):
-            fail('adb is not root: turn on Rooted debugging in Developer options')
-        wifi = adb.sh('grep -c PreSharedKey /data/misc/apexdata/com.android.wifi/WifiConfigStore.xml 2>/dev/null')
-        if wifi in ('', '0'):
-            fail('LineageOS has no saved Wi-Fi network with a password: join one first')
-        note('rook, adb root, a saved Wi-Fi network')
+        if twrp:
+            zdev = lineage_board(a.lineage_zip)
+            if zdev != 'rook':
+                fail('%s is a LineageOS build for %s, not rook' % (a.lineage_zip, zdev))
+            note('rook in TWRP; LineageOS zip for rook')
+        else:
+            adb.root()
+            if not adb.sh('id').startswith('uid=0'):
+                fail('adb is not root: turn on Rooted debugging in Developer options')
+            saved = adb.sh('grep -c PreSharedKey /data/misc/apexdata/com.android.wifi/WifiConfigStore.xml 2>/dev/null')
+            if saved in ('', '0') and not a.wifi:
+                fail('LineageOS has no saved Wi-Fi network with a password: join one first, or give one with --wifi')
+            note('rook, adb root, %s' % ('a saved Wi-Fi network' if saved not in ('', '0') else '--wifi for the network'))
         check_serial_access()
     a.name = ask_name(a.name, 'Echo Spot')
     note("name in Home Assistant: '%s'" % a.name)
+    wifi = None
+    if a.wifi:
+        if a.wifi_passphrase_file:
+            with open(a.wifi_passphrase_file) as f:
+                wifi = spot_wifi_conf(wifi_conf(a.wifi, f.read().strip()))
+        else:
+            wifi = spot_wifi_conf(ask_wifi(a.wifi))
+        note("Wi-Fi: '%s' (only its key goes to the unit)" % a.wifi)
+    if twrp:
+        # From TWRP the first thing written is userdata, so the one question comes before it.
+        confirm(a.force, [
+            "About to install TECHO5 Spot on %s as '%s', from TWRP." % (a.serial, a.name),
+            "This formats userdata (Fire OS's data), installs LineageOS for its drivers without starting it,",
+            "flashes TECHO5's boot image, then erases the system partition (mmcblk0p11) to make the slot store.",
+        ])
+        step('LineageOS, for its drivers')
+        install_lineage(adb, a.lineage_zip)
 
     # ------------------------------------------------------------------------------------ 2. release
     step("the release, and this unit's boot image")
@@ -207,6 +313,8 @@ def main():
     os.makedirs(tmp, exist_ok=True)
     try:
         files = [('name', a.name), ('psk', psk)] + ([('ssh/authorized_keys', pub + '\n')] if pub else [])
+        if wifi:
+            files.append(('../../techo5-linux/wpa_supplicant.conf', wifi))
         for remote, text in files:
             local = os.path.join(tmp, remote.replace('/', '_'))
             with open(local, 'w', newline='\n') as f:
@@ -217,7 +325,8 @@ def main():
         # Whatever a failed push left behind goes too (the Home Assistant key among it), and a cleanup that
         # cannot finish never replaces the error that stopped the provisioning.
         shutil.rmtree(tmp, ignore_errors=True)
-    adb.sh('chmod 600 /data/misc/techo5/name /data/misc/techo5/psk /data/misc/techo5/ssh/authorized_keys 2>/dev/null')
+    adb.sh('chmod 600 /data/misc/techo5/name /data/misc/techo5/psk /data/misc/techo5/ssh/authorized_keys '
+           '/data/techo5-linux/wpa_supplicant.conf 2>/dev/null')
     tar_name = 'techo5-spot-rootfs-%s.tar.gz' % version
     uploads = [(rootfs, '/data/techo5-linux/' + tar_name)]
     if a.logo:
@@ -231,7 +340,7 @@ def main():
     # ------------------------------------------------------------------------------------ 4. flash
     # Asked here, once, rather than halfway through the store: the flash is where the unit stops being
     # a LineageOS unit, so this is the last moment a "no" leaves it as it was.
-    confirm(a.force, [
+    confirm(a.force or twrp, [
         "About to install TECHO5 Spot %s on %s as '%s'." % (version, a.serial, a.name),
         "This flashes TECHO5's boot image, then erases LineageOS's system partition (mmcblk0p11) to",
         'make the slot store. The way back: fastboot flash boot %s, and restore system from TWRP.' % los_boot,
