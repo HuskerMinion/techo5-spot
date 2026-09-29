@@ -240,10 +240,24 @@ def main():
     if a.wifi:
         if a.wifi_passphrase_file:
             with open(a.wifi_passphrase_file) as f:
-                wifi = spot_wifi_conf(wifi_conf(a.wifi, f.read().strip()))
+                # Only the line's end goes: a passphrase may begin or end with spaces.
+                wifi = spot_wifi_conf(wifi_conf(a.wifi, f.read().rstrip('\r\n')))
         else:
             wifi = spot_wifi_conf(ask_wifi(a.wifi))
         note("Wi-Fi: '%s' (only its key goes to the unit)" % a.wifi)
+    # ------------------------------------------------------------------------------------ 2. release
+    step("the release, and this unit's boot image")
+    os.makedirs(a.work, exist_ok=True)
+    rel = Release(REPO, a.release, a.work)
+    version = rel.version
+    rootfs = os.path.abspath(a.rootfs) if a.rootfs else rel.rootfs('arm-spot')
+    kernel = None if a.no_bluetooth else (os.path.abspath(a.kernel) if a.kernel else rel.asset('techo5-spot-kernel-bt.Image.gz-dtb'))
+    rescue = os.path.join(rel.dir, 'rescue')
+    tar_extract_all(rel.asset('techo5-spot-rescue.tar'), rescue)
+    note('TECHO5 Spot %s: root filesystem, %s and rescue bundle checked against the signed manifest'
+         % (version, 'Bluetooth kernel' if kernel else "LineageOS's kernel (no Bluetooth)"))
+    # From TWRP, LineageOS goes on only now, after the release is downloaded and checked: a network or
+    # GitHub failure then stops with the unit as it was.
     if twrp:
         # From TWRP the first thing written is userdata, so the one question comes before it.
         confirm(a.force, [
@@ -253,10 +267,6 @@ def main():
         ])
         step('LineageOS, for its drivers')
         install_lineage(adb, a.lineage_zip)
-
-    # ------------------------------------------------------------------------------------ 2. release
-    step("the release, and this unit's boot image")
-    os.makedirs(a.work, exist_ok=True)
     if not os.path.exists(los_boot):
         if a.build_only:
             fail('no %s yet; run once without --build-only' % los_boot)
@@ -268,14 +278,6 @@ def main():
             fail('the boot partition holds no Android boot image (not LineageOS?)')
         os.replace(los_boot + '.partial', los_boot)
     note('LineageOS boot image: %s' % los_boot)
-    rel = Release(REPO, a.release, a.work)
-    version = rel.version
-    rootfs = os.path.abspath(a.rootfs) if a.rootfs else rel.rootfs('arm-spot')
-    kernel = None if a.no_bluetooth else (os.path.abspath(a.kernel) if a.kernel else rel.asset('techo5-spot-kernel-bt.Image.gz-dtb'))
-    rescue = os.path.join(rel.dir, 'rescue')
-    tar_extract_all(rel.asset('techo5-spot-rescue.tar'), rescue)
-    note('TECHO5 Spot %s: root filesystem, %s and rescue bundle checked against the signed manifest'
-         % (version, 'Bluetooth kernel' if kernel else "LineageOS's kernel (no Bluetooth)"))
     build_boot_image(rescue, los_boot, alpine(a.work), kernel, boot_out)
     note('boot image %d bytes' % os.path.getsize(boot_out))
     logo_chunk = os.path.join(backup, 'expdb-logo-chunk.bin')
@@ -310,7 +312,7 @@ def main():
         note('Home Assistant key: new, in %s' % key_file)
     adb.sh('mkdir -p /data/misc/techo5/models /data/misc/techo5/ssh /data/techo5-linux; chmod 700 /data/misc/techo5 /data/misc/techo5/ssh')
     tmp = os.path.join(a.work, 'provision-' + a.serial)
-    os.makedirs(tmp, exist_ok=True)
+    os.makedirs(tmp, mode=0o700, exist_ok=True)  # the key and the Wi-Fi key pass through it
     try:
         files = [('name', a.name), ('psk', psk)] + ([('ssh/authorized_keys', pub + '\n')] if pub else [])
         if wifi:
