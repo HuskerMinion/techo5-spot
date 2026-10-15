@@ -239,8 +239,9 @@ def main():
     wifi = None
     if a.wifi:
         if a.wifi_passphrase_file:
-            with open(a.wifi_passphrase_file) as f:
-                # Only the line's end goes: a passphrase may begin or end with spaces.
+            # UTF-8, whatever this computer's code page, with a BOM (Notepad's) dropped. Only the line's
+            # end goes: a passphrase may begin or end with spaces.
+            with open(a.wifi_passphrase_file, encoding='utf-8-sig') as f:
                 wifi = spot_wifi_conf(wifi_conf(a.wifi, f.read().rstrip('\r\n')))
         else:
             wifi = spot_wifi_conf(ask_wifi(a.wifi))
