@@ -319,7 +319,7 @@ def main():
             files.append(('../../techo5-linux/wpa_supplicant.conf', wifi))
         for remote, text in files:
             local = os.path.join(tmp, remote.replace('/', '_'))
-            with open(local, 'w', newline='\n') as f:
+            with open(local, 'w', encoding='utf-8', newline='\n') as f:
                 f.write(text)
             adb.push(local, '/data/misc/techo5/' + remote)
             os.remove(local)
