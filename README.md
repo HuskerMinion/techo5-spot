@@ -61,6 +61,61 @@ rather than A/B slots. It differs in the radio: Wi-Fi and Bluetooth are a **Broa
 over USB with the `bcmdhd` driver and Bluetooth over a UART, so neither the Show's `mt76x8` modules nor
 the Dot's `wmtup` apply. It has about 2 GB of RAM, more than either.
 
+## Using it
+
+The Spot has no swipe-down settings or swipe-in camera like the Show. Everything is on the ring menu.
+
+- **Press and hold** the clock to open the ring menu.
+- **Turn your finger around the ring** to bring an item to the top, then lift your finger and tap the
+  middle. A tap on any item goes straight to it.
+- The menu closes by itself after a few seconds if you leave it alone.
+
+The items, clockwise from the top:
+
+| Item | What it does |
+|---|---|
+| Talk | Starts Assist, the same as a tap on the clock |
+| Call | Your devices and contacts to call |
+| Mute | Turns the microphones off or back on |
+| Music | Radio stations, and Stop |
+| Volume | Tap, then turn your finger around the ring |
+| Weather | The forecast; swipe sideways for the rain map |
+| Calendar | Today and what's next (only when a calendar is chosen) |
+| Camera | This Spot's own camera. While a camera is up, swipe sideways for the next one, or press and hold for the list |
+| Dashboard | Your Home Assistant dashboard, or back to the clock |
+| Timers | Stops a timer that is ringing |
+| Announce | Talk to every device in the house |
+| Settings | Display, sound, alarms and the rest |
+| Sleep | Turns the screen off; tap to wake it |
+
+Other gestures on the clock: a tap starts Assist, swipe up or down for the volume, and swipe left or
+right for the next clock style (when **Swipe between clock styles** is on).
+
+### Night
+
+At night the Spot can dim, as it always has, show the night clock, or turn the screen off. The night
+clock is the time alone in dim red on black, with the backlight turned down to almost nothing, like
+the Show's.
+
+- **Settings → Display → Night hours**: when the night starts and ends. 10 PM to 7 AM unless you
+  change it.
+- **At night**: *Dim*, *Night clock* or *Screen off*.
+- **Night clock**: the look. *Red*, *Red LED* or *Flip*.
+
+The night clock or the dark screen comes after the Spot has been left alone for a minute and a half.
+A tap lights the screen, dimmed, and the night clock comes back (or the screen goes off again) a
+minute and a half after the last touch. Press and hold to light it and open the ring menu in one go.
+
+With the night clock, an alarm or a timer rings over it, and a tap anywhere stops it. Calls, Assist
+answers, announcements, reminders and cameras show over it at the same low light, and the clock comes
+back after. With Screen off, alarms, timers, calls, reminders, announcements and the light before an
+alarm turn the screen on, dimmed, and it goes off again once they're done. When the night ends the
+screen comes back on, unless you turned it off yourself with Sleep.
+
+In Home Assistant these are **Night hours**, **Night starts**, **Night ends**, **Screen at night**,
+**Night clock style**, **Night light brightness** (1 to 10, how bright the night clock is) and the
+**Night mode** switch, the same names as on the Show, so automations made for a Show work on a Spot.
+
 ## Lineage
 
 - [TECHO5](https://github.com/HuskerMinion/techo5) (MIT): the daemon (`echod`), the Linux image
