@@ -102,9 +102,10 @@ the Show's.
 - **At night**: *Dim*, *Night clock* or *Screen off*.
 - **Night clock**: the look. *Red*, *Red LED* or *Flip*.
 
-The night clock or the dark screen comes after the Spot has been left alone for a minute and a half.
-A tap lights the screen, dimmed, and the night clock comes back (or the screen goes off again) a
-minute and a half after the last touch. Press and hold to light it and open the ring menu in one go.
+The night clock or the dark screen comes about 10 seconds after Settings closes, and otherwise once
+the Spot has been left alone for a minute and a half. A tap lights the screen, dimmed, and the night
+clock comes back (or the screen goes off again) a minute and a half after the last touch. Press and
+hold to light it and open the ring menu in one go.
 
 With the night clock, an alarm or a timer rings over it, and a tap anywhere stops it. Calls, Assist
 answers, announcements, reminders and cameras show over it at the same low light, and the clock comes
