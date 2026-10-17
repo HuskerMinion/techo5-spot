@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="images/rook.png" alt="ROOK" width="160">
+</p>
+
 # TECHO5 Spot
 
 **TECHO5 for the Echo Spot**: the TECHO5 Linux image, brought to the Amazon Echo Spot 1st
@@ -132,6 +136,12 @@ the Show, so automations made for a Show work on a Spot.
 - amonet, kaeru and the Echo TWRP trees ([R0rt1z2](https://github.com/R0rt1z2), k4y0z): the unlock.
 - [amazon-oss](https://github.com/amazon-oss): the LineageOS 18.1 `rook` device tree and the 4.9
   kernel it builds.
+
+## Image credits
+
+- The ROOK badge: a white chess rook. Photo by MichaelMaggs,
+  [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Chess_piece_-_White_rook.JPG),
+  [CC BY-SA 2.5](https://creativecommons.org/licenses/by-sa/2.5/); the cropped badge is CC BY-SA 2.5 too.
 
 ## License
 
