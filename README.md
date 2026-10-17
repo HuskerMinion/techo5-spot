@@ -101,11 +101,14 @@ the Show's.
   change it.
 - **At night**: *Dim*, *Night clock* or *Screen off*.
 - **Night clock**: the look. *Red*, *Red LED* or *Flip*.
+- **Night clock brightness**: shown when At night is *Night clock*. 1 to 10; the lowest step is a
+  faint glow. Changes show on the screen as you make them.
 
-The night clock or the dark screen comes about 10 seconds after Settings closes, and otherwise once
-the Spot has been left alone for a minute and a half. A tap lights the screen, dimmed, and the night
-clock comes back (or the screen goes off again) a minute and a half after the last touch. Press and
-hold to light it and open the ring menu in one go.
+The night clock comes about 10 seconds after Settings closes, and otherwise once the Spot has been
+left alone for a minute and a half. With Screen off, the screen always waits for that minute and a
+half alone. A tap lights the screen, dimmed, and the night clock comes back (or the screen goes off
+again) a minute and a half after the last touch. Press and hold to light it and open the ring menu in
+one go.
 
 With the night clock, an alarm or a timer rings over it, and a tap anywhere stops it. Calls, Assist
 answers, announcements, reminders and cameras show over it at the same low light, and the clock comes
@@ -114,8 +117,9 @@ alarm turn the screen on, dimmed, and it goes off again once they're done. When 
 screen comes back on, unless you turned it off yourself with Sleep.
 
 In Home Assistant these are **Night hours**, **Night starts**, **Night ends**, **Screen at night**,
-**Night clock style**, **Night light brightness** (1 to 10, how bright the night clock is) and the
-**Night mode** switch, the same names as on the Show, so automations made for a Show work on a Spot.
+**Night clock style**, **Night light brightness** (1 to 10, how bright the night clock is: the same
+setting as Night clock brightness on the Spot) and the **Night mode** switch, the same names as on
+the Show, so automations made for a Show work on a Spot.
 
 ## Lineage
 
