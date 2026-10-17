@@ -102,10 +102,11 @@ the Show's.
 - **At night**: *Dim*, *Night clock* or *Screen off*.
 - **Night clock**: the look. *Red*, *Red LED* or *Flip*.
 - **Night clock brightness**: shown when At night is *Night clock*. 1 to 10; the lowest step is a
-  faint glow. Changes show on the screen as you make them.
+  faint glow. At night, changes show on the screen as you make them.
 
-The night clock comes about 10 seconds after Settings closes, and otherwise once the Spot has been
-left alone for a minute and a half. With Screen off, the screen always waits for that minute and a
+The night clock comes about 10 seconds after Settings or the ring menu closes, when the night starts
+and when Night clock is chosen, and otherwise once the Spot has been left alone for a minute and a
+half. With Screen off, the screen always waits for that minute and a
 half alone. A tap lights the screen, dimmed, and the night clock comes back (or the screen goes off
 again) a minute and a half after the last touch. Press and hold to light it and open the ring menu in
 one go.
