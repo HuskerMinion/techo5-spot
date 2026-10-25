@@ -89,7 +89,8 @@ bash tools/linux/build-kernel.sh -o inputs/Image.gz-dtb-rook-bt
 
 ## 5. The root filesystem
 
-From techo5, with this repository's overlay and inputs:
+From techo5, with this repository's overlay and inputs. Its `bin/` needs `tailscaled-arm64` and
+`tailscaled-arm64.LICENSE` first (techo5's `tools/linux/build-tailscaled.sh`), as every image carries them:
 
 ```
 export BUILD_TAGS=spot DEVICE_OVERLAY=../techo5-spot/tools/linux/rootfs TECHO5_INPUTS=../techo5-spot/inputs
