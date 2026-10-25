@@ -143,6 +143,11 @@ if ($release -notmatch "rootfs $([regex]::Escape($Version)) .*daemon echod versi
 Write-Host $release
 # LineageOS's vendor tree is Amazon's and Broadcom's, not ours to publish: each Spot mounts its own.
 if (& $tar -tzf $tarball | Where-Object { $_ -match '^(\./)?vendor/.' } | Select-Object -First 1) { throw "$tarball carries a vendor tree; build it without VENDOR_TGZ" }
+# Tailscale, which TECHO5's deploy-rootfs.sh puts in every image, with its license (docs/tailscale.md there).
+$names = @(& $tar -tzf $tarball) -replace '^\./', ''
+if ($names -notcontains 'usr/local/bin/tailscaled' -or $names -notcontains 'usr/share/licenses/tailscale/LICENSE') {
+    throw "$tarball has no Tailscale, or not its license: build bin/tailscaled-arm64 with TECHO5's tools/linux/build-tailscaled.sh"
+}
 $daemon = Join-Path $out 'echod-arm-spot'
 Push-Location $out
 try {
