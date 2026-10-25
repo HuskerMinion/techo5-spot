@@ -148,6 +148,10 @@ $names = @(& $tar -tzf $tarball) -replace '^\./', ''
 if ($names -notcontains 'usr/local/bin/tailscaled' -or $names -notcontains 'usr/share/licenses/tailscale/LICENSE') {
     throw "$tarball has no Tailscale, or not its license: build bin/tailscaled-arm64 with TECHO5's tools/linux/build-tailscaled.sh"
 }
+# AirPlay (classic and AirPlay 2) and Spotify Connect, as on the Show: TECHO5's bin/ needs the receivers' prebuilts.
+foreach ($b in 'usr/bin/shairport-sync', 'usr/local/bin/techo5-shairport-sync', 'usr/local/bin/techo5-nqptp', 'usr/local/bin/techo5-librespot') {
+    if ($names -notcontains $b) { throw "$tarball has no ${b}: copy TECHO5's bin/techo5-librespot-arm, techo5-shairport-sync-arm and techo5-nqptp-arm into its bin/ before building" }
+}
 $daemon = Join-Path $out 'echod-arm-spot'
 Push-Location $out
 try {
