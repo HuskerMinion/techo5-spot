@@ -49,6 +49,10 @@ LineageOS. What exists:
 - **Phone calls** (v0.1.0): through your own SIP provider, from Home Assistant or by voice, with an
   incoming-call face on the round screen (tap to answer, swipe to decline, tap to hang up). Setup is in
   TECHO5's [docs/phone.md](https://github.com/HuskerMinion/techo5/blob/main/docs/phone.md).
+- **AirPlay and Spotify Connect** (spot-v1.4.8): the Spot can be a speaker an iPhone, iPad or Mac
+  plays to over AirPlay 2, grouped with other AirPlay 2 speakers, or the Spotify app over Spotify
+  Connect. Both are off until you turn them on, in Home Assistant or on the setup page. Setup is in
+  TECHO5's [docs/setup.md](https://github.com/HuskerMinion/techo5/blob/main/docs/setup.md#5-music).
 - **Updates** come from this repository's
   [releases](https://github.com/HuskerMinion/techo5-spot/releases), signed, through Home Assistant's
   update card into the spare slot; [tools/release-spot.ps1](tools/release-spot.ps1) publishes one
