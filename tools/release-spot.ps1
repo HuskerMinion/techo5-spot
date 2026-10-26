@@ -43,10 +43,17 @@ param(
     # Attaching the kernel and rescue bundle to a release published before them: no longer possible,
     # kept so anyone who reaches for it is told why rather than left guessing.
     [switch]$AddTo,
+    # The sources of the programs the root filesystem carries built from others' sources (FFmpeg,
+    # Shairport Sync, nqptp, librespot; NOTICE), from TECHO5's tools/linux/third-party-sources.sh: their
+    # licenses want the source beside the binaries. Published as techo5-third-party-sources.tar.gz.
+    [string]$ThirdPartySources = '',
     # Sign everything into bin/release/<version>, publish nothing.
     [switch]$DryRun
 )
 $ErrorActionPreference = 'Stop'
+if (-not $DryRun -and (-not $ThirdPartySources -or -not (Test-Path $ThirdPartySources))) {
+    throw "no -ThirdPartySources archive: build it with TECHO5's tools/linux/third-party-sources.sh"
+}
 # -AddTo used to upload the kernel and the rescue bundle to a release that went out before they
 # existed. It cannot work now: install-spot.py takes those two files only when the release's signed
 # manifest names them, and the manifest of a published release was signed without them. Re-signing one
@@ -177,6 +184,10 @@ foreach ($f in 'echod-arm-spot', 'techo5-spot-rootfs.tar.gz', 'manifest.json', '
 }
 
 $names = 'echod-arm-spot', 'techo5-spot-rootfs.tar.gz', 'manifest.json', 'manifest.json.sig', $Script:SpotKernelAsset, $Script:SpotRescueAsset
+if ($ThirdPartySources) {
+    Copy-Item $ThirdPartySources (Join-Path $out 'techo5-third-party-sources.tar.gz') -Force
+    $names += 'techo5-third-party-sources.tar.gz'
+}
 # SHA256SUMS: for checking a download by hand. The installer reads the signed manifest instead, which
 # names the kernel and the rescue bundle too; nothing signs this file, so it says nothing about who
 # served the files it describes.

@@ -53,6 +53,14 @@ Linux kernel, https://git.kernel.org (GPL-2.0)
     - The script that does it is tools/linux/build-kernel.sh, and docs/building.md is how to run it.
       A rebuild reproduces the shipped image.
 
+FFmpeg, Shairport Sync, nqptp, librespot and Tailscale
+  The root filesystem, built by TECHO5's tools/linux/deploy-rootfs.sh, carries FFmpeg 8.1.2
+  (LGPL-2.1-or-later), Shairport Sync 5.6.1 (MIT, parts BSD and ISC), nqptp 1.2.9 (GPL-2.0),
+  librespot 0.8.0 (MIT) and tailscaled (BSD 3-Clause), each with its license files in
+  /usr/share/licenses. Where their sources are, what was changed and how they are built is in TECHO5's
+  NOTICE; their source archives, patches, licenses and build scripts are attached to each release from
+  spot-v1.4.8 on (techo5-third-party-sources*.tar.gz).
+
 docs/dumps/rook_defconfig-lineage-18.1 is arch/arm64/configs/rook_defconfig from
 github.com/amazon-oss/android_kernel_amazon_mt8163, branch lineage-18.1 (GPL-2.0), copied as a
 reference; docs/dumps/rook-vs-cronos-defconfig.diff compares it with cronos_defconfig from the same tree.
