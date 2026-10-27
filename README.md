@@ -139,6 +139,14 @@ the Spot restarted partway (techo5-spot#11), the unit isn't lost. Finish by hand
 a terminal on the port the installer named, at 115200 (`screen /dev/ttyACM0 115200` on Linux or macOS,
 PuTTY on Windows). The port can come back under another name after a restart.
 
+If the Spot restarted by itself, also run these once it is back on the console, and attach what they
+print to the issue (the installer saves the same to `slot-store-restart.txt` in the unit's backup folder
+when it sees the unit come back):
+```
+cat /sys/fs/pstore/console-ramoops* 2>/dev/null | tail -200
+tail -100 /data/techo5-linux/rescue.log
+```
+
 1. Keep the rescue environment up, and see how far it got:
    ```
    touch /tmp/stay

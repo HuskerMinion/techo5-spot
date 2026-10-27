@@ -59,6 +59,25 @@ WIFI_MODULE = 'vendor/lib/modules/amzn-bcmdhd.ko'
 LOGO_OFFSET = 431416
 LOGO_SLOT = 12096
 
+# What the first rescue boot (mode android) started for Wi-Fi, from tools/linux/init and techo5-lib.sh
+# (t5_wifi_up, t5_dropbear, the clock): stopped before the system partition is unmounted and erased, so
+# nothing is still using the vendor tree or writing to the disk when mkstore runs. Each is tolerant of
+# "not running". The module is the one WIFI_MODULE names, as the kernel spells it (- becomes _).
+# Theory, not proven (techo5-spot#11, techo5#313): the Spot restarting here has to do with that stack.
+STOP_WIFI = ('killall wpa_supplicant udhcpc dropbear ntpd 2>/dev/null; sleep 1; '
+             'killall -9 wpa_supplicant udhcpc dropbear ntpd 2>/dev/null; '
+             'ip link set wlan0 down 2>/dev/null; '
+             'grep -q "^amzn_bcmdhd " /proc/modules && rmmod amzn_bcmdhd 2>/dev/null; true')
+UNMOUNT_ANDROID = ('killall techo5 fbprobe 2>/dev/null; sleep 2; sync; umount /android 2>/dev/null; '
+                   'mountpoint -q /android && echo STILL-MOUNTED || echo UNMOUNTED')
+MKSTORE = ('slotctl mkstore /dev/mmcblk0p11 --i-know-this-erases-it >/tmp/mkstore.log 2>&1 && sync && echo MKSTORE-OK; '
+           'tail -3 /tmp/mkstore.log')
+# What to attach to the issue when the Spot restarts during the slot store.
+EVIDENCE = ('cat /sys/fs/pstore/console-ramoops* 2>/dev/null | tail -200; '
+            'echo ----- rescue.log; tail -100 /data/techo5-linux/rescue.log 2>/dev/null')
+EVIDENCE_BY_HAND = ('cat /sys/fs/pstore/console-ramoops* 2>/dev/null | tail -200\n'
+                    '   tail -100 /data/techo5-linux/rescue.log')
+
 
 def build_boot_image(rescue, lineage_boot, alpine_tgz, kernel, out):
     """This unit's boot image: its LineageOS boot image's header (and kernel, without --kernel), and the
@@ -394,14 +413,35 @@ def main():
     # Past this point the system partition is erased, so a step that stops leaves the unit in its rescue
     # environment, to be finished by hand. A unit that restarts mid-step (techo5-spot#11) takes its
     # console with it; that is said as such, rather than after the whole wait as "None".
+    def collect_evidence():
+        # The unit restarted: when it is back on the rescue console, the kernel's last console lines
+        # (pstore) and the rescue log are what show why. Saved next to the backups; said if it cannot.
+        out = os.path.join(backup, 'slot-store-restart.txt')
+        note('waiting up to 3 minutes for the unit to come back, to read why it restarted')
+        text = None
+        deadline = time.time() + 180
+        while time.time() < deadline and text is None:
+            text = console.run(EVIDENCE, 20)
+            if text is None:
+                time.sleep(5)
+        if text is None:
+            return ('The unit did not come back on its console in time. Once it has, collect these by hand\n'
+                    '   on its USB console and attach them to the issue:\n   ' + EVIDENCE_BY_HAND)
+        with open(out, 'w', encoding='utf-8') as f:
+            f.write(text + '\n')
+        return 'Attach this file to the issue (techo5-spot#11): %s' % out
+
     def store_failed(what, o):
+        extra = ''
         if console.gone:
+            extra = collect_evidence()
             what = 'the Spot restarted, or its USB went away, while %s (%s).' % (what, console.gone)
         else:
             what = '%s failed:\n%s' % (what, '   (no answer from the unit)' if o is None else o)
         fail('%s\n   The unit is in its rescue environment (RESCUE on its screen) and is not lost: finish the\n'
              '   install by hand on its USB console, as "If the install stops at the slot store" in README.md\n'
-             '   says (https://github.com/HuskerMinion/techo5-spot#if-the-install-stops-at-the-slot-store).' % what)
+             '   says (https://github.com/HuskerMinion/techo5-spot#if-the-install-stops-at-the-slot-store).%s'
+             % (what, '\n   ' + extra if extra else ''))
 
     # The vendor tree is this unit's own, from LineageOS: releases don't carry it. Kept on userdata
     # before the system partition is erased, then in the store.
@@ -412,16 +452,23 @@ def main():
             fail("the Spot restarted, or its USB went away, while saving LineageOS's vendor tree (%s).\n"
                  '   Nothing was erased yet: LineageOS comes back with fastboot flash boot %s.' % (console.gone, los_boot))
         fail("saving LineageOS's vendor tree failed (nothing was erased):\n%s" % o)
-    o = console.run('killall techo5 fbprobe 2>/dev/null; sleep 2; umount /android 2>/dev/null; mountpoint -q /android && echo STILL-MOUNTED; '
-                    'slotctl mkstore /dev/mmcblk0p11 --i-know-this-erases-it >/tmp/mkstore.log 2>&1 && echo MKSTORE-OK; tail -3 /tmp/mkstore.log', 300)
+    console.run(STOP_WIFI, 30)
+    o = console.run(UNMOUNT_ANDROID, 60)
+    if 'UNMOUNTED' not in (o or ''):
+        if console.gone:
+            store_failed('stopping Wi-Fi and unmounting the system partition', o)
+        fail('the system partition could not be unmounted, so the slot store was not made (nothing was erased):\n%s\n'
+             '   The unit is in its rescue environment (RESCUE on its screen). "fuser -vm /android" on its USB\n'
+             '   console shows what holds it; run the installer again after that.' % ('   (no answer from the unit)' if o is None else o))
+    o = console.run(MKSTORE, 300)
     if 'MKSTORE-OK' not in (o or ''):
         store_failed('making the slot store', o)
-    o = console.run('tar -xf /data/techo5-linux/vendor.tar -C /store && [ -e /store/%s ] && echo VENDOR-OK' % WIFI_MODULE, 180)
+    o = console.run('tar -xf /data/techo5-linux/vendor.tar -C /store && sync && [ -e /store/%s ] && echo VENDOR-OK' % WIFI_MODULE, 180)
     if 'VENDOR-OK' not in (o or ''):
         store_failed('putting the vendor tree into the store (it is kept in /data/techo5-linux/vendor.tar)', o)
     o = console.run('STORE=/store slotctl install %s >/tmp/install.log 2>&1 && echo INSTALL-OK; tail -2 /tmp/install.log; '
                     '[ -e /store/slots/a/%s ] || { mkdir -p /store/slots/a/vendor && cp -a /store/vendor/. /store/slots/a/vendor/; }; '
-                    '[ -e /store/slots/a/%s ] && rm -f /data/techo5-linux/vendor.tar && echo SLOT-VENDOR-OK; STORE=/store slotctl status'
+                    '[ -e /store/slots/a/%s ] && rm -f /data/techo5-linux/vendor.tar && echo SLOT-VENDOR-OK; sync; STORE=/store slotctl status'
                     % (tar, WIFI_MODULE, WIFI_MODULE), 900)
     if 'INSTALL-OK' not in (o or ''):
         store_failed('installing the release into slot a', o)
