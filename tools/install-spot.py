@@ -390,27 +390,43 @@ def main():
              % (console.run('STORE=/store slotctl status', 30) or '   (slotctl status did not answer)',
                 los_boot))
     tar = '/data/techo5-linux/' + tar_name
+
+    # Past this point the system partition is erased, so a step that stops leaves the unit in its rescue
+    # environment, to be finished by hand. A unit that restarts mid-step (techo5-spot#11) takes its
+    # console with it; that is said as such, rather than after the whole wait as "None".
+    def store_failed(what, o):
+        if console.gone:
+            what = 'the Spot restarted, or its USB went away, while %s (%s).' % (what, console.gone)
+        else:
+            what = '%s failed:\n%s' % (what, '   (no answer from the unit)' if o is None else o)
+        fail('%s\n   The unit is in its rescue environment (RESCUE on its screen) and is not lost: finish the\n'
+             '   install by hand on its USB console, as "If the install stops at the slot store" in README.md\n'
+             '   says (https://github.com/HuskerMinion/techo5-spot#if-the-install-stops-at-the-slot-store).' % what)
+
     # The vendor tree is this unit's own, from LineageOS: releases don't carry it. Kept on userdata
     # before the system partition is erased, then in the store.
     o = console.run('touch /tmp/stay; tar -cf /data/techo5-linux/vendor.tar -C /android/system vendor && '
                     'tar -tf /data/techo5-linux/vendor.tar %s >/dev/null && echo VENDOR-SAVED' % WIFI_MODULE, 180)
     if 'VENDOR-SAVED' not in (o or ''):
+        if console.gone:
+            fail("the Spot restarted, or its USB went away, while saving LineageOS's vendor tree (%s).\n"
+                 '   Nothing was erased yet: LineageOS comes back with fastboot flash boot %s.' % (console.gone, los_boot))
         fail("saving LineageOS's vendor tree failed (nothing was erased):\n%s" % o)
     o = console.run('killall techo5 fbprobe 2>/dev/null; sleep 2; umount /android 2>/dev/null; mountpoint -q /android && echo STILL-MOUNTED; '
                     'slotctl mkstore /dev/mmcblk0p11 --i-know-this-erases-it >/tmp/mkstore.log 2>&1 && echo MKSTORE-OK; tail -3 /tmp/mkstore.log', 300)
     if 'MKSTORE-OK' not in (o or ''):
-        fail('mkstore failed:\n%s' % o)
+        store_failed('making the slot store', o)
     o = console.run('tar -xf /data/techo5-linux/vendor.tar -C /store && [ -e /store/%s ] && echo VENDOR-OK' % WIFI_MODULE, 180)
     if 'VENDOR-OK' not in (o or ''):
-        fail('putting the vendor tree into the store failed (it is kept in /data/techo5-linux/vendor.tar):\n%s' % o)
+        store_failed('putting the vendor tree into the store (it is kept in /data/techo5-linux/vendor.tar)', o)
     o = console.run('STORE=/store slotctl install %s >/tmp/install.log 2>&1 && echo INSTALL-OK; tail -2 /tmp/install.log; '
                     '[ -e /store/slots/a/%s ] || { mkdir -p /store/slots/a/vendor && cp -a /store/vendor/. /store/slots/a/vendor/; }; '
                     '[ -e /store/slots/a/%s ] && rm -f /data/techo5-linux/vendor.tar && echo SLOT-VENDOR-OK; STORE=/store slotctl status'
                     % (tar, WIFI_MODULE, WIFI_MODULE), 900)
     if 'INSTALL-OK' not in (o or ''):
-        fail('slot install failed:\n%s' % o)
+        store_failed('installing the release into slot a', o)
     if 'SLOT-VENDOR-OK' not in o:
-        fail('the vendor tree did not reach slot a:\n%s' % o)
+        store_failed('copying the vendor tree into slot a', o)
     for line in o.split('\n'):
         if line.startswith('slot a'):
             note(line)

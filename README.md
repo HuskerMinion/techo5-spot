@@ -130,6 +130,39 @@ In Home Assistant these are **Night hours**, **Night starts**, **Night ends**, *
 setting as Night clock brightness on the Spot) and the **Night mode** switch, the same names as on
 the Show, so automations made for a Show work on a Spot.
 
+## If the install stops at the slot store
+
+Once the installer has flashed TECHO5's boot image, the Spot runs its rescue environment (RESCUE on
+the screen) while the installer saves LineageOS's vendor tree, erases the system partition into the
+slot store and installs the release into slot a. If the installer stops there, for example because
+the Spot restarted partway (techo5-spot#11), the unit isn't lost. Finish by hand on its USB console:
+a terminal on the port the installer named, at 115200 (`screen /dev/ttyACM0 115200` on Linux or macOS,
+PuTTY on Windows). The port can come back under another name after a restart.
+
+1. Keep the rescue environment up, and see how far it got:
+   ```
+   touch /tmp/stay
+   STORE=/store slotctl status; ls /store; ls -la /data/techo5-linux
+   ```
+2. If `/store` has no `vendor` folder, put this unit's vendor tree there from the copy the installer
+   kept. If `vendor.tar` isn't in `/data/techo5-linux`, stop here and open an issue with what step 1
+   printed.
+   ```
+   tar -xf /data/techo5-linux/vendor.tar -C /store
+   ls /store/vendor/lib/modules/amzn-bcmdhd.ko
+   ```
+3. Install the release into slot a (it takes a few minutes; use the file name `ls` showed), then restart:
+   ```
+   STORE=/store slotctl install /data/techo5-linux/techo5-spot-rootfs-<version>.tar.gz
+   sync; /bin/busybox.static reboot -f
+   ```
+4. When the TECHO5 clock is up, keep the slot from the same console:
+   ```
+   slotctl commit
+   ```
+   `slotctl status` then shows `slot a: good`. Add it to Home Assistant as after any install; the
+   key is in `backups/<serial>/home-assistant.key`.
+
 ## Lineage
 
 - [TECHO5](https://github.com/HuskerMinion/techo5) (MIT): the daemon (`echod`), the Linux image
