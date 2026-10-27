@@ -434,8 +434,9 @@ def main():
     def store_failed(what, o):
         extra = ''
         if console.gone:
-            extra = collect_evidence()
+            # Read before the evidence is collected: a run that reaches the unit again clears it.
             what = 'the Spot restarted, or its USB went away, while %s (%s).' % (what, console.gone)
+            extra = collect_evidence()
         else:
             what = '%s failed:\n%s' % (what, '   (no answer from the unit)' if o is None else o)
         fail('%s\n   The unit is in its rescue environment (RESCUE on its screen) and is not lost: finish the\n'
