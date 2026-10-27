@@ -47,7 +47,7 @@ import time
 import zipfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from techo5lib import (CONSOLE_TECHO5, Adb, Console, Fastboot, Release, alpine, ask_name, ask_wifi, wifi_conf,  # noqa: E402
+from techo5lib import (CONSOLE_TECHO5, Adb, Fail, Console, Fastboot, Release, alpine, ask_name, ask_wifi, wifi_conf,  # noqa: E402
                        check_serial_access, confirm, console_hint, default_dir, fail, head_is_android, md5,
                        need, new_api_key, note, pick_unit, repo_root, run_main, step, tar_extract_all,
                        valid_api_key, wait_for, write_private)
@@ -129,6 +129,41 @@ def spot_wifi_conf(lines):
     the same form the boot script writes from Android's saved networks."""
     kv = dict(line.split('=', 1) for line in lines.strip().split('\n'))
     return 'ctrl_interface=/run/wpa\nupdate_config=0\nnetwork={\n\tssid=%s\n\tpsk=%s\n}\n' % (kv['ssid'], kv['psk'])
+
+
+GOOD_LINEAGE = ('the LineageOS 18.1 build the getting started guide links (kernel 4.9.337); other builds carry '
+                'a Wi-Fi driver this kernel cannot load')
+
+
+def lineage_kernel_problem(uname, vermagic):
+    """Why this LineageOS build cannot be used, or None when it can. uname is `uname -r` over adb and
+    vermagic what the Wi-Fi module names (empty when it could not be read, which is not held against it)."""
+    uname = (uname or '').strip()
+    # Only a kernel version that is read and is another one refuses: adb answering oddly once is not a
+    # reason to stop an install the rescue console checks again later.
+    if re.match(r'\d+\.\d+\.\d+', uname) and not uname.startswith('4.9.337'):
+        return 'LineageOS here runs kernel %s, not 4.9.337: use %s' % (uname.split()[0], GOOD_LINEAGE)
+    if vermagic and 'vermagic=4.9.337' not in vermagic:
+        return ('the Wi-Fi driver in LineageOS here is built for %s, not 4.9.337: use %s'
+                % (vermagic.strip().split('=', 1)[-1], GOOD_LINEAGE))
+    return None
+
+
+def first_boot_state(out):
+    """What one console read says of the first boot: 'running' (slot a, daemon up), 'rescue' (the console
+    answers but no slot is running), 'bad' (a slot other than a, or a slot without its daemon), or 'gone'
+    (no answer, which a unit that now runs a full slot gives too)."""
+    if out is None:
+        return 'gone'
+    m = re.search(r'slot=(\S*)- daemon=(\d*)', out)
+    if not m:
+        return 'gone'
+    slot, daemon = m.groups()
+    if not slot:
+        return 'rescue'
+    if slot == 'a' and daemon:
+        return 'running'
+    return 'bad'
 
 
 def install_lineage(adb, zip_path):
@@ -255,6 +290,12 @@ def main():
             saved = adb.sh('grep -c PreSharedKey /data/misc/apexdata/com.android.wifi/WifiConfigStore.xml 2>/dev/null')
             if saved in ('', '0') and not a.wifi:
                 fail('LineageOS has no saved Wi-Fi network with a password: join one first, or give one with --wifi')
+            # Checked before anything is written: the TWRP path checks the same after its install.
+            vm = adb.sh('grep -a -o "vermagic=[^ ]*" /vendor/%s /system/vendor/%s 2>/dev/null | head -1'
+                        % (WIFI_MODULE[len('vendor/'):], WIFI_MODULE[len('vendor/'):])).split(':')[-1]
+            bad = lineage_kernel_problem(adb.sh('uname -r'), vm)
+            if bad:
+                fail(bad)
             note('rook, adb root, %s' % ('a saved Wi-Fi network' if saved not in ('', '0') else '--wifi for the network'))
         check_serial_access()
     a.name = ask_name(a.name, 'Echo Spot')
@@ -353,6 +394,7 @@ def main():
         shutil.rmtree(tmp, ignore_errors=True)
     adb.sh('chmod 600 /data/misc/techo5/name /data/misc/techo5/psk /data/misc/techo5/ssh/authorized_keys '
            '/data/techo5-linux/wpa_supplicant.conf 2>/dev/null')
+    note('pushing the root filesystem and checking it (about a minute or two)')
     tar_name = 'techo5-spot-rootfs-%s.tar.gz' % version
     uploads = [(rootfs, '/data/techo5-linux/' + tar_name)]
     if a.logo:
@@ -450,6 +492,7 @@ def main():
 
     # The vendor tree is this unit's own, from LineageOS: releases don't carry it. Kept on userdata
     # before the system partition is erased, then in the store.
+    note("saving LineageOS's vendor tree (up to a minute, nothing printed meanwhile)")
     o = console.run('touch /tmp/stay; tar -cf /data/techo5-linux/vendor.tar -C /android/system vendor && '
                     'tar -tf /data/techo5-linux/vendor.tar %s >/dev/null && echo VENDOR-SAVED' % WIFI_MODULE, 180)
     if 'VENDOR-SAVED' not in (o or ''):
@@ -467,9 +510,11 @@ def main():
         fail('the system partition could not be unmounted, so the slot store was not made (nothing was erased):\n%s\n'
              '   The unit is in its rescue environment (RESCUE on its screen). "fuser -vm /android" on its USB\n'
              '   console shows what holds it; run the installer again after that.' % ('   (no answer from the unit)' if o is None else o))
+    note('making the slot store: formatting the system partition (up to a few minutes, nothing printed meanwhile)')
     o = console.run(MKSTORE, 300)
     if 'MKSTORE-OK' not in (o or ''):
         store_failed('making the slot store', o)
+    note('unpacking the vendor tree, then the release into slot a (a few minutes, nothing printed meanwhile)')
     o = console.run('tar -xf /data/techo5-linux/vendor.tar -C /store && sync && [ -e /store/%s ] && echo VENDOR-OK' % WIFI_MODULE, 180)
     if 'VENDOR-OK' not in (o or ''):
         store_failed('putting the vendor tree into the store (it is kept in /data/techo5-linux/vendor.tar)', o)
@@ -510,9 +555,25 @@ def main():
 
     # ------------------------------------------------------------------------------------ 6. watch
     step('first boot')
-    wait_for('slot a with the daemon running', 300,
-             lambda: bool(re.search(r'slot=a- daemon=\d', console.run('echo slot=$(cat /run/techo5/slot 2>/dev/null)- daemon=$(pidof techo5)-', 4) or '')),
-             hint=console.waiting_hint)
+    seen = [None]
+    saw_slot = [False]
+
+    def first_boot_up():
+        seen[0] = console.run('echo slot=$(cat /run/techo5/slot 2>/dev/null)- daemon=$(pidof techo5)-', 4)
+        if 'slot=a-' in (seen[0] or ''):
+            saw_slot[0] = True
+        return first_boot_state(seen[0]) == 'running'
+    try:
+        wait_for('slot a with the daemon running', 300, first_boot_up, hint=console.waiting_hint)
+    except Fail:
+        # The console can go away once slot a runs (techo5#313), so no answer after slot a was seen is
+        # not a failure. Never seeing slot a, or a last answer from the rescue environment, is.
+        if not saw_slot[0] or first_boot_state(seen[0]) == 'rescue':
+            raise
+        print('\nThe unit booted slot a, then stopped answering on its USB console.\n'
+              "The install is probably done: check Home Assistant for the new ESPHome device, or the unit's setup page.")
+        print('When Home Assistant asks for the encryption key, paste:\n\n    %s\n\n(kept in %s)' % (psk, key_file))
+        return
     note('slot a booted, daemon running; giving it a minute')
     time.sleep(60)
     o = console.run('pidof techo5 >/dev/null && slotctl commit; slotctl status | head -5; ip -4 addr show wlan0 | grep -c inet; ls /sys/class/bluetooth 2>/dev/null', 15) or ''

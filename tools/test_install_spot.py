@@ -33,5 +33,24 @@ class SlotStoreCommands(unittest.TestCase):
         self.assertIn('tail -100 /data/techo5-linux/rescue.log', spot.EVIDENCE)
 
 
+class Followups(unittest.TestCase):
+    def test_lineage_kernel(self):
+        self.assertIsNone(spot.lineage_kernel_problem('4.9.337-lineage\n','vermagic=4.9.337 SMP'))
+        self.assertIsNone(spot.lineage_kernel_problem('4.9.337', ''))  # module unreadable: not held against it
+        self.assertIn('4.9.113', spot.lineage_kernel_problem('4.9.113', ''))
+        self.assertIsNone(spot.lineage_kernel_problem('', ''))  # nothing read: the console checks later
+        self.assertIsNone(spot.lineage_kernel_problem('error: closed', ''))
+        self.assertIn('4.14.1', spot.lineage_kernel_problem('4.9.337', 'vermagic=4.14.1 SMP'))
+
+    def test_first_boot_state(self):
+        f = spot.first_boot_state
+        self.assertEqual(f('slot=a- daemon=123-'), 'running')
+        self.assertEqual(f('slot=- daemon=-'), 'rescue')
+        self.assertEqual(f('slot=a- daemon=-'), 'bad')
+        self.assertEqual(f('slot=b- daemon=9-'), 'bad')
+        self.assertEqual(f(None), 'gone')
+        self.assertEqual(f(''), 'gone')
+
+
 if __name__ == '__main__':
     unittest.main()
