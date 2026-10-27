@@ -73,9 +73,13 @@ UNMOUNT_ANDROID = ('killall techo5 fbprobe 2>/dev/null; sleep 2; sync; umount /a
 MKSTORE = ('slotctl mkstore /dev/mmcblk0p11 --i-know-this-erases-it >/tmp/mkstore.log 2>&1 && sync && echo MKSTORE-OK; '
            'tail -3 /tmp/mkstore.log')
 # What to attach to the issue when the Spot restarts during the slot store.
-EVIDENCE = ('cat /sys/fs/pstore/console-ramoops* 2>/dev/null | tail -200; '
+# pstore is not mounted by the rescue init, so it is mounted first (harmless when it already is);
+# /proc/last_kmsg is where older kernels keep the same.
+EVIDENCE = ('mount -t pstore pstore /sys/fs/pstore 2>/dev/null; '
+            'cat /sys/fs/pstore/console-ramoops* /proc/last_kmsg 2>/dev/null | tail -200; '
             'echo ----- rescue.log; tail -100 /data/techo5-linux/rescue.log 2>/dev/null')
-EVIDENCE_BY_HAND = ('cat /sys/fs/pstore/console-ramoops* 2>/dev/null | tail -200\n'
+EVIDENCE_BY_HAND = ('mount -t pstore pstore /sys/fs/pstore 2>/dev/null\n'
+                    '   cat /sys/fs/pstore/console-ramoops* /proc/last_kmsg 2>/dev/null | tail -200\n'
                     '   tail -100 /data/techo5-linux/rescue.log')
 
 
@@ -453,7 +457,9 @@ def main():
             fail("the Spot restarted, or its USB went away, while saving LineageOS's vendor tree (%s).\n"
                  '   Nothing was erased yet: LineageOS comes back with fastboot flash boot %s.' % (console.gone, los_boot))
         fail("saving LineageOS's vendor tree failed (nothing was erased):\n%s" % o)
-    console.run(STOP_WIFI, 30)
+    o = console.run(STOP_WIFI, 30)
+    if console.gone:
+        store_failed('stopping Wi-Fi', o)
     o = console.run(UNMOUNT_ANDROID, 60)
     if 'UNMOUNTED' not in (o or ''):
         if console.gone:

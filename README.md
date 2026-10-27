@@ -143,7 +143,8 @@ If the Spot restarted by itself, also run these once it is back on the console, 
 print to the issue (the installer saves the same to `slot-store-restart.txt` in the unit's backup folder
 when it sees the unit come back):
 ```
-cat /sys/fs/pstore/console-ramoops* 2>/dev/null | tail -200
+mount -t pstore pstore /sys/fs/pstore 2>/dev/null
+cat /sys/fs/pstore/console-ramoops* /proc/last_kmsg 2>/dev/null | tail -200
 tail -100 /data/techo5-linux/rescue.log
 ```
 
