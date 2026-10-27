@@ -166,6 +166,13 @@ def first_boot_state(out):
     return 'bad'
 
 
+def first_boot_probably_up(saw_slot, last):
+    """Whether a first boot whose wait ran out is probably up all the same: slot a was seen, and then the
+    console went quiet, as it can once TECHO5 runs (techo5#313). A console still answering at the end
+    (slot a without its daemon, or the rescue environment) is a real failure."""
+    return saw_slot and first_boot_state(last) == 'gone'
+
+
 def install_lineage(adb, zip_path):
     """Format userdata and install the LineageOS zip from TWRP, without ever starting LineageOS: its
     system partition is where this unit's drivers come from, and its boot partition the boot image this
@@ -477,7 +484,7 @@ def main():
             f.write(text + '\n')
         return 'Attach this file to the issue (techo5-spot#11): %s' % out
 
-    def store_failed(what, o):
+    def store_failed(what, o, erased=True):
         extra = ''
         if console.gone:
             # Read before the evidence is collected: a run that reaches the unit again clears it.
@@ -485,6 +492,10 @@ def main():
             extra = collect_evidence()
         else:
             what = '%s failed:\n%s' % (what, '   (no answer from the unit)' if o is None else o)
+        if not erased:
+            # Before mkstore the system partition is whole: LineageOS is still there to go back to.
+            fail('%s\n   Nothing was erased yet: run the installer again, or put LineageOS back with\n'
+                 '   fastboot flash boot %s%s' % (what, los_boot, '\n   ' + extra if extra else ''))
         fail('%s\n   The unit is in its rescue environment (RESCUE on its screen) and is not lost: finish the\n'
              '   install by hand on its USB console, as "If the install stops at the slot store" in README.md\n'
              '   says (https://github.com/HuskerMinion/techo5-spot#if-the-install-stops-at-the-slot-store).%s'
@@ -502,11 +513,11 @@ def main():
         fail("saving LineageOS's vendor tree failed (nothing was erased):\n%s" % o)
     o = console.run(STOP_WIFI, 30)
     if console.gone:
-        store_failed('stopping Wi-Fi', o)
+        store_failed('stopping Wi-Fi', o, erased=False)
     o = console.run(UNMOUNT_ANDROID, 60)
     if 'UNMOUNTED' not in (o or ''):
         if console.gone:
-            store_failed('stopping Wi-Fi and unmounting the system partition', o)
+            store_failed('stopping Wi-Fi and unmounting the system partition', o, erased=False)
         fail('the system partition could not be unmounted, so the slot store was not made (nothing was erased):\n%s\n'
              '   The unit is in its rescue environment (RESCUE on its screen). "fuser -vm /android" on its USB\n'
              '   console shows what holds it; run the installer again after that.' % ('   (no answer from the unit)' if o is None else o))
@@ -568,7 +579,9 @@ def main():
     except Fail:
         # The console can go away once slot a runs (techo5#313), so no answer after slot a was seen is
         # not a failure. Never seeing slot a, or a last answer from the rescue environment, is.
-        if not saw_slot[0] or first_boot_state(seen[0]) == 'rescue':
+        # Only a console gone quiet counts: one still answering 'bad' (slot a without its daemon) or
+        # 'rescue' at the end is a real failure.
+        if not first_boot_probably_up(saw_slot[0], seen[0]):
             raise
         print('\nThe unit booted slot a, then stopped answering on its USB console.\n'
               "The install is probably done: check Home Assistant for the new ESPHome device, or the unit's setup page.")

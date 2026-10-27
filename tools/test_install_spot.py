@@ -51,6 +51,13 @@ class Followups(unittest.TestCase):
         self.assertEqual(f(None), 'gone')
         self.assertEqual(f(''), 'gone')
 
+    def test_first_boot_probably_up(self):
+        up = spot.first_boot_probably_up
+        self.assertTrue(up(True, None))                   # slot a seen, then the console went quiet
+        self.assertFalse(up(True, 'slot=a- daemon=-'))    # still answering: the daemon never started
+        self.assertFalse(up(True, 'slot=- daemon=-'))     # back in rescue
+        self.assertFalse(up(False, None))                 # slot a never seen
+
 
 if __name__ == '__main__':
     unittest.main()
