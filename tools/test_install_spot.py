@@ -9,6 +9,7 @@ sys.path.insert(0, here)
 spec = importlib.util.spec_from_file_location('install_spot', os.path.join(here, 'install-spot.py'))
 spot = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(spot)
+import techo5lib  # noqa: E402
 
 
 class SlotStoreCommands(unittest.TestCase):
@@ -29,8 +30,10 @@ class SlotStoreCommands(unittest.TestCase):
         self.assertLess(spot.MKSTORE.index('sync'), spot.MKSTORE.index('MKSTORE-OK'))
 
     def test_evidence_commands(self):
-        self.assertIn('console-ramoops*', spot.EVIDENCE)
-        self.assertIn('tail -100 /data/techo5-linux/rescue.log', spot.EVIDENCE)
+        # The restart evidence is techo5lib's, shared with the Show's installer.
+        self.assertIn('console-ramoops*', techo5lib.EVIDENCE)
+        self.assertIn('tail -100 /data/techo5-linux/rescue.log', techo5lib.EVIDENCE)
+        self.assertIs(spot.collect_evidence, techo5lib.collect_evidence)
 
 
 class Followups(unittest.TestCase):

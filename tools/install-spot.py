@@ -48,9 +48,9 @@ import zipfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from techo5lib import (CONSOLE_TECHO5, Adb, Fail, Console, Fastboot, Release, alpine, ask_name, ask_wifi, wifi_conf,  # noqa: E402
-                       check_serial_access, confirm, console_hint, default_dir, fail, head_is_android, md5,
-                       need, new_api_key, note, pick_unit, repo_root, run_main, step, tar_extract_all,
-                       valid_api_key, wait_for, write_private)
+                       check_serial_access, collect_evidence, confirm, console_hint, default_dir, fail,
+                       head_is_android, md5, need, new_api_key, note, pick_unit, repo_root, run_main, step,
+                       tar_extract_all, valid_api_key, wait_for, write_private)
 
 REPO = 'HuskerMinion/techo5-spot'
 WIFI_MODULE = 'vendor/lib/modules/amzn-bcmdhd.ko'
@@ -72,15 +72,6 @@ UNMOUNT_ANDROID = ('killall techo5 fbprobe 2>/dev/null; sleep 2; sync; umount /a
                    'mountpoint -q /android && echo STILL-MOUNTED || echo UNMOUNTED')
 MKSTORE = ('slotctl mkstore /dev/mmcblk0p11 --i-know-this-erases-it >/tmp/mkstore.log 2>&1 && sync && echo MKSTORE-OK; '
            'tail -3 /tmp/mkstore.log')
-# What to attach to the issue when the Spot restarts during the slot store.
-# pstore is not mounted by the rescue init, so it is mounted first (harmless when it already is);
-# /proc/last_kmsg is where older kernels keep the same.
-EVIDENCE = ('mount -t pstore pstore /sys/fs/pstore 2>/dev/null; '
-            'cat /sys/fs/pstore/console-ramoops* /proc/last_kmsg 2>/dev/null | tail -200; '
-            'echo ----- rescue.log; tail -100 /data/techo5-linux/rescue.log 2>/dev/null')
-EVIDENCE_BY_HAND = ('mount -t pstore pstore /sys/fs/pstore 2>/dev/null\n'
-                    '   cat /sys/fs/pstore/console-ramoops* /proc/last_kmsg 2>/dev/null | tail -200\n'
-                    '   tail -100 /data/techo5-linux/rescue.log')
 
 
 def build_boot_image(rescue, lineage_boot, alpine_tgz, kernel, out):
@@ -466,30 +457,13 @@ def main():
     # Past this point the system partition is erased, so a step that stops leaves the unit in its rescue
     # environment, to be finished by hand. A unit that restarts mid-step (techo5-spot#11) takes its
     # console with it; that is said as such, rather than after the whole wait as "None".
-    def collect_evidence():
-        # The unit restarted: when it is back on the rescue console, the kernel's last console lines
-        # (pstore) and the rescue log are what show why. Saved next to the backups; said if it cannot.
-        out = os.path.join(backup, 'slot-store-restart.txt')
-        note('waiting up to 3 minutes for the unit to come back, to read why it restarted')
-        text = None
-        deadline = time.time() + 180
-        while time.time() < deadline and text is None:
-            text = console.run(EVIDENCE, 20)
-            if text is None:
-                time.sleep(5)
-        if text is None:
-            return ('The unit did not come back on its console in time. Once it has, collect these by hand\n'
-                    '   on its USB console and attach them to the issue:\n   ' + EVIDENCE_BY_HAND)
-        with open(out, 'w', encoding='utf-8') as f:
-            f.write(text + '\n')
-        return 'Attach this file to the issue (techo5-spot#11): %s' % out
-
     def store_failed(what, o, erased=True):
         extra = ''
         if console.gone:
             # Read before the evidence is collected: a run that reaches the unit again clears it.
             what = 'the Spot restarted, or its USB went away, while %s (%s).' % (what, console.gone)
-            extra = collect_evidence()
+            # The kernel's last console lines (pstore) and the rescue log show why; kept with the backups.
+            extra = collect_evidence(console, backup, 'slot-store-restart.txt')
         else:
             what = '%s failed:\n%s' % (what, '   (no answer from the unit)' if o is None else o)
         if not erased:
