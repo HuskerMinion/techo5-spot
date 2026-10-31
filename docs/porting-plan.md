@@ -32,8 +32,8 @@ What carries over:
 - **Image**: TECHO5's layout as it is. Kernel + initramfs rescue in `boot`, rootfs slots as directories
   on the `system` partition, TWRP left in `recovery`, state on `userdata`. `slotctl`, trial boots and
   the rescue environment unchanged. With 2 GB of RAM there is no memory pressure to design around.
-- **Daemon**: one source. TECHO5's `echod` today has two builds, the default (cronos, screen) and
-  `dot` (no screen). The Spot needs a third, `spot`: the screen, touch and camera code of the default
+- **Daemon**: one source. TECHO5's `echod` has three builds: the default (Show; cronos, screen),
+  `dot` (no screen) and `spot` (done). The Spot's build has the screen, touch and camera code of the default
   build, with its own microphone device and channel map, button codes, backlight path and mixer
   sequences. The display code learns a round 480×480 canvas (see "The round screen"). Changes land in
   TECHO5's `echod`, not here.
@@ -219,16 +219,15 @@ watched to healthy).
 rooted adb, backed up) to TECHO5 Linux in slot a: checks, capture (the unit's LineageOS boot image and
 vendor tree), build (kernel once, boot image, root filesystem, optional logo), provision (name, ESPHome
 key, uploads checked by md5), flash `boot`, then over the USB serial console (`tools/serial-console.ps1`,
-which finds the unit by serial) the slot store, the install and the logo, and the first boot watched to a
-committed slot. Its build phase (`-BuildOnly -Logo`) is tested and reproduces the logo bytes the first
-unit boots with; the phases that touch a unit repeat what was done by hand on the first one but have not
-run end to end, since that unit is already converted. Run it with someone watching on the next Spot.
+which finds the unit by serial; this script has since been replaced by `tools/install-spot.py`) the slot store, the install and the logo, and the first boot watched to a
+committed slot. Its build phase (now `tools/install-spot.py --build-only --logo`) is tested and reproduces the logo bytes the first
+unit boots with; the phases that touch a unit repeat what was done by hand on the first one but had not
+run end to end then, since that unit was already converted (past; see the next entry).
 
 **2026-09-17:** rewritten in Python (the same on Windows, Linux and macOS) and taking the signed release
 instead of building: the root filesystem, Bluetooth kernel and rescue bundle are downloaded and checked,
 and the boot image is built from them. Rehearsed end to end, logo included, against a simulated unit (an
-Alpine root standing in for the Spot, with the real `slotctl` and the real release). The first real unit
-should still be watched.
+Alpine root standing in for the Spot, with the real `slotctl` and the real release). (Watching the first real unit was the plan; that is past.)
 
 ## The round screen
 

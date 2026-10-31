@@ -90,7 +90,10 @@ bash tools/linux/build-kernel.sh -o inputs/Image.gz-dtb-rook-bt
 ## 5. The root filesystem
 
 From techo5, with this repository's overlay and inputs. Its `bin/` needs `tailscaled-arm64` and
-`tailscaled-arm64.LICENSE` first (techo5's `tools/linux/build-tailscaled.sh`), as every image carries them:
+`tailscaled-arm64.LICENSE` first (techo5's `tools/linux/build-tailscaled.sh`), as every image carries them.
+AirPlay 2 and Spotify Connect need techo5's `build-shairport-sync.sh` output (`techo5-shairport-sync-arm`
+and `techo5-nqptp-arm`, required by `deploy-rootfs.sh`) and `build-librespot.sh` output
+(`techo5-librespot-arm`) in its `bin/` too:
 
 ```
 export BUILD_TAGS=spot DEVICE_OVERLAY=../techo5-spot/tools/linux/rootfs TECHO5_INPUTS=../techo5-spot/inputs
@@ -139,7 +142,10 @@ lists are brought up to date (and tested) before a release.
 pwsh ./tools/release-spot.ps1 -Version v0.3.0 -Rootfs <root filesystem tarball> -Notes "..." -DryRun
 ```
 
-A PowerShell script for the maintainer's Windows machine: it checks the tarball's version and that it
+A PowerShell script for the maintainer's Windows machine. A real release (not `-DryRun`) needs
+`-ThirdPartySources`, the archive from techo5's `tools/linux/third-party-sources.sh`, published as
+`techo5-third-party-sources.tar.gz`; it also refuses a root filesystem without the AirPlay and Spotify
+receivers. The script checks the tarball's version and that it
 carries no vendor tree, takes the daemon out of it, and publishes the Bluetooth kernel and the rescue
 bundle (packages, busybox, TECHO5's tools and `mkimage.py`), from which the installer builds each
 Spot's boot image. The manifest names all of them, with their sha256 and size, and is signed with
