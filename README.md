@@ -51,6 +51,21 @@ ring menu, Bluetooth audio, calls, AirPlay and Spotify Connect, and signed updat
   plays to over AirPlay 2, grouped with other AirPlay 2 speakers, or the Spotify app over Spotify
   Connect. Both are off until you turn them on, in Home Assistant or on the setup page. Setup is in
   TECHO5's [docs/setup.md](https://github.com/HuskerMinion/techo5/blob/main/docs/setup.md#5-music).
+- **Your language** (spot-v1.4.23): the ring menu, calls, music, weather, alarm and settings text comes
+  from TECHO5's language catalogs, and the menu's hints and the settings rows shrink, then wrap, to fit
+  the round screen before anything is cut. Pick the language with **Screen language**.
+- **Speaking right after the wake word**: with echo cancellation on, the microphones stay open while
+  the wake sound plays, so a request in one breath works.
+- **Baby monitor**: a private link plays the room's sound live in a phone's browser. Off until you turn it
+  on in Privacy & Security; the screen shows when someone is listening, and the mute switch stops it.
+  Setup is in TECHO5's [docs/setup.md](https://github.com/HuskerMinion/techo5/blob/main/docs/setup.md#the-baby-monitor).
+- **Sounds and volumes of your own**: the volume, button, Bluetooth, listening-ended and Drop In sounds can
+  be your recordings, **Voice volume** and **Call volume** sit a few steps above or below the music
+  volume, and spoken replies can play on any Home Assistant media player. See
+  [Sounds of your own](https://github.com/HuskerMinion/techo5/blob/main/docs/setup.md#sounds-of-your-own) and
+  [Voice volume and call volume](https://github.com/HuskerMinion/techo5/blob/main/docs/setup.md#voice-volume-and-call-volume).
+- **Home Assistant extras**: a fan's tile on a drawn dashboard sets its speed when you slide along it, and the
+  Bluetooth proxy can pair devices such as Hue bulbs.
 - **Updates** come from this repository's
   [releases](https://github.com/HuskerMinion/techo5-spot/releases), signed, through Home Assistant's
   update card into the spare slot; [tools/release-spot.ps1](tools/release-spot.ps1) publishes one
