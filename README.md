@@ -59,11 +59,17 @@ ring menu, Bluetooth audio, calls, AirPlay and Spotify Connect, and signed updat
 - **Baby monitor**: a private link plays the room's sound live in a phone's browser. Off until you turn it
   on in Privacy & Security; the screen shows when someone is listening, and the mute switch stops it.
   Setup is in TECHO5's [docs/setup.md](https://github.com/HuskerMinion/techo5/blob/main/docs/setup.md#the-baby-monitor).
-- **Sounds and volumes of your own**: the volume, button, Bluetooth, listening-ended and Drop In sounds can
+- **Sounds and volumes of your own**: the volume, button, Bluetooth, listening-ended, Drop In and announcement sounds can
   be your recordings, **Voice volume** and **Call volume** sit a few steps above or below the music
   volume, and spoken replies can play on any Home Assistant media player. See
   [Sounds of your own](https://github.com/HuskerMinion/techo5/blob/main/docs/setup.md#sounds-of-your-own) and
   [Voice volume and call volume](https://github.com/HuskerMinion/techo5/blob/main/docs/setup.md#voice-volume-and-call-volume).
+- **Snapcast and your own Headscale** (spot-v1.4.26): the Spot can play in step with a Snapcast server's other
+  speakers, and Tailscale can join a Headscale server you run. The **Baby monitor light** keeps the
+  listening mark dim or off for a dark nursery.
+- **Call on a wake word** (spot-v1.4.28): a wake word can call a phone book contact. Off by default; see
+  TECHO5's [docs/phone.md](https://github.com/HuskerMinion/techo5/blob/main/docs/phone.md).
+- **Everything else new** in the daemon is in TECHO5's [What's new](https://github.com/HuskerMinion/techo5#whats-new).
 - **Home Assistant extras**: a fan's tile on a drawn dashboard sets its speed when you slide along it, and the
   Bluetooth proxy can pair devices such as Hue bulbs.
 - **Updates** come from this repository's
