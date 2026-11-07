@@ -201,13 +201,20 @@ def install_lineage(adb, zip_path):
     note('Wi-Fi driver built for kernel %s' % out.strip().split('=', 1)[1])
 
 
+EMPTY_WIFI_CONF = 'ctrl_interface=/run/wpa\nupdate_config=0\n'
+
+
 def provision_files(gift, name, psk, pub, wifi):
     """What goes into the state directory (layout.StateDir, /data/misc/techo5), as (path, text). A gift
     install leaves an empty "firstrun" instead of a name and key, so the Spot starts its own setup."""
-    files = [('firstrun', '')] if gift else [('name', name), ('psk', psk)]
+    if gift:
+        # No network in the configuration: LineageOS's saved ones are not imported at the first boot.
+        files = [('firstrun', ''), ('../../techo5-linux/wpa_supplicant.conf', EMPTY_WIFI_CONF)]
+    else:
+        files = [('name', name), ('psk', psk)]
     if pub:
         files.append(('ssh/authorized_keys', pub + '\n'))
-    if wifi:
+    if wifi and not gift:
         files.append(('../../techo5-linux/wpa_supplicant.conf', wifi))
     return files
 
@@ -409,6 +416,9 @@ def main():
     tmp = os.path.join(a.work, 'provision-' + a.serial)
     os.makedirs(tmp, mode=0o700, exist_ok=True)  # the key and the Wi-Fi key pass through it
     try:
+        if gift:
+            # Nothing of the giver's stays: no name or key from an earlier install, no saved network.
+            adb.sh('rm -f /data/misc/techo5/name /data/misc/techo5/psk /data/techo5-linux/wifi.conf')
         files = provision_files(gift, a.name, psk, pub, wifi)
         for remote, text in files:
             local = os.path.join(tmp, remote.replace('/', '_'))

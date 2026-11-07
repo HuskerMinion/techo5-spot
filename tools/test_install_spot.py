@@ -81,15 +81,26 @@ class GiftInstall(unittest.TestCase):
             self.assertIn(extra[0], err, extra)
 
     def test_gift_writes_only_the_marker(self):
-        self.assertEqual(spot.provision_files(True, None, None, None, None), [('firstrun', '')])
+        files = dict(spot.provision_files(True, None, None, None, None))
+        self.assertEqual(sorted(files), ['../../techo5-linux/wpa_supplicant.conf', 'firstrun'])
+        self.assertEqual(files['firstrun'], '')
+        # a configuration with no network, so LineageOS's saved ones are not imported at the first boot
+        self.assertNotIn('network={', files['../../techo5-linux/wpa_supplicant.conf'])
+        self.assertIn('ctrl_interface', files['../../techo5-linux/wpa_supplicant.conf'])
 
     def test_gift_still_takes_an_ssh_key(self):
         self.assertEqual(spot.provision_files(True, None, None, 'ssh-ed25519 AAAA', None),
-                         [('firstrun', ''), ('ssh/authorized_keys', 'ssh-ed25519 AAAA\n')])
+                         [('firstrun', ''), ('../../techo5-linux/wpa_supplicant.conf', spot.EMPTY_WIFI_CONF),
+                          ('ssh/authorized_keys', 'ssh-ed25519 AAAA\n')])
 
     def test_usual_install_writes_name_and_key_and_no_marker(self):
         files = spot.provision_files(False, 'Kitchen', 'KEY', None, None)
         self.assertEqual(files, [('name', 'Kitchen'), ('psk', 'KEY')])
+
+    def test_gift_clears_an_earlier_name_key_and_network(self):
+        with open(os.path.join(here, 'install-spot.py'), encoding='utf-8') as f:
+            src = f.read()
+        self.assertIn("rm -f /data/misc/techo5/name /data/misc/techo5/psk /data/techo5-linux/wifi.conf", src)
 
     def test_gift_needs_no_wifi_from_twrp(self):
         # without --for-someone-else, TWRP says --wifi is needed; with it, the check is skipped
