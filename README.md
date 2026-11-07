@@ -88,6 +88,16 @@ rather than A/B slots. It differs in the radio: Wi-Fi and Bluetooth are a **Broa
 over USB with the `bcmdhd` driver and Bluetooth over a UART, so neither the Show's `mt76x8` modules nor
 the Dot's `wmtup` apply. It has about 2 GB of RAM, more than either.
 
+## Giving it to someone else
+
+Add `--for-someone-else` to install a Spot that is going to another person:
+
+```
+python3 tools/install-spot.py --for-someone-else
+```
+
+It asks for no Wi-Fi network, name or key, and writes none. The Spot starts its own setup the next time it is powered on, and the new owner's Home Assistant can add it with nothing typed. Everything else (backups, image, first boot) is the same. It cannot be used with `--name`, `--wifi` or `--key-file`.
+
 ## Using it
 
 The Spot has no swipe-down settings or swipe-in camera like the Show. Everything is on the ring menu.

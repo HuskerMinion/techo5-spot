@@ -62,5 +62,40 @@ class Followups(unittest.TestCase):
         self.assertFalse(up(False, None))                 # slot a never seen
 
 
+class GiftInstall(unittest.TestCase):
+    def run_main(self, *argv):
+        old = sys.argv
+        sys.argv = ['install-spot.py'] + list(argv)
+        try:
+            spot.main()
+        except techo5lib.Fail as e:
+            return str(e)
+        finally:
+            sys.argv = old
+
+    def test_cannot_be_combined_with_name_wifi_or_key(self):
+        for extra in (['--name', 'Kitchen'], ['--wifi', 'Net'], ['--wifi-passphrase-file', 'p.txt'],
+                      ['--key-file', 'k.key']):
+            err = self.run_main('--for-someone-else', *extra)
+            self.assertIn('--for-someone-else', err or '', extra)
+            self.assertIn(extra[0], err, extra)
+
+    def test_gift_writes_only_the_marker(self):
+        self.assertEqual(spot.provision_files(True, None, None, None, None), [('firstrun', '')])
+
+    def test_gift_still_takes_an_ssh_key(self):
+        self.assertEqual(spot.provision_files(True, None, None, 'ssh-ed25519 AAAA', None),
+                         [('firstrun', ''), ('ssh/authorized_keys', 'ssh-ed25519 AAAA\n')])
+
+    def test_usual_install_writes_name_and_key_and_no_marker(self):
+        files = spot.provision_files(False, 'Kitchen', 'KEY', None, None)
+        self.assertEqual(files, [('name', 'Kitchen'), ('psk', 'KEY')])
+
+    def test_gift_needs_no_wifi_from_twrp(self):
+        # without --for-someone-else, TWRP says --wifi is needed; with it, the check is skipped
+        with open(os.path.join(here, 'install-spot.py'), encoding='utf-8') as f:
+            self.assertIn("if not a.wifi and not gift:", f.read())
+
+
 if __name__ == '__main__':
     unittest.main()

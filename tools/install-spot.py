@@ -5,12 +5,17 @@
     python3 tools/install-spot.py
     python3 tools/install-spot.py --serial <serial> --name Kitchen --build-only
     python3 tools/install-spot.py --serial <serial> --name Kitchen --force
+    python3 tools/install-spot.py --serial <serial> --for-someone-else
     python3 tools/install-spot.py --lineage-zip lineage-18.1-...-rook.zip --wifi MyNetwork
 
 From TWRP (--lineage-zip), a unit fresh from its unlock never has to start LineageOS: the installer backs
 the unit up (backup-spot.py), formats userdata, installs the LineageOS zip from TWRP only for the drivers
 on its system partition and the boot image it builds from, and goes on from there. The Spot has no Wi-Fi
 page of its own, so --wifi is needed from TWRP.
+
+--for-someone-else is for a Spot you are giving away. It asks for no Wi-Fi network, name or key, writes none,
+and marks the Spot to start its own setup when it is next powered on; the new owner's Home Assistant can then
+add it with nothing typed. It cannot be used with --name, --wifi, --wifi-passphrase-file or --key-file.
 
 Run with nothing, it finds the unit (asking which, when there are several), asks for a name, and asks
 once before anything is erased. Every question has a switch, for running it from a script.
@@ -47,7 +52,7 @@ import time
 import zipfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from techo5lib import (CONSOLE_TECHO5, Adb, Fail, Console, Fastboot, Release, alpine, ask_name, ask_wifi, wifi_conf,  # noqa: E402
+from techo5lib import (CONSOLE_TECHO5, Adb, Fail, Console, Fastboot, Release, alpine, ask_name, ask_wifi, check_gift, wifi_conf,  # noqa: E402
                        check_serial_access, collect_evidence, confirm, console_hint, default_dir, fail,
                        head_is_android, md5, need, new_api_key, note, pick_unit, repo_root, run_main, step,
                        tar_extract_all, valid_api_key, wait_for, write_private)
@@ -196,6 +201,21 @@ def install_lineage(adb, zip_path):
     note('Wi-Fi driver built for kernel %s' % out.strip().split('=', 1)[1])
 
 
+def provision_files(gift, name, psk, pub, wifi):
+    """What goes into the state directory (layout.StateDir, /data/misc/techo5), as (path, text). A gift
+    install leaves an empty "firstrun" instead of a name and key, so the Spot starts its own setup."""
+    files = [('firstrun', '')] if gift else [('name', name), ('psk', psk)]
+    if pub:
+        files.append(('ssh/authorized_keys', pub + '\n'))
+    if wifi:
+        files.append(('../../techo5-linux/wpa_supplicant.conf', wifi))
+    return files
+
+
+GIFT_DONE = ("This Spot will start its own setup when it is next powered on.\n"
+             "Its owner's Home Assistant can add it with nothing typed.")
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('--serial', help="the unit's adb serial (adb devices); found, or asked for, when missing")
@@ -210,6 +230,8 @@ def main():
     ap.add_argument('--lineage-zip', help='install from TWRP: the LineageOS 18.1 zip for rook, installed only for its drivers')
     ap.add_argument('--wifi', help="a Wi-Fi network to join (its passphrase is asked for); needed from TWRP, since the Spot has no Wi-Fi page")
     ap.add_argument('--wifi-passphrase-file', help='a file holding the --wifi passphrase, for running from a script')
+    ap.add_argument('--for-someone-else', action='store_true',
+                    help='a gift install: no Wi-Fi, name or key is asked for or written; the Spot starts its own setup when next powered on')
     ap.add_argument('--build-only', action='store_true', help='build the boot image and stop; write nothing to the unit')
     ap.add_argument('--force', action='store_true', help='do not ask before erasing LineageOS')
     ap.add_argument('--backups', default=default_dir('TECHO5_BACKUPS', 'backups'))
@@ -217,6 +239,9 @@ def main():
     ap.add_argument('--adb', default='adb')
     ap.add_argument('--fastboot', default='fastboot')
     a = ap.parse_args()
+    check_gift(a, **{'--name': a.name, '--wifi': a.wifi, '--wifi-passphrase-file': a.wifi_passphrase_file,
+                     '--key-file': a.key_file})
+    gift = a.for_someone_else
 
     if not (a.build_only and a.serial):
         need(a.adb, 'install the Android platform tools (adb and fastboot)')
@@ -226,7 +251,7 @@ def main():
             fail('no file at %s' % a.lineage_zip)
         if a.build_only:
             fail('--build-only builds from a LineageOS unit\'s boot image; from TWRP, run without it')
-        if not a.wifi:
+        if not a.wifi and not gift:
             fail('from TWRP the Spot needs --wifi: it has no Wi-Fi page of its own, and no LineageOS network to carry over')
     a.serial = pick_unit(a.serial, a.adb, ('recovery',) if twrp else ('device',), 'Echo Spot', consoles=(CONSOLE_TECHO5,))
     if a.name is not None:
@@ -286,7 +311,7 @@ def main():
             if not adb.sh('id').startswith('uid=0'):
                 fail('adb is not root: turn on Rooted debugging in Developer options')
             saved = adb.sh('grep -c PreSharedKey /data/misc/apexdata/com.android.wifi/WifiConfigStore.xml 2>/dev/null')
-            if saved in ('', '0') and not a.wifi:
+            if saved in ('', '0') and not a.wifi and not gift:
                 fail('LineageOS has no saved Wi-Fi network with a password: join one first, or give one with --wifi')
             # Checked before anything is written: the TWRP path checks the same after its install.
             vm = adb.sh('grep -a -o "vermagic=[^ ]*" /vendor/%s /system/vendor/%s 2>/dev/null | head -1'
@@ -296,8 +321,12 @@ def main():
                 fail(bad)
             note('rook, adb root, %s' % ('a saved Wi-Fi network' if saved not in ('', '0') else '--wifi for the network'))
         check_serial_access()
-    a.name = ask_name(a.name, 'Echo Spot')
-    note("name in Home Assistant: '%s'" % a.name)
+    if gift:
+        note('gift install: no name, Wi-Fi network or Home Assistant key is asked for or written')
+    else:
+        a.name = ask_name(a.name, 'Echo Spot')
+        note("name in Home Assistant: '%s'" % a.name)
+    as_name = "as '%s'" % a.name if a.name else 'as a gift'
     wifi = None
     if a.wifi:
         if a.wifi_passphrase_file:
@@ -324,7 +353,7 @@ def main():
     if twrp:
         # From TWRP the first thing written is userdata, so the one question comes before it.
         confirm(a.force, [
-            "About to install TECHO5 Spot on %s as '%s', from TWRP." % (a.serial, a.name),
+            "About to install TECHO5 Spot on %s %s, from TWRP." % (a.serial, as_name),
             "This formats userdata (Fire OS's data), installs LineageOS for its drivers without starting it,",
             "flashes TECHO5's boot image, then erases the system partition (mmcblk0p11) to make the slot store.",
         ])
@@ -363,7 +392,10 @@ def main():
 
     # ------------------------------------------------------------------------------------ 3. provision
     step('provision')
-    if os.path.exists(key_file):
+    psk = None
+    if gift:
+        pass
+    elif os.path.exists(key_file):
         with open(key_file) as f:
             psk = f.read().strip()
         if not valid_api_key(psk):
@@ -377,9 +409,7 @@ def main():
     tmp = os.path.join(a.work, 'provision-' + a.serial)
     os.makedirs(tmp, mode=0o700, exist_ok=True)  # the key and the Wi-Fi key pass through it
     try:
-        files = [('name', a.name), ('psk', psk)] + ([('ssh/authorized_keys', pub + '\n')] if pub else [])
-        if wifi:
-            files.append(('../../techo5-linux/wpa_supplicant.conf', wifi))
+        files = provision_files(gift, a.name, psk, pub, wifi)
         for remote, text in files:
             local = os.path.join(tmp, remote.replace('/', '_'))
             with open(local, 'w', encoding='utf-8', newline='\n') as f:
@@ -407,7 +437,7 @@ def main():
     # Asked here, once, rather than halfway through the store: the flash is where the unit stops being
     # a LineageOS unit, so this is the last moment a "no" leaves it as it was.
     confirm(a.force or twrp, [
-        "About to install TECHO5 Spot %s on %s as '%s'." % (version, a.serial, a.name),
+        "About to install TECHO5 Spot %s on %s %s." % (version, a.serial, as_name),
         "This flashes TECHO5's boot image, then erases LineageOS's system partition (mmcblk0p11) to",
         'make the slot store. The way back: fastboot flash boot %s, and restore system from TWRP.' % los_boot,
     ])
@@ -559,7 +589,10 @@ def main():
             raise
         print('\nThe unit booted slot a, then stopped answering on its USB console.\n'
               "The install is probably done: check Home Assistant for the new ESPHome device, or the unit's setup page.")
-        print('When Home Assistant asks for the encryption key, paste:\n\n    %s\n\n(kept in %s)' % (psk, key_file))
+        if not gift:
+            print('When Home Assistant asks for the encryption key, paste:\n\n    %s\n\n(kept in %s)' % (psk, key_file))
+        else:
+            print(GIFT_DONE)
         return
     note('slot a booted, daemon running; giving it a minute')
     time.sleep(60)
@@ -569,8 +602,12 @@ def main():
     if 'committed' not in o and 'already good' not in o:
         fail('the slot was not marked good: check the daemon log (/data/techo5-linux/techo5.log)')
 
-    print("\nDone. '%s' runs TECHO5 Spot %s from slot a." % (a.name, version))
-    print('Home Assistant finds it as an ESPHome device. When it asks for the encryption key, paste:\n\n    %s\n\n(kept in %s)' % (psk, key_file))
+    if gift:
+        print('\nDone. TECHO5 Spot %s is on slot a.' % version)
+        print(GIFT_DONE)
+    else:
+        print("\nDone. '%s' runs TECHO5 Spot %s from slot a." % (a.name, version))
+        print('Home Assistant finds it as an ESPHome device. When it asks for the encryption key, paste:\n\n    %s\n\n(kept in %s)' % (psk, key_file))
     print("Later versions arrive through Home Assistant's update card.")
 
 
