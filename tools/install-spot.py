@@ -247,7 +247,7 @@ def main():
     ap.add_argument('--fastboot', default='fastboot')
     a = ap.parse_args()
     check_gift(a, **{'--name': a.name, '--wifi': a.wifi, '--wifi-passphrase-file': a.wifi_passphrase_file,
-                     '--key-file': a.key_file})
+                     '--key-file': a.key_file, '--ssh-key': a.ssh_key})
     gift = a.for_someone_else
 
     if not (a.build_only and a.serial):
