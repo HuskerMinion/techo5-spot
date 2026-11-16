@@ -124,7 +124,7 @@ def spot_wifi_conf(lines):
     """A wpa_supplicant configuration from wifi_conf's two lines (the name and WPA's key, both as hex):
     the same form the boot script writes from Android's saved networks."""
     kv = dict(line.split('=', 1) for line in lines.strip().split('\n'))
-    return 'ctrl_interface=/run/wpa\nupdate_config=0\nnetwork={\n\tssid=%s\n\tpsk=%s\n}\n' % (kv['ssid'], kv['psk'])
+    return 'ctrl_interface=/run/wpa\nupdate_config=0\nnetwork={\n\tssid=%s\n\tscan_ssid=1\n\tpsk=%s\n}\n' % (kv['ssid'], kv['psk'])
 
 
 GOOD_LINEAGE = ('the LineageOS 18.1 build the getting started guide links (kernel 4.9.337); other builds carry '
