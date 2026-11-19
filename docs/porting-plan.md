@@ -32,6 +32,11 @@ What carries over:
 - **Image**: TECHO5's layout as it is. Kernel + initramfs rescue in `boot`, rootfs slots as directories
   on the `system` partition, TWRP left in `recovery`, state on `userdata`. `slotctl`, trial boots and
   the rescue environment unchanged. With 2 GB of RAM there is no memory pressure to design around.
+  The root filesystem is TECHO5's with this repository's overlay (`tools/linux/rootfs`), so the Spot
+  boots with TECHO5's own `etc/techo5/boot.sh`, its userdata mounted at `/data` and its logs in
+  `/data/techo5-linux` as on the Show. That includes an owner's executable
+  `/data/techo5-linux/rc.local`, started at the end of every boot (from spot-v1.4.30): see TECHO5's
+  [docs/setup.md](https://github.com/HuskerMinion/techo5/blob/main/docs/setup.md#running-something-of-your-own-at-boot).
 - **Daemon**: one source. TECHO5's `echod` has three builds: the default (Show; cronos, screen),
   `dot` (no screen) and `spot` (done). The Spot's build has the screen, touch and camera code of the default
   build, with its own microphone device and channel map, button codes, backlight path and mixer

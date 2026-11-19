@@ -69,6 +69,10 @@ ring menu, Bluetooth audio, calls, AirPlay and Spotify Connect, and signed updat
   listening mark dim or off for a dark nursery.
 - **Call on a wake word** (spot-v1.4.28): a wake word can call a phone book contact. Off by default; see
   TECHO5's [docs/phone.md](https://github.com/HuskerMinion/techo5/blob/main/docs/phone.md).
+- **Something of your own at boot** (spot-v1.4.30): an executable `/data/techo5-linux/rc.local` is started
+  at the end of every boot, in the background, with its output in `rc.local.log`. Nothing runs unless
+  you put it there; see TECHO5's
+  [docs/setup.md](https://github.com/HuskerMinion/techo5/blob/main/docs/setup.md#running-something-of-your-own-at-boot).
 - **Everything else new** in the daemon is in TECHO5's [What's new](https://github.com/HuskerMinion/techo5#whats-new).
 - **Home Assistant extras**: a fan's tile on a drawn dashboard sets its speed when you slide along it, and the
   Bluetooth proxy can pair devices such as Hue bulbs.
