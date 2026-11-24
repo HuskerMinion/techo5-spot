@@ -72,9 +72,12 @@ To try it on a Spot already running TECHO5 (SSH switch on in Home Assistant, wit
 `ssh_keys`), bind it in place until the next reboot:
 
 ```
-scp bin/echod-arm-spot root@<address>:/tmp/echod-test
-ssh root@<address> 'mount --bind /tmp/echod-test /usr/local/bin/techo5 && killall techo5'
+scp bin/echod-arm-spot root@<address>:/run/echod-test
+ssh root@<address> 'mount --bind /run/echod-test /usr/local/bin/techo5 && killall techo5'
 ```
+
+It goes in `/run`, which is memory, root's alone and not capped, rather than `/tmp`: TECHO5 bounds `/tmp` at
+32 MB, which is less than a daemon, and anyone on the device can write to it.
 
 ## 4. The Bluetooth kernel (Linux)
 
